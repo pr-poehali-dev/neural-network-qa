@@ -24,26 +24,31 @@ def extract_text_from_file(file_content: bytes, file_name: str) -> str:
     else:
         return file_content.decode('utf-8', errors='ignore')[:10000]
 
-def call_together(message: str, api_key: str) -> str:
-    url = "https://api.together.xyz/v1/chat/completions"
+def call_huggingface(message: str, api_key: str) -> str:
+    url = "https://api-inference.huggingface.co/models/meta-llama/Llama-3.2-3B-Instruct"
     headers = {
         "Authorization": f"Bearer {api_key}",
         "Content-Type": "application/json"
     }
     payload = {
-        "model": "meta-llama/Llama-3.3-70B-Instruct-Turbo",
-        "messages": [
-            {"role": "system", "content": "Ты Богдан ИИ - умный помощник. Отвечай кратко и точно на русском языке."},
-            {"role": "user", "content": message}
-        ],
-        "temperature": 0.7,
-        "max_tokens": 1500
+        "inputs": message,
+        "parameters": {
+            "max_new_tokens": 800,
+            "temperature": 0.7,
+            "top_p": 0.9,
+            "return_full_text": False
+        }
     }
     
-    response = requests.post(url, headers=headers, json=payload, timeout=25)
+    response = requests.post(url, headers=headers, json=payload, timeout=30)
     response.raise_for_status()
     result = response.json()
-    return result['choices'][0]['message']['content']
+    
+    if isinstance(result, list) and len(result) > 0:
+        return result[0].get('generated_text', '')
+    elif isinstance(result, dict) and 'generated_text' in result:
+        return result['generated_text']
+    return str(result)
 
 def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     '''
@@ -86,15 +91,15 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             'body': json.dumps({'error': 'Message is required'})
         }
     
-    together_key = os.environ.get('TOGETHER_API_KEY')
+    hf_key = os.environ.get('HUGGINGFACE_API_KEY')
     database_url = os.environ.get('DATABASE_URL')
     
-    if not together_key:
+    if not hf_key:
         return {
             'statusCode': 500,
             'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
             'isBase64Encoded': False,
-            'body': json.dumps({'error': 'TOGETHER_API_KEY не установлен. Получите бесплатно $25 кредитов на https://api.together.xyz'})
+            'body': json.dumps({'error': 'HUGGINGFACE_API_KEY не установлен. Получите бесплатно на https://huggingface.co/settings/tokens'})
         }
     
     file_context = ""
@@ -120,8 +125,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     
     full_message = user_message + file_context
     
-    ai_response = call_together(full_message, together_key)
-    model_used = "Together AI (Llama 3.3 70B)"
+    ai_response = call_huggingface(full_message, hf_key)
+    model_used = "Hugging Face (Llama 3.2)"
     
     return {
         'statusCode': 200,
