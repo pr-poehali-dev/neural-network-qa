@@ -24,20 +24,23 @@ def extract_text_from_file(file_content: bytes, file_name: str) -> str:
     else:
         return file_content.decode('utf-8', errors='ignore')[:10000]
 
-def call_openrouter(message: str, api_key: str) -> str:
-    url = "https://openrouter.ai/api/v1/chat/completions"
+def call_groq(message: str, api_key: str) -> str:
+    url = "https://api.groq.com/openai/v1/chat/completions"
     headers = {
         "Content-Type": "application/json",
         "Authorization": f"Bearer {api_key}"
     }
     payload = {
         "messages": [
+            {"role": "system", "content": "Ты Богдан ИИ - умный AI-помощник. Отвечай кратко и точно на русском языке."},
             {"role": "user", "content": message}
         ],
-        "model": "meta-llama/llama-3.2-3b-instruct:free"
+        "model": "llama-3.1-8b-instant",
+        "temperature": 0.7,
+        "max_tokens": 2000
     }
     
-    response = requests.post(url, headers=headers, json=payload, timeout=20)
+    response = requests.post(url, headers=headers, json=payload, timeout=25)
     response.raise_for_status()
     result = response.json()
     return result['choices'][0]['message']['content']
@@ -84,15 +87,15 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         }
     
     deepseek_key = os.environ.get('DEEPSEEK_API_KEY')
-    openrouter_key = os.environ.get('OPENROUTER_API_KEY')
+    groq_key = os.environ.get('GROQ_API_KEY')
     database_url = os.environ.get('DATABASE_URL')
     
-    if not deepseek_key and not openrouter_key:
+    if not deepseek_key and not groq_key:
         return {
             'statusCode': 500,
             'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
             'isBase64Encoded': False,
-            'body': json.dumps({'error': 'API ключ не установлен. Добавьте DEEPSEEK_API_KEY или OPENROUTER_API_KEY.'})
+            'body': json.dumps({'error': 'API ключ не установлен. Добавьте DEEPSEEK_API_KEY или GROQ_API_KEY.'})
         }
     
     file_context = ""
@@ -145,14 +148,14 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             model_used = "DeepSeek"
             
         except requests.exceptions.HTTPError as e:
-            if e.response.status_code == 402 and openrouter_key:
-                ai_response = call_openrouter(full_message, openrouter_key)
+            if e.response.status_code == 402 and groq_key:
+                ai_response = call_groq(full_message, groq_key)
                 ai_response += "\n\n⚠️ (Бесплатная модель - DeepSeek требует пополнения)"
-                model_used = "OpenRouter Fallback"
+                model_used = "Groq Fallback"
             elif e.response.status_code in [401, 403]:
-                if openrouter_key:
-                    ai_response = call_openrouter(full_message, openrouter_key)
-                    model_used = "OpenRouter Fallback"
+                if groq_key:
+                    ai_response = call_groq(full_message, groq_key)
+                    model_used = "Groq Fallback"
                 else:
                     return {
                         'statusCode': 403,
@@ -163,9 +166,9 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             else:
                 raise
         except Exception as e:
-            if openrouter_key:
-                ai_response = call_openrouter(full_message, openrouter_key)
-                model_used = "OpenRouter Fallback"
+            if groq_key:
+                ai_response = call_groq(full_message, groq_key)
+                model_used = "Groq Fallback"
             else:
                 return {
                     'statusCode': 500,
@@ -174,8 +177,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     'body': json.dumps({'error': f'AI error: {str(e)}'})
                 }
     else:
-        ai_response = call_openrouter(full_message, openrouter_key)
-        model_used = "OpenRouter (Llama 3.2)"
+        ai_response = call_groq(full_message, groq_key)
+        model_used = "Groq (Llama 3.1)"
     
     return {
         'statusCode': 200,
