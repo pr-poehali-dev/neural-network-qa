@@ -32,15 +32,12 @@ def call_groq(message: str, api_key: str) -> str:
     }
     payload = {
         "messages": [
-            {"role": "system", "content": "Ты Богдан ИИ - умный AI-помощник. Отвечай кратко и точно на русском языке."},
             {"role": "user", "content": message}
         ],
-        "model": "llama-3.1-8b-instant",
-        "temperature": 0.7,
-        "max_tokens": 2000
+        "model": "llama-3.1-8b-instant"
     }
     
-    response = requests.post(url, headers=headers, json=payload, timeout=25)
+    response = requests.post(url, headers=headers, json=payload, timeout=20)
     response.raise_for_status()
     result = response.json()
     return result['choices'][0]['message']['content']
@@ -87,15 +84,14 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         }
     
     deepseek_key = os.environ.get('DEEPSEEK_API_KEY')
-    groq_key = os.environ.get('GROQ_API_KEY')
     database_url = os.environ.get('DATABASE_URL')
     
-    if not deepseek_key and not groq_key:
+    if not deepseek_key:
         return {
             'statusCode': 500,
             'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
             'isBase64Encoded': False,
-            'body': json.dumps({'error': 'API ключ не установлен. Добавьте DEEPSEEK_API_KEY или GROQ_API_KEY.'})
+            'body': json.dumps({'error': 'DEEPSEEK_API_KEY не установлен. Добавьте ключ в секреты.'})
         }
     
     file_context = ""
@@ -120,65 +116,28 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             file_context = f"\n\n(Ошибка чтения файла: {str(e)})"
     
     full_message = user_message + file_context
-    ai_response = ""
-    model_used = ""
     
-    if deepseek_key:
-        try:
-            url = "https://api.deepseek.com/v1/chat/completions"
-            headers = {
-                "Content-Type": "application/json",
-                "Authorization": f"Bearer {deepseek_key}"
-            }
-            payload = {
-                "messages": [
-                    {"role": "system", "content": "Ты Богдан ИИ - умный AI-помощник на базе DeepSeek. Отвечай кратко и точно на русском языке."},
-                    {"role": "user", "content": full_message}
-                ],
-                "model": "deepseek-chat",
-                "stream": False,
-                "temperature": 0.7,
-                "max_tokens": 2000
-            }
-            
-            response = requests.post(url, headers=headers, json=payload, timeout=30)
-            response.raise_for_status()
-            result = response.json()
-            ai_response = result['choices'][0]['message']['content']
-            model_used = "DeepSeek"
-            
-        except requests.exceptions.HTTPError as e:
-            if e.response.status_code == 402 and groq_key:
-                ai_response = call_groq(full_message, groq_key)
-                ai_response += "\n\n⚠️ (Бесплатная модель - DeepSeek требует пополнения)"
-                model_used = "Groq Fallback"
-            elif e.response.status_code in [401, 403]:
-                if groq_key:
-                    ai_response = call_groq(full_message, groq_key)
-                    model_used = "Groq Fallback"
-                else:
-                    return {
-                        'statusCode': 403,
-                        'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-                        'isBase64Encoded': False,
-                        'body': json.dumps({'error': 'API ключ DeepSeek недействителен'})
-                    }
-            else:
-                raise
-        except Exception as e:
-            if groq_key:
-                ai_response = call_groq(full_message, groq_key)
-                model_used = "Groq Fallback"
-            else:
-                return {
-                    'statusCode': 500,
-                    'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-                    'isBase64Encoded': False,
-                    'body': json.dumps({'error': f'AI error: {str(e)}'})
-                }
-    else:
-        ai_response = call_groq(full_message, groq_key)
-        model_used = "Groq (Llama 3.1)"
+    url = "https://api.deepseek.com/v1/chat/completions"
+    headers = {
+        "Content-Type": "application/json",
+        "Authorization": f"Bearer {deepseek_key}"
+    }
+    payload = {
+        "messages": [
+            {"role": "system", "content": "Ты Богдан ИИ - умный AI-помощник на базе DeepSeek. Отвечай кратко и точно на русском языке."},
+            {"role": "user", "content": full_message}
+        ],
+        "model": "deepseek-chat",
+        "stream": False,
+        "temperature": 0.7,
+        "max_tokens": 2000
+    }
+    
+    response = requests.post(url, headers=headers, json=payload, timeout=30)
+    response.raise_for_status()
+    result = response.json()
+    ai_response = result['choices'][0]['message']['content']
+    model_used = "DeepSeek"
     
     return {
         'statusCode': 200,
