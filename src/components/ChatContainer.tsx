@@ -41,6 +41,16 @@ export default function ChatContainer({
 }: ChatContainerProps) {
   const [speakingIndex, setSpeakingIndex] = useState<number | null>(null);
 
+  const detectLanguage = (text: string): string => {
+    const russianChars = text.match(/[а-яА-ЯЁё]/g);
+    const englishChars = text.match(/[a-zA-Z]/g);
+    
+    const russianCount = russianChars ? russianChars.length : 0;
+    const englishCount = englishChars ? englishChars.length : 0;
+    
+    return russianCount > englishCount ? 'ru-RU' : 'en-US';
+  };
+
   const speakText = (text: string, index: number) => {
     if (speakingIndex === index) {
       window.speechSynthesis.cancel();
@@ -50,7 +60,7 @@ export default function ChatContainer({
 
     window.speechSynthesis.cancel();
     const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = 'ru-RU';
+    utterance.lang = detectLanguage(text);
     utterance.rate = 1.0;
     utterance.pitch = 1.0;
     
