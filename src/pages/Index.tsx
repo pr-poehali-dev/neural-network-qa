@@ -25,6 +25,7 @@ export default function Index() {
   const [chatHistory, setChatHistory] = useState<Array<{ id: string; title: string; messages: Array<{ role: 'user' | 'ai'; text: string }> }>>([]);
   const [currentChatId, setCurrentChatId] = useState<string | null>(null);
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
+  const [currentFileId, setCurrentFileId] = useState<number | null>(null);
   const { toast } = useToast();
 
   const saveChat = async () => {
@@ -51,6 +52,7 @@ export default function Index() {
     setMessages([]);
     setCurrentChatId(null);
     setUploadedFile(null);
+    setCurrentFileId(null);
   };
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -64,24 +66,29 @@ export default function Index() {
       const content = event.target?.result as string;
       
       try {
-        await fetch(FILE_UPLOAD_URL, {
+        const response = await fetch(FILE_UPLOAD_URL, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             filename: file.name,
             fileType: file.type,
             fileSize: file.size,
-            content: content.substring(0, 10000),
+            content: content,
             sessionId: getSessionId()
           })
         });
         
-        toast({ title: `Файл "${file.name}" загружен` });
-        setMessages(prev => [...prev, { 
-          role: 'user', 
-          text: `Загружен файл: ${file.name}`,
-          file: { name: file.name, type: file.type, size: file.size }
-        }]);
+        const data = await response.json();
+        
+        if (data.file_id) {
+          setCurrentFileId(data.file_id);
+          toast({ title: `Файл "${file.name}" загружен и готов к анализу` });
+          setMessages(prev => [...prev, { 
+            role: 'user', 
+            text: `📎 Загружен файл: ${file.name}`,
+            file: { name: file.name, type: file.type, size: file.size, id: data.file_id }
+          }]);
+        }
       } catch (error) {
         toast({ title: 'Ошибка загрузки файла', variant: 'destructive' });
       }
@@ -110,20 +117,30 @@ export default function Index() {
     setIsLoading(true);
     
     try {
+      const requestBody: any = { message: userMsg };
+      
+      if (currentFileId) {
+        requestBody.file_id = currentFileId;
+      }
+      
       const response = await fetch(AI_CHAT_URL, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ message: userMsg })
+        body: JSON.stringify(requestBody)
       });
       
       const data = await response.json();
       
       if (data.response) {
+        const responseText = data.file_analyzed 
+          ? `${data.response}`
+          : data.response;
+          
         setMessages(prev => [...prev, { 
           role: 'ai', 
-          text: data.response 
+          text: responseText
         }]);
       } else {
         throw new Error('No response from AI');
@@ -242,14 +259,17 @@ export default function Index() {
               </div>
 
               <div className="space-y-3">
-                {uploadedFile && (
-                  <div className="flex items-center gap-2 p-3 bg-indigo-50 rounded-lg border border-indigo-200">
-                    <Icon name="FileText" className="text-indigo-600" size={20} />
-                    <span className="text-sm text-indigo-900 flex-1">{uploadedFile.name}</span>
+                {uploadedFile && currentFileId && (
+                  <div className="flex items-center gap-2 p-3 bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg border border-green-200">
+                    <Icon name="CheckCircle" className="text-green-600" size={20} />
+                    <div className="flex-1">
+                      <span className="text-sm font-medium text-green-900">{uploadedFile.name}</span>
+                      <p className="text-xs text-green-700">Готов к анализу. Задайте вопрос о файле!</p>
+                    </div>
                     <Button 
                       variant="ghost" 
                       size="sm" 
-                      onClick={() => setUploadedFile(null)}
+                      onClick={() => { setUploadedFile(null); setCurrentFileId(null); }}
                     >
                       <Icon name="X" size={16} />
                     </Button>

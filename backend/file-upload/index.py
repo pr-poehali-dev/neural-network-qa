@@ -1,12 +1,15 @@
 import json
 import base64
+import os
 from typing import Dict, Any
+import psycopg2
+from psycopg2.extras import RealDictCursor
 
 def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     '''
-    Business: Handle file uploads and store metadata in database
+    Business: Handle file uploads and store in database with binary data
     Args: event with httpMethod, body containing file data
-    Returns: Success response with file info
+    Returns: Success response with file_id for later analysis
     '''
     method: str = event.get('httpMethod', 'GET')
     
@@ -37,14 +40,38 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         content = body.get('content', '')
         session_id = body.get('sessionId', 'anonymous')
         
-        # For now, return success (DB connection will be added separately)
+        database_url = os.environ.get('DATABASE_URL')
+        
+        if not database_url:
+            return {
+                'statusCode': 500,
+                'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                'body': json.dumps({'error': 'Database not configured'})
+            }
+        
+        file_data = content.encode('utf-8')
+        
+        conn = psycopg2.connect(database_url)
+        cursor = conn.cursor(cursor_factory=RealDictCursor)
+        
+        cursor.execute(
+            "INSERT INTO files (file_name, file_data, file_type, file_size, session_id) VALUES (%s, %s, %s, %s, %s) RETURNING id",
+            (filename, file_data, file_type, file_size, session_id)
+        )
+        
+        file_id = cursor.fetchone()['id']
+        
+        conn.commit()
+        cursor.close()
+        conn.close()
+        
         result = {
             'success': True,
+            'file_id': file_id,
             'file': {
                 'filename': filename,
                 'type': file_type,
-                'size': file_size,
-                'uploadedAt': 'now'
+                'size': file_size
             }
         }
         
