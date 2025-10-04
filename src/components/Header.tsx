@@ -28,15 +28,6 @@ export default function Header({ chatHistoryLength, onToggleHistory, onOpenSetti
             <AIStatusIndicator />
           </div>
           <nav className="flex gap-4 items-center">
-            <Button 
-              variant="outline" 
-              size="sm"
-              onClick={onToggleHistory}
-              className="border-purple-200 dark:border-purple-800"
-            >
-              <Icon name="History" className="mr-2" size={16} />
-              {t('header.history')} ({chatHistoryLength})
-            </Button>
             <Button
               variant="outline"
               size="sm"
@@ -47,10 +38,6 @@ export default function Header({ chatHistoryLength, onToggleHistory, onOpenSetti
             </Button>
             <a href="/" className="text-indigo-600 font-medium dark:text-indigo-400">{t('header.home')}</a>
             <a href="/about" className="text-gray-700 hover:text-indigo-600 transition-colors dark:text-gray-300 dark:hover:text-indigo-400">{t('header.about')}</a>
-            <a href="/admin" className="text-gray-700 hover:text-indigo-600 transition-colors dark:text-gray-300 dark:hover:text-indigo-400">
-              <Icon name="Shield" className="inline mr-1" size={16} />
-              {t('header.admin')}
-            </a>
           </nav>
         </div>
       </div>

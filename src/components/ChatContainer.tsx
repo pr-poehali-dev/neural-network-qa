@@ -112,10 +112,6 @@ export default function ChatContainer({
         <div className="flex gap-2">
           {messages.length > 0 && (
             <>
-              <Button variant="outline" size="sm" onClick={onSaveChat} className="dark:border-purple-800">
-                <Icon name="Save" className="mr-2" size={16} />
-                {t('chat.save')}
-              </Button>
               <Button variant="outline" size="sm" onClick={onExportChat} className="dark:border-purple-800">
                 <Icon name="Download" className="mr-2" size={16} />
                 {t('chat.export')}

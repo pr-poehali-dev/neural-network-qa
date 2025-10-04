@@ -21,8 +21,8 @@ const translations: Translations = {
   'header.admin': { ru: 'Админ', en: 'Admin' },
   
   // Main page
-  'main.title': { ru: 'Богдан', en: 'Bogdan' },
-  'main.subtitle': { ru: 'Ваш умный помощник, который всегда готов ответить на вопросы', en: 'Your smart assistant, always ready to answer questions' },
+  'main.title': { ru: 'Богдан AI', en: 'Bogdan AI' },
+  'main.subtitle': { ru: 'Демо-версия чат-бота с красивым интерфейсом', en: 'Demo chatbot with beautiful interface' },
   
   // Chat
   'chat.title': { ru: 'Чат', en: 'Chat' },

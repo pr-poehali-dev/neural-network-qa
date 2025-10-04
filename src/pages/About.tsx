@@ -37,7 +37,7 @@ export default function About() {
               О сервисе
             </h2>
             <p className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-              Умный помощник, который знает ответы на ваши вопросы
+              Демо-версия чат-бота с искусственным интеллектом
             </p>
           </section>
 
@@ -50,7 +50,7 @@ export default function About() {
                 <div>
                   <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">Что это такое?</h3>
                   <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
-                    Богдан — это умный виртуальный помощник, который всегда готов ответить на ваши вопросы. Задавайте любые вопросы и получайте точные ответы на основе базы знаний сервиса.
+                    Это демонстрационный чат-бот с искусственным интеллектом. В текущей версии работает в режиме простого диалога без подключения к внешним AI-сервисам.
                   </p>
                 </div>
               </div>
@@ -62,27 +62,31 @@ export default function About() {
                   <Icon name="Zap" className="text-white" size={24} />
                 </div>
                 <div>
-                  <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Что я могу?</h3>
+                  <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Что реально работает?</h3>
                   <ul className="space-y-3 text-gray-700 dark:text-gray-300">
                     <li className="flex items-start gap-3">
                       <Icon name="Check" className="text-green-600 dark:text-green-400 mt-1 flex-shrink-0" size={20} />
-                      <span><strong>Отвечать на вопросы</strong> — задавайте любые вопросы и получайте быстрые ответы</span>
+                      <span><strong>Интерфейс чата</strong> — красивый дизайн с анимациями и темной темой</span>
                     </li>
                     <li className="flex items-start gap-3">
                       <Icon name="Check" className="text-green-600 dark:text-green-400 mt-1 flex-shrink-0" size={20} />
-                      <span><strong>Помнить историю</strong> — все наши диалоги сохраняются для вашего удобства</span>
+                      <span><strong>Сохранение диалогов</strong> — все сообщения хранятся в браузере</span>
                     </li>
                     <li className="flex items-start gap-3">
                       <Icon name="Check" className="text-green-600 dark:text-green-400 mt-1 flex-shrink-0" size={20} />
-                      <span><strong>Сохранять переписку</strong> — экспортируйте важные диалоги в текстовые файлы</span>
+                      <span><strong>Экспорт в файл</strong> — скачивание переписки в TXT формате</span>
                     </li>
                     <li className="flex items-start gap-3">
                       <Icon name="Check" className="text-green-600 dark:text-green-400 mt-1 flex-shrink-0" size={20} />
-                      <span><strong>Работать с голосом</strong> — слушайте ответы и задавайте вопросы голосом</span>
+                      <span><strong>Озвучка текста</strong> — браузерный Text-to-Speech для ответов</span>
                     </li>
                     <li className="flex items-start gap-3">
                       <Icon name="Check" className="text-green-600 dark:text-green-400 mt-1 flex-shrink-0" size={20} />
-                      <span><strong>Быть на связи 24/7</strong> — всегда готов помочь в любое время</span>
+                      <span><strong>Голосовой ввод</strong> — распознавание речи через Web Speech API</span>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <Icon name="Check" className="text-green-600 dark:text-green-400 mt-1 flex-shrink-0" size={20} />
+                      <span><strong>Markdown</strong> — поддержка форматирования в сообщениях</span>
                     </li>
                   </ul>
                 </div>
