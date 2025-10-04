@@ -6,7 +6,7 @@ import Header from '@/components/Header';
 import ChatHistoryPanel from '@/components/ChatHistoryPanel';
 import ChatContainer from '@/components/ChatContainer';
 
-import FeaturesGrid from '@/components/FeaturesGrid';
+
 import Footer from '@/components/Footer';
 import AIToolsPanel from '@/components/AIToolsPanel';
 import ExportMenu from '@/components/ExportMenu';
@@ -355,7 +355,7 @@ export default function Index() {
 
 
 
-            <FeaturesGrid />
+
           </div>
         </main>
 

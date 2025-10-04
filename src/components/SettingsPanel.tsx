@@ -9,18 +9,34 @@ interface SettingsPanelProps {
 }
 
 const voiceLanguages = [
-  { code: 'ru-RU', name: 'Русский (Russian)', flag: '🇷🇺' },
+  { code: 'ru-RU', name: 'Русский', flag: '🇷🇺' },
   { code: 'en-US', name: 'English (US)', flag: '🇺🇸' },
   { code: 'en-GB', name: 'English (UK)', flag: '🇬🇧' },
-  { code: 'es-ES', name: 'Español (Spanish)', flag: '🇪🇸' },
-  { code: 'fr-FR', name: 'Français (French)', flag: '🇫🇷' },
-  { code: 'de-DE', name: 'Deutsch (German)', flag: '🇩🇪' },
-  { code: 'it-IT', name: 'Italiano (Italian)', flag: '🇮🇹' },
-  { code: 'pt-BR', name: 'Português (Portuguese)', flag: '🇧🇷' },
-  { code: 'zh-CN', name: '中文 (Chinese)', flag: '🇨🇳' },
-  { code: 'ja-JP', name: '日本語 (Japanese)', flag: '🇯🇵' },
-  { code: 'ko-KR', name: '한국어 (Korean)', flag: '🇰🇷' },
-  { code: 'ar-SA', name: 'العربية (Arabic)', flag: '🇸🇦' },
+  { code: 'es-ES', name: 'Español', flag: '🇪🇸' },
+  { code: 'fr-FR', name: 'Français', flag: '🇫🇷' },
+  { code: 'de-DE', name: 'Deutsch', flag: '🇩🇪' },
+  { code: 'it-IT', name: 'Italiano', flag: '🇮🇹' },
+  { code: 'pt-BR', name: 'Português (Brasil)', flag: '🇧🇷' },
+  { code: 'pt-PT', name: 'Português (Portugal)', flag: '🇵🇹' },
+  { code: 'zh-CN', name: '中文 (简体)', flag: '🇨🇳' },
+  { code: 'zh-TW', name: '中文 (繁體)', flag: '🇹🇼' },
+  { code: 'ja-JP', name: '日本語', flag: '🇯🇵' },
+  { code: 'ko-KR', name: '한국어', flag: '🇰🇷' },
+  { code: 'ar-SA', name: 'العربية', flag: '🇸🇦' },
+  { code: 'hi-IN', name: 'हिन्दी', flag: '🇮🇳' },
+  { code: 'tr-TR', name: 'Türkçe', flag: '🇹🇷' },
+  { code: 'pl-PL', name: 'Polski', flag: '🇵🇱' },
+  { code: 'nl-NL', name: 'Nederlands', flag: '🇳🇱' },
+  { code: 'sv-SE', name: 'Svenska', flag: '🇸🇪' },
+  { code: 'no-NO', name: 'Norsk', flag: '🇳🇴' },
+  { code: 'da-DK', name: 'Dansk', flag: '🇩🇰' },
+  { code: 'fi-FI', name: 'Suomi', flag: '🇫🇮' },
+  { code: 'cs-CZ', name: 'Čeština', flag: '🇨🇿' },
+  { code: 'uk-UA', name: 'Українська', flag: '🇺🇦' },
+  { code: 'he-IL', name: 'עברית', flag: '🇮🇱' },
+  { code: 'th-TH', name: 'ไทย', flag: '🇹🇭' },
+  { code: 'vi-VN', name: 'Tiếng Việt', flag: '🇻🇳' },
+  { code: 'id-ID', name: 'Bahasa Indonesia', flag: '🇮🇩' },
 ];
 
 export default function SettingsPanel({ onClose }: SettingsPanelProps) {
@@ -62,6 +78,41 @@ export default function SettingsPanel({ onClose }: SettingsPanelProps) {
                 onClick={() => setLanguage('en')}
               >
                 🇺🇸 English
+              </Button>
+              <Button
+                variant={language === 'es' ? 'default' : 'outline'}
+                className={language === 'es' ? 'bg-gradient-to-r from-indigo-600 to-purple-600' : ''}
+                onClick={() => setLanguage('es')}
+              >
+                🇪🇸 Español
+              </Button>
+              <Button
+                variant={language === 'fr' ? 'default' : 'outline'}
+                className={language === 'fr' ? 'bg-gradient-to-r from-indigo-600 to-purple-600' : ''}
+                onClick={() => setLanguage('fr')}
+              >
+                🇫🇷 Français
+              </Button>
+              <Button
+                variant={language === 'de' ? 'default' : 'outline'}
+                className={language === 'de' ? 'bg-gradient-to-r from-indigo-600 to-purple-600' : ''}
+                onClick={() => setLanguage('de')}
+              >
+                🇩🇪 Deutsch
+              </Button>
+              <Button
+                variant={language === 'zh' ? 'default' : 'outline'}
+                className={language === 'zh' ? 'bg-gradient-to-r from-indigo-600 to-purple-600' : ''}
+                onClick={() => setLanguage('zh')}
+              >
+                🇨🇳 中文
+              </Button>
+              <Button
+                variant={language === 'ja' ? 'default' : 'outline'}
+                className={language === 'ja' ? 'bg-gradient-to-r from-indigo-600 to-purple-600' : ''}
+                onClick={() => setLanguage('ja')}
+              >
+                🇯🇵 日本語
               </Button>
             </div>
           </div>

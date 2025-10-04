@@ -1,31 +1,36 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
-type Language = 'ru' | 'en';
+type Language = 'ru' | 'en' | 'es' | 'fr' | 'de' | 'zh' | 'ja';
 
 interface Translations {
   [key: string]: {
     ru: string;
     en: string;
+    es: string;
+    fr: string;
+    de: string;
+    zh: string;
+    ja: string;
   };
 }
 
 const translations: Translations = {
   // Header
-  'header.title': { ru: 'Богдан ИИ', en: 'Bogdan AI' },
-  'header.online': { ru: 'Онлайн', en: 'Online' },
-  'header.offline': { ru: 'Офлайн', en: 'Offline' },
-  'header.checking': { ru: 'Проверка...', en: 'Checking...' },
-  'header.history': { ru: 'История', en: 'History' },
-  'header.home': { ru: 'Главная', en: 'Home' },
-  'header.about': { ru: 'О сервисе', en: 'About' },
-  'header.admin': { ru: 'Админ', en: 'Admin' },
+  'header.title': { ru: 'Богдан ИИ', en: 'Bogdan AI', es: 'Bogdan IA', fr: 'Bogdan IA', de: 'Bogdan KI', zh: '博丹 AI', ja: 'ボグダン AI' },
+  'header.online': { ru: 'Онлайн', en: 'Online', es: 'En línea', fr: 'En ligne', de: 'Online', zh: '在线', ja: 'オンライン' },
+  'header.offline': { ru: 'Офлайн', en: 'Offline', es: 'Fuera de línea', fr: 'Hors ligne', de: 'Offline', zh: '离线', ja: 'オフライン' },
+  'header.checking': { ru: 'Проверка...', en: 'Checking...', es: 'Verificando...', fr: 'Vérification...', de: 'Überprüfung...', zh: '检查中...', ja: '確認中...' },
+  'header.history': { ru: 'История', en: 'History', es: 'Historial', fr: 'Historique', de: 'Verlauf', zh: '历史', ja: '履歴' },
+  'header.home': { ru: 'Главная', en: 'Home', es: 'Inicio', fr: 'Accueil', de: 'Startseite', zh: '主页', ja: 'ホーム' },
+  'header.about': { ru: 'О сервисе', en: 'About', es: 'Acerca de', fr: 'À propos', de: 'Über', zh: '关于', ja: 'アプリについて' },
+  'header.admin': { ru: 'Админ', en: 'Admin', es: 'Admin', fr: 'Admin', de: 'Admin', zh: '管理', ja: '管理' },
   
   // Main page
-  'main.title': { ru: 'Богдан AI', en: 'Bogdan AI' },
-  'main.subtitle': { ru: 'Твой ассистент', en: 'Your assistant' },
+  'main.title': { ru: 'Богдан AI', en: 'Bogdan AI', es: 'Bogdan IA', fr: 'Bogdan IA', de: 'Bogdan KI', zh: '博丹 AI', ja: 'ボグダン AI' },
+  'main.subtitle': { ru: 'Твой ассистент', en: 'Your assistant', es: 'Tu asistente', fr: 'Votre assistant', de: 'Dein Assistent', zh: '你的助手', ja: 'あなたのアシスタント' },
   
   // Chat
-  'chat.title': { ru: 'Чат', en: 'Chat' },
+  'chat.title': { ru: 'Чат', en: 'Chat', es: 'Chat', fr: 'Chat', de: 'Chat', zh: '聊天', ja: 'チャット' },
   'chat.save': { ru: 'Сохранить', en: 'Save' },
   'chat.export': { ru: 'Экспорт', en: 'Export' },
   'chat.new': { ru: 'Новый', en: 'New' },
