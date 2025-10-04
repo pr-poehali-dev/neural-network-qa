@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import { Textarea } from '@/components/ui/textarea';
-import Icon from '@/components/ui/icon';
 import { useToast } from '@/hooks/use-toast';
+import Header from '@/components/Header';
+import ChatHistoryPanel from '@/components/ChatHistoryPanel';
+import ChatContainer from '@/components/ChatContainer';
+import SuggestionsGrid from '@/components/SuggestionsGrid';
+import FeaturesGrid from '@/components/FeaturesGrid';
+import Footer from '@/components/Footer';
 
 const AI_CHAT_URL = 'https://functions.poehali.dev/95328c78-94a6-4f98-a89c-a4b1b840ea99';
 const CHAT_HISTORY_URL = 'https://functions.poehali.dev/824196a4-a71d-49e7-acbc-08d9f8801ff2';
@@ -205,37 +207,10 @@ export default function Index() {
       <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAxMCAwIEwgMCAwIDAgMTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzYzNjZmMSIgc3Ryb2tlLW9wYWNpdHk9IjAuMDUiIHN0cm9rZS13aWR0aD0iMSIvPjwvcGF0dGVybj48L2RlZnM+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0idXJsKCNncmlkKSIvPjwvc3ZnPg==')] opacity-50"></div>
       
       <div className="relative z-10">
-        <header className="border-b border-white/20 backdrop-blur-md bg-white/30">
-          <div className="container mx-auto px-6 py-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-600 to-purple-600 flex items-center justify-center">
-                  <Icon name="Brain" className="text-white" size={24} />
-                </div>
-                <h1 className="text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-                  Богдан AI
-                </h1>
-              </div>
-              <nav className="flex gap-6 items-center">
-                <Button 
-                  variant="outline" 
-                  size="sm"
-                  onClick={() => setShowHistory(!showHistory)}
-                  className="border-purple-200"
-                >
-                  <Icon name="History" className="mr-2" size={16} />
-                  История ({chatHistory.length})
-                </Button>
-                <a href="/" className="text-indigo-600 font-medium">Главная</a>
-                <a href="/about" className="text-gray-700 hover:text-indigo-600 transition-colors">О сервисе</a>
-                <a href="/admin" className="text-gray-700 hover:text-indigo-600 transition-colors">
-                  <Icon name="Shield" className="inline mr-1" size={16} />
-                  Админ
-                </a>
-              </nav>
-            </div>
-          </div>
-        </header>
+        <Header 
+          chatHistoryLength={chatHistory.length}
+          onToggleHistory={() => setShowHistory(!showHistory)}
+        />
 
         <main className="container mx-auto px-6 py-12">
           <section className="text-center mb-12 animate-fade-in">
@@ -249,270 +224,34 @@ export default function Index() {
 
           <div className="max-w-5xl mx-auto relative">
             {showHistory && (
-              <Card className="absolute left-0 top-0 w-80 max-h-[600px] overflow-y-auto border-2 border-purple-200 p-4 z-20 shadow-xl bg-white">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="font-bold text-lg text-gray-900">История чатов</h3>
-                  <Button variant="ghost" size="sm" onClick={() => setShowHistory(false)}>
-                    <Icon name="X" size={16} />
-                  </Button>
-                </div>
-                
-                {chatHistory.length === 0 ? (
-                  <p className="text-sm text-gray-500 text-center py-8">Нет сохранённых чатов</p>
-                ) : (
-                  <div className="space-y-2">
-                    {chatHistory.map((chat) => (
-                      <div 
-                        key={chat.id}
-                        className="p-3 rounded-lg border border-gray-200 hover:border-indigo-400 hover:bg-indigo-50 transition-all cursor-pointer group"
-                      >
-                        <div onClick={() => loadChat(chat)}>
-                          <p className="font-medium text-sm text-gray-900 truncate">{chat.title}</p>
-                          <p className="text-xs text-gray-500 mt-1">
-                            {chat.messages.length} сообщений
-                          </p>
-                        </div>
-                        <Button 
-                          variant="ghost" 
-                          size="sm" 
-                          className="mt-2 text-red-500 hover:text-red-700 w-full opacity-0 group-hover:opacity-100 transition-opacity"
-                          onClick={(e) => { e.stopPropagation(); deleteChat(chat.id); }}
-                        >
-                          <Icon name="Trash2" size={14} className="mr-1" />
-                          Удалить
-                        </Button>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </Card>
+              <ChatHistoryPanel
+                chatHistory={chatHistory}
+                onClose={() => setShowHistory(false)}
+                onLoadChat={loadChat}
+                onDeleteChat={deleteChat}
+              />
             )}
             
-            <Card className="p-8 border-2 border-purple-200 flex flex-col animate-slide-up min-h-[600px]">
-              <div className="flex items-center justify-between mb-6">
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-purple-500 to-cyan-500 flex items-center justify-center">
-                    <Icon name="MessageSquare" className="text-white" size={24} />
-                  </div>
-                  <h3 className="text-2xl font-bold text-gray-900">Чат</h3>
-                </div>
-                <div className="flex gap-2">
-                  {messages.length > 0 && (
-                    <>
-                      <Button variant="outline" size="sm" onClick={saveChat}>
-                        <Icon name="Save" className="mr-2" size={16} />
-                        Сохранить
-                      </Button>
-                      <Button variant="outline" size="sm" onClick={exportChat}>
-                        <Icon name="Download" className="mr-2" size={16} />
-                        Экспорт
-                      </Button>
-                      <Button variant="outline" size="sm" onClick={clearChat}>
-                        <Icon name="Plus" className="mr-2" size={16} />
-                        Новый
-                      </Button>
-                    </>
-                  )}
-                </div>
-              </div>
+            <ChatContainer
+              messages={messages}
+              inputMessage={inputMessage}
+              isLoading={isLoading}
+              isGeneratingImage={isGeneratingImage}
+              onInputChange={setInputMessage}
+              onSendMessage={handleSendMessage}
+              onGenerateImage={handleGenerateImage}
+              onSaveChat={saveChat}
+              onExportChat={exportChat}
+              onClearChat={clearChat}
+            />
 
-              <div className="flex-1 bg-gradient-to-br from-gray-50 to-purple-50/30 rounded-xl p-6 mb-6 overflow-y-auto space-y-4">
-                {messages.length === 0 ? (
-                  <div className="text-center text-gray-500 mt-32">
-                    <Icon name="Sparkles" className="mx-auto mb-6 text-purple-400" size={64} />
-                    <h4 className="text-2xl font-bold text-gray-700 mb-3">Начните диалог</h4>
-                    <p className="text-lg">Задайте любой вопрос</p>
-                  </div>
-                ) : (
-                  messages.map((msg, idx) => (
-                    <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'} animate-fade-in`}>
-                      <div className={`max-w-[80%] rounded-2xl px-5 py-4 ${
-                        msg.role === 'user' 
-                          ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white' 
-                          : 'bg-white border border-purple-200 text-gray-900 shadow-sm'
-                      }`}>
-                        {msg.role === 'ai' && (
-                          <Icon name="Sparkles" className="inline mr-2 text-purple-600" size={18} />
-                        )}
-                        <span className="text-base">{msg.text}</span>
-                        {msg.imageUrl && (
-                          <div className="mt-3">
-                            <img src={msg.imageUrl} alt="Generated" className="rounded-lg max-w-full" />
-                          </div>
-                        )}
-                        {msg.file && (
-                          <div className="mt-2 pt-2 border-t border-white/20">
-                            <Icon name="FileText" className="inline mr-1" size={14} />
-                            <span className="text-xs opacity-80">{msg.file.name}</span>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  ))
-                )}
-              </div>
+            <SuggestionsGrid onSelectSuggestion={setInputMessage} />
 
-              <div className="space-y-3">
-                <div className="flex gap-2">
-                  <div className="flex-1 relative">
-                    <Textarea 
-                      placeholder="Задайте вопрос или описание для изображения..." 
-                      value={inputMessage}
-                      onChange={(e) => setInputMessage(e.target.value)}
-                      onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && (e.preventDefault(), handleSendMessage())}
-                      className="resize-none border-purple-200 focus:border-indigo-500 text-base"
-                      rows={3}
-                      disabled={isLoading || isGeneratingImage}
-                    />
-                  </div>
-                </div>
-                <div className="flex gap-2">
-                  <Button 
-                    onClick={handleSendMessage}
-                    className="flex-1 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 shadow-lg"
-                    size="lg"
-                    disabled={isLoading || isGeneratingImage}
-                  >
-                    {isLoading ? (
-                      <Icon name="Loader2" size={20} className="animate-spin mr-2" />
-                    ) : (
-                      <Icon name="MessageSquare" size={20} className="mr-2" />
-                    )}
-                    Ответить
-                  </Button>
-                  <Button 
-                    onClick={handleGenerateImage}
-                    className="flex-1 bg-gradient-to-r from-pink-500 to-orange-500 hover:from-pink-600 hover:to-orange-600 shadow-lg"
-                    size="lg"
-                    disabled={isLoading || isGeneratingImage}
-                  >
-                    {isGeneratingImage ? (
-                      <Icon name="Loader2" size={20} className="animate-spin mr-2" />
-                    ) : (
-                      <Icon name="Image" size={20} className="mr-2" />
-                    )}
-                    Нарисовать
-                  </Button>
-                </div>
-              </div>
-            </Card>
-
-            <div className="mt-12 mb-8">
-              <h3 className="text-2xl font-bold text-center mb-6 text-gray-800">Попробуй спросить</h3>
-              <div className="grid md:grid-cols-2 gap-4 max-w-4xl mx-auto">
-                <Card 
-                  className="p-4 border-2 border-purple-200 hover:border-indigo-400 cursor-pointer transition-all hover:shadow-lg"
-                  onClick={() => setInputMessage('Объясни квантовую физику простыми словами')}
-                >
-                  <div className="flex items-start gap-3">
-                    <Icon name="Lightbulb" className="text-yellow-500 mt-1" size={24} />
-                    <div>
-                      <p className="font-semibold text-gray-900">Объясни квантовую физику простыми словами</p>
-                      <p className="text-xs text-gray-500 mt-1">Получи понятное объяснение</p>
-                    </div>
-                  </div>
-                </Card>
-
-                <Card 
-                  className="p-4 border-2 border-purple-200 hover:border-pink-400 cursor-pointer transition-all hover:shadow-lg"
-                  onClick={() => { setInputMessage('Космический корабль на орбите планеты'); }}
-                >
-                  <div className="flex items-start gap-3">
-                    <Icon name="Palette" className="text-pink-500 mt-1" size={24} />
-                    <div>
-                      <p className="font-semibold text-gray-900">Нарисуй космический корабль</p>
-                      <p className="text-xs text-gray-500 mt-1">Создай изображение с AI</p>
-                    </div>
-                  </div>
-                </Card>
-
-                <Card 
-                  className="p-4 border-2 border-purple-200 hover:border-green-400 cursor-pointer transition-all hover:shadow-lg"
-                  onClick={() => setInputMessage('Напиши план тренировок на неделю')}
-                >
-                  <div className="flex items-start gap-3">
-                    <Icon name="ClipboardList" className="text-green-500 mt-1" size={24} />
-                    <div>
-                      <p className="font-semibold text-gray-900">Составь план тренировок</p>
-                      <p className="text-xs text-gray-500 mt-1">Персональная программа</p>
-                    </div>
-                  </div>
-                </Card>
-
-                <Card 
-                  className="p-4 border-2 border-purple-200 hover:border-orange-400 cursor-pointer transition-all hover:shadow-lg"
-                  onClick={() => setInputMessage('Какие книги стоит прочитать по психологии?')}
-                >
-                  <div className="flex items-start gap-3">
-                    <Icon name="BookOpen" className="text-orange-500 mt-1" size={24} />
-                    <div>
-                      <p className="font-semibold text-gray-900">Посоветуй книги по психологии</p>
-                      <p className="text-xs text-gray-500 mt-1">Подборка от AI</p>
-                    </div>
-                  </div>
-                </Card>
-              </div>
-            </div>
-
-            <div className="grid md:grid-cols-4 gap-6 mt-12">
-              <Card className="p-6 border-2 border-purple-200 text-center hover:shadow-lg transition-shadow">
-                <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-indigo-100 flex items-center justify-center">
-                  <Icon name="Zap" className="text-indigo-600" size={32} />
-                </div>
-                <h4 className="font-bold text-gray-900 mb-2">Быстрые ответы</h4>
-                <p className="text-sm text-gray-600">Мгновенный анализ и результаты</p>
-              </Card>
-
-              <Card className="p-6 border-2 border-purple-200 text-center hover:shadow-lg transition-shadow">
-                <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-pink-100 flex items-center justify-center">
-                  <Icon name="Image" className="text-pink-600" size={32} />
-                </div>
-                <h4 className="font-bold text-gray-900 mb-2">Генерация изображений</h4>
-                <p className="text-sm text-gray-600">Создавай картинки по описанию</p>
-              </Card>
-
-              <Card className="p-6 border-2 border-purple-200 text-center hover:shadow-lg transition-shadow">
-                <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-green-100 flex items-center justify-center">
-                  <Icon name="FileText" className="text-green-600" size={32} />
-                </div>
-                <h4 className="font-bold text-gray-900 mb-2">Анализ документов</h4>
-                <p className="text-sm text-gray-600">Загружай файлы через админку</p>
-              </Card>
-
-              <Card className="p-6 border-2 border-purple-200 text-center hover:shadow-lg transition-shadow">
-                <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-cyan-100 flex items-center justify-center">
-                  <Icon name="Brain" className="text-cyan-600" size={32} />
-                </div>
-                <h4 className="font-bold text-gray-900 mb-2">Grok AI</h4>
-                <p className="text-sm text-gray-600">Мощная языковая модель от X.AI</p>
-              </Card>
-            </div>
+            <FeaturesGrid />
           </div>
         </main>
 
-        <footer className="border-t border-purple-200 mt-20 py-12 bg-white/50 backdrop-blur-sm">
-          <div className="container mx-auto px-6">
-            <div className="flex flex-col md:flex-row justify-between items-center gap-6">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-600 to-purple-600 flex items-center justify-center">
-                  <Icon name="Brain" className="text-white" size={20} />
-                </div>
-                <div>
-                  <p className="font-bold text-gray-900">Богдан AI</p>
-                  <p className="text-sm text-gray-600">Умный помощник нового поколения</p>
-                </div>
-              </div>
-              <div className="flex gap-8">
-                <a href="/" className="text-gray-600 hover:text-indigo-600 transition-colors">Главная</a>
-                <a href="/about" className="text-gray-600 hover:text-indigo-600 transition-colors">О сервисе</a>
-                <a href="/admin" className="text-gray-600 hover:text-indigo-600 transition-colors">Админ</a>
-              </div>
-            </div>
-            <div className="text-center text-gray-500 text-sm mt-8 pt-8 border-t border-purple-100">
-              © 2024 Богдан AI. Все права защищены.
-            </div>
-          </div>
-        </footer>
+        <Footer />
       </div>
     </div>
   );
