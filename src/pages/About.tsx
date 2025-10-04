@@ -37,7 +37,7 @@ export default function About() {
               О сервисе
             </h2>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Богдан — твой умный помощник с суперспособностями
+              Виртуальный помощник на основе загруженных данных
             </p>
           </section>
 
@@ -50,7 +50,7 @@ export default function About() {
                 <div>
                   <h3 className="text-2xl font-bold text-gray-900 mb-3">Что это такое?</h3>
                   <p className="text-gray-700 leading-relaxed">
-                    Богдан — это умный AI-помощник с суперспособностями, который использует современные языковые модели (Grok, GPT-4) для анализа данных и ответов на вопросы. Система позволяет загружать документы, работать с файлами и получать мгновенные ответы на любые вопросы.
+                    Богдан — это виртуальный помощник, который отвечает на вопросы только на основе загруженных вами документов. Система позволяет загружать файлы и получать точные ответы, извлекая информацию исключительно из вашей базы знаний.
                   </p>
                 </div>
               </div>
@@ -66,7 +66,7 @@ export default function About() {
                   <ul className="space-y-3 text-gray-700">
                     <li className="flex items-start gap-3">
                       <Icon name="Check" className="text-green-600 mt-1 flex-shrink-0" size={20} />
-                      <span><strong>Интеллектуальный чат</strong> — задавайте вопросы на русском языке и получайте точные ответы</span>
+                      <span><strong>Работа с документами</strong> — загружайте файлы и задавайте вопросы по их содержанию</span>
                     </li>
                     <li className="flex items-start gap-3">
                       <Icon name="Check" className="text-green-600 mt-1 flex-shrink-0" size={20} />
@@ -78,7 +78,7 @@ export default function About() {
                     </li>
                     <li className="flex items-start gap-3">
                       <Icon name="Check" className="text-green-600 mt-1 flex-shrink-0" size={20} />
-                      <span><strong>Загрузка файлов</strong> — прикрепляйте документы прямо в чат для анализа</span>
+                      <span><strong>Поиск по документам</strong> — быстрое извлечение информации из загруженных файлов</span>
                     </li>
                     <li className="flex items-start gap-3">
                       <Icon name="Check" className="text-green-600 mt-1 flex-shrink-0" size={20} />
@@ -86,7 +86,7 @@ export default function About() {
                     </li>
                     <li className="flex items-start gap-3">
                       <Icon name="Check" className="text-green-600 mt-1 flex-shrink-0" size={20} />
-                      <span><strong>Поддержка Grok и GPT-4</strong> — выбор лучшей AI-модели для ваших задач</span>
+                      <span><strong>Голосовые функции</strong> — озвучка ответов и голосовой ввод вопросов</span>
                     </li>
                   </ul>
                 </div>
@@ -134,8 +134,8 @@ export default function About() {
                       <p className="text-sm text-gray-600">Python + Cloud Functions</p>
                     </div>
                     <div className="bg-gradient-to-br from-cyan-50 to-indigo-50 p-4 rounded-lg">
-                      <p className="font-semibold text-gray-900 mb-1">AI</p>
-                      <p className="text-sm text-gray-600">Grok + GPT-4</p>
+                      <p className="font-semibold text-gray-900 mb-1">DB</p>
+                      <p className="text-sm text-gray-600">PostgreSQL</p>
                     </div>
                   </div>
                 </div>
