@@ -24,28 +24,31 @@ def extract_text_from_file(file_content: bytes, file_name: str) -> str:
     else:
         return file_content.decode('utf-8', errors='ignore')[:10000]
 
-def call_huggingface(message: str, api_key: str) -> str:
-    url = "https://api-inference.huggingface.co/models/google/flan-t5-large"
+def call_free_api(message: str) -> str:
+    url = "https://nexra.aryahcr.cc/api/chat/complements"
     headers = {
-        "Authorization": f"Bearer {api_key}",
         "Content-Type": "application/json"
     }
     payload = {
-        "inputs": f"Ответь на русском языке кратко: {message}",
-        "parameters": {
-            "max_new_tokens": 500,
-            "temperature": 0.7
-        }
+        "messages": [
+            {
+                "role": "user",
+                "content": f"Ты Богдан ИИ - умный помощник. Отвечай кратко и точно на русском языке.\n\n{message}"
+            }
+        ],
+        "markdown": False,
+        "stream": False,
+        "model": "chatgpt"
     }
     
     response = requests.post(url, headers=headers, json=payload, timeout=30)
     response.raise_for_status()
     result = response.json()
     
-    if isinstance(result, list) and len(result) > 0:
-        return result[0].get('generated_text', '')
-    elif isinstance(result, dict) and 'generated_text' in result:
-        return result['generated_text']
+    if 'message' in result:
+        return result['message']
+    elif 'gpt' in result:
+        return result['gpt']
     return str(result)
 
 def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
@@ -89,16 +92,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             'body': json.dumps({'error': 'Message is required'})
         }
     
-    hf_key = os.environ.get('HUGGINGFACE_API_KEY')
     database_url = os.environ.get('DATABASE_URL')
-    
-    if not hf_key:
-        return {
-            'statusCode': 500,
-            'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-            'isBase64Encoded': False,
-            'body': json.dumps({'error': 'HUGGINGFACE_API_KEY не установлен. Получите бесплатно на https://huggingface.co/settings/tokens'})
-        }
     
     file_context = ""
     
@@ -123,8 +117,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     
     full_message = user_message + file_context
     
-    ai_response = call_huggingface(full_message, hf_key)
-    model_used = "Hugging Face (Flan-T5)"
+    ai_response = call_free_api(full_message)
+    model_used = "Free AI (ChatGPT)"
     
     return {
         'statusCode': 200,
