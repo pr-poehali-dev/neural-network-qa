@@ -91,7 +91,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             'body': json.dumps({'error': 'Message is required'})
         }
     
-    xai_key = os.environ.get('XAI_API_KEY')
+    xai_key = os.environ.get('XAI_API_KEY') or os.environ.get('OPENAI_API')
     database_url = os.environ.get('DATABASE_URL')
     
     if not xai_key:
@@ -99,7 +99,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             'statusCode': 500,
             'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
             'isBase64Encoded': False,
-            'body': json.dumps({'error': 'XAI_API_KEY не установлен. Добавьте ключ в секреты проекта.'})
+            'body': json.dumps({'error': 'API ключ не установлен. Добавьте XAI_API_KEY или OPENAI_API в секреты проекта.'})
         }
     
     if generate_image:

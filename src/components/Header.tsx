@@ -1,5 +1,6 @@
 import { Button } from '@/components/ui/button';
 import Icon from '@/components/ui/icon';
+import AIStatusIndicator from './AIStatusIndicator';
 
 interface HeaderProps {
   chatHistoryLength: number;
@@ -15,9 +16,12 @@ export default function Header({ chatHistoryLength, onToggleHistory }: HeaderPro
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-600 to-purple-600 flex items-center justify-center">
               <Icon name="Brain" className="text-white" size={24} />
             </div>
-            <h1 className="text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-              Богдан ИИ
-            </h1>
+            <div className="flex flex-col">
+              <h1 className="text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+                Богдан ИИ
+              </h1>
+            </div>
+            <AIStatusIndicator />
           </div>
           <nav className="flex gap-6 items-center">
             <Button 
