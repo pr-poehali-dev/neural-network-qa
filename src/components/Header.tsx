@@ -37,7 +37,18 @@ export default function Header({ chatHistoryLength, onToggleHistory, onOpenSetti
               <Icon name="Settings" size={16} />
             </Button>
             <a href="/" className="text-indigo-600 font-medium dark:text-indigo-400">{t('header.home')}</a>
+            <a href="/favorites" className="text-gray-700 hover:text-yellow-600 transition-colors dark:text-gray-300 dark:hover:text-yellow-400 hidden md:inline">
+              <Icon name="Star" className="inline mr-1" size={16} />
+              Избранное
+            </a>
+            <a href="/gallery" className="text-gray-700 hover:text-pink-600 transition-colors dark:text-gray-300 dark:hover:text-pink-400 hidden md:inline">
+              <Icon name="Image" className="inline mr-1" size={16} />
+              Галерея
+            </a>
             <a href="/about" className="text-gray-700 hover:text-indigo-600 transition-colors dark:text-gray-300 dark:hover:text-indigo-400">{t('header.about')}</a>
+            <Button variant="ghost" size="sm" className="md:hidden">
+              <Icon name="Menu" size={20} />
+            </Button>
           </nav>
         </div>
       </div>

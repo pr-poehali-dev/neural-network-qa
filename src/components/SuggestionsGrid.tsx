@@ -18,7 +18,7 @@ export default function SuggestionsGrid({ onSelectSuggestion }: SuggestionsGridP
           onClick={() => onSelectSuggestion(t('examples.prices'))}
         >
           <div className="flex items-start gap-3">
-            <Icon name="Search" className="text-indigo-500 mt-1" size={24} />
+            <Icon name="Smile" className="text-indigo-500 mt-1" size={24} />
             <div>
               <p className="font-semibold text-gray-900 dark:text-white">{t('examples.prices')}</p>
               <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{t('examples.pricesDesc')}</p>
@@ -31,7 +31,7 @@ export default function SuggestionsGrid({ onSelectSuggestion }: SuggestionsGridP
           onClick={() => onSelectSuggestion(t('examples.contacts'))}
         >
           <div className="flex items-start gap-3">
-            <Icon name="Phone" className="text-pink-500 mt-1" size={24} />
+            <Icon name="Lightbulb" className="text-pink-500 mt-1" size={24} />
             <div>
               <p className="font-semibold text-gray-900 dark:text-white">{t('examples.contacts')}</p>
               <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{t('examples.contactsDesc')}</p>
@@ -44,7 +44,7 @@ export default function SuggestionsGrid({ onSelectSuggestion }: SuggestionsGridP
           onClick={() => onSelectSuggestion(t('examples.summary'))}
         >
           <div className="flex items-start gap-3">
-            <Icon name="FileText" className="text-green-500 mt-1" size={24} />
+            <Icon name="BookOpen" className="text-green-500 mt-1" size={24} />
             <div>
               <p className="font-semibold text-gray-900 dark:text-white">{t('examples.summary')}</p>
               <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{t('examples.summaryDesc')}</p>
@@ -57,7 +57,7 @@ export default function SuggestionsGrid({ onSelectSuggestion }: SuggestionsGridP
           onClick={() => onSelectSuggestion(t('examples.dates'))}
         >
           <div className="flex items-start gap-3">
-            <Icon name="Calendar" className="text-orange-500 mt-1" size={24} />
+            <Icon name="TrendingUp" className="text-orange-500 mt-1" size={24} />
             <div>
               <p className="font-semibold text-gray-900 dark:text-white">{t('examples.dates')}</p>
               <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{t('examples.datesDesc')}</p>

@@ -6,6 +6,7 @@ import Icon from '@/components/ui/icon';
 import { useLanguage } from '@/contexts/LanguageContext';
 import ChatAvatar from '@/components/ChatAvatar';
 import ReactMarkdown from 'react-markdown';
+import SearchMessages from '@/components/SearchMessages';
 
 interface Message {
   role: 'user' | 'ai';
@@ -107,7 +108,14 @@ export default function ChatContainer({
           <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-purple-500 to-cyan-500 flex items-center justify-center">
             <Icon name="MessageSquare" className="text-white" size={24} />
           </div>
-          <h3 className="text-2xl font-bold text-gray-900 dark:text-white">{t('chat.title')}</h3>
+          <div>
+            <h3 className="text-2xl font-bold text-gray-900 dark:text-white">{t('chat.title')}</h3>
+            {messages.length > 0 && (
+              <p className="text-xs text-gray-500 dark:text-gray-400">
+                {messages.length} {messages.length === 1 ? 'сообщение' : messages.length < 5 ? 'сообщения' : 'сообщений'}
+              </p>
+            )}
+          </div>
         </div>
         <div className="flex gap-2">
           {messages.length > 0 && (
@@ -125,7 +133,23 @@ export default function ChatContainer({
         </div>
       </div>
 
+      {messages.length > 3 && (
+        <SearchMessages messages={messages} onResultClick={(idx) => console.log('Scroll to:', idx)} />
+      )}
+
       <div className="flex-1 bg-gradient-to-br from-gray-50 to-purple-50/30 dark:from-gray-800 dark:to-purple-900/20 rounded-xl p-6 mb-6 overflow-y-auto space-y-4">
+        {isLoading && messages[messages.length - 1]?.role === 'user' && (
+          <div className="flex gap-3 justify-start animate-fade-in">
+            <ChatAvatar type="ai" size={40} />
+            <div className="bg-white dark:bg-gray-800 border border-purple-200 dark:border-purple-800 rounded-2xl px-5 py-4 shadow-sm">
+              <div className="flex gap-1">
+                <div className="w-2 h-2 bg-purple-600 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                <div className="w-2 h-2 bg-purple-600 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+                <div className="w-2 h-2 bg-purple-600 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+              </div>
+            </div>
+          </div>
+        )}
         {messages.length === 0 ? (
           <div className="text-center text-gray-500 dark:text-gray-400 mt-32">
             <Icon name="Sparkles" className="mx-auto mb-6 text-purple-400" size={64} />

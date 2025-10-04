@@ -25,7 +25,7 @@ const voiceLanguages = [
 
 export default function SettingsPanel({ onClose }: SettingsPanelProps) {
   const { language, setLanguage, voiceLanguage, setVoiceLanguage, t } = useLanguage();
-  const { theme, setTheme } = useTheme();
+  const { theme, setTheme, colorScheme, setColorScheme } = useTheme();
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
@@ -107,6 +107,43 @@ export default function SettingsPanel({ onClose }: SettingsPanelProps) {
               >
                 <Icon name="Moon" className="mr-2" size={18} />
                 {t('settings.dark')}
+              </Button>
+            </div>
+          </div>
+
+          {/* Color Scheme */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+              Цветовая схема
+            </label>
+            <div className="grid grid-cols-2 gap-3">
+              <Button
+                variant={colorScheme === 'purple' ? 'default' : 'outline'}
+                className={colorScheme === 'purple' ? 'bg-gradient-to-r from-indigo-600 to-purple-600' : ''}
+                onClick={() => setColorScheme('purple')}
+              >
+                🟣 Фиолетовая
+              </Button>
+              <Button
+                variant={colorScheme === 'blue' ? 'default' : 'outline'}
+                className={colorScheme === 'blue' ? 'bg-gradient-to-r from-blue-600 to-cyan-600' : ''}
+                onClick={() => setColorScheme('blue')}
+              >
+                🔵 Синяя
+              </Button>
+              <Button
+                variant={colorScheme === 'green' ? 'default' : 'outline'}
+                className={colorScheme === 'green' ? 'bg-gradient-to-r from-green-600 to-emerald-600' : ''}
+                onClick={() => setColorScheme('green')}
+              >
+                🟢 Зелёная
+              </Button>
+              <Button
+                variant={colorScheme === 'pink' ? 'default' : 'outline'}
+                className={colorScheme === 'pink' ? 'bg-gradient-to-r from-pink-600 to-rose-600' : ''}
+                onClick={() => setColorScheme('pink')}
+              >
+                🩷 Розовая
               </Button>
             </div>
           </div>

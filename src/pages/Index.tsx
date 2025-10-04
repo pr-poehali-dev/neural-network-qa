@@ -144,12 +144,29 @@ export default function Index() {
   };
 
   const toggleFavorite = (index: number) => {
-    setMessages(prev => prev.map((msg, i) => 
+    const updatedMessages = messages.map((msg, i) => 
       i === index ? { ...msg, isFavorite: !msg.isFavorite } : msg
-    ));
-    toast({ 
-      title: messages[index].isFavorite ? 'Удалено из избранного' : 'Добавлено в избранное'
-    });
+    );
+    setMessages(updatedMessages);
+    
+    const favMessage = updatedMessages[index];
+    const favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
+    
+    if (favMessage.isFavorite) {
+      favorites.push({
+        text: favMessage.text,
+        role: favMessage.role,
+        timestamp: new Date().toISOString()
+      });
+      toast({ title: 'Добавлено в избранное' });
+    } else {
+      const filtered = favorites.filter((f: any) => f.text !== favMessage.text);
+      localStorage.setItem('favorites', JSON.stringify(filtered));
+      toast({ title: 'Удалено из избранного' });
+      return;
+    }
+    
+    localStorage.setItem('favorites', JSON.stringify(favorites));
   };
 
   const handleGenerateImage = async () => {

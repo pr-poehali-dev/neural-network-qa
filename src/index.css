@@ -81,6 +81,24 @@
     --sidebar-border: 240 3.7% 15.9%;
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
+
+  [data-color-scheme="blue"] {
+    --primary: 221 83% 53%;
+    --secondary: 199 89% 48%;
+    --accent: 187 85% 53%;
+  }
+
+  [data-color-scheme="green"] {
+    --primary: 142 76% 36%;
+    --secondary: 122 39% 49%;
+    --accent: 173 58% 39%;
+  }
+
+  [data-color-scheme="pink"] {
+    --primary: 330 81% 60%;
+    --secondary: 316 72% 60%;
+    --accent: 340 82% 52%;
+  }
 }
 
 @layer base {

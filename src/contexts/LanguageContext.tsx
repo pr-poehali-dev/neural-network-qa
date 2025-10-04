@@ -40,15 +40,15 @@ const translations: Translations = {
   'chat.copy': { ru: 'Копировать', en: 'Copy' },
   
   // Examples
-  'examples.title': { ru: 'Примеры вопросов', en: 'Example questions' },
-  'examples.prices': { ru: 'Что говорится о ценах?', en: 'What about prices?' },
-  'examples.pricesDesc': { ru: 'Поиск по документам', en: 'Search documents' },
-  'examples.contacts': { ru: 'Какие контакты есть?', en: 'What contacts are there?' },
-  'examples.contactsDesc': { ru: 'Извлечение данных', en: 'Data extraction' },
-  'examples.summary': { ru: 'Кратко перескажи', en: 'Brief summary' },
-  'examples.summaryDesc': { ru: 'Резюме документа', en: 'Document summary' },
-  'examples.dates': { ru: 'Найди все даты', en: 'Find all dates' },
-  'examples.datesDesc': { ru: 'Извлечение дат', en: 'Date extraction' },
+  'examples.title': { ru: 'Готовые шаблоны', en: 'Ready templates' },
+  'examples.prices': { ru: 'Расскажи анекдот', en: 'Tell me a joke' },
+  'examples.pricesDesc': { ru: 'Развлекательный контент', en: 'Fun content' },
+  'examples.contacts': { ru: 'Помоги с идеей для проекта', en: 'Help with project idea' },
+  'examples.contactsDesc': { ru: 'Мозговой штурм', en: 'Brainstorming' },
+  'examples.summary': { ru: 'Объясни простыми словами что такое AI', en: 'Explain AI in simple words' },
+  'examples.summaryDesc': { ru: 'Простые объяснения', en: 'Simple explanations' },
+  'examples.dates': { ru: 'Дай совет по продуктивности', en: 'Give productivity advice' },
+  'examples.datesDesc': { ru: 'Полезные советы', en: 'Useful tips' },
   
   // Settings
   'settings.title': { ru: 'Настройки', en: 'Settings' },
