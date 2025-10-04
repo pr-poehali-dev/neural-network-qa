@@ -18,7 +18,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             'statusCode': 200,
             'headers': {
                 'Access-Control-Allow-Origin': '*',
-                'Access-Control-Allow-Methods': 'GET, POST, DELETE, OPTIONS',
+                'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
                 'Access-Control-Allow-Headers': 'Content-Type',
                 'Access-Control-Max-Age': '86400'
             },
@@ -52,7 +52,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 }
             
             cur.execute(
-                "SELECT c.id, c.title, c.created_at, c.updated_at FROM chats c WHERE c.session_id = %s ORDER BY c.updated_at DESC LIMIT 10",
+                "SELECT c.id, c.title, c.created_at, c.updated_at, c.tags FROM chats c WHERE c.session_id = %s ORDER BY c.updated_at DESC LIMIT 10",
                 (session_id,)
             )
             chats = cur.fetchall()
@@ -68,7 +68,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     'id': chat['id'],
                     'title': chat['title'],
                     'created_at': chat['created_at'].isoformat() if chat['created_at'] else None,
-                    'messages': [{'role': m['role'], 'text': m['content']} for m in messages]
+                    'messages': [{'role': m['role'], 'text': m['content']} for m in messages],
+                    'tags': chat['tags'] or []
                 })
             
             cur.close()
@@ -86,6 +87,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             session_id = body_data.get('session_id')
             title = body_data.get('title', 'Новый чат')
             messages = body_data.get('messages', [])
+            tags = body_data.get('tags', [])
             
             if not session_id or not messages:
                 return {
@@ -96,8 +98,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 }
             
             cur.execute(
-                "INSERT INTO chats (session_id, title) VALUES (%s, %s) RETURNING id",
-                (session_id, title)
+                "INSERT INTO chats (session_id, title, tags) VALUES (%s, %s, %s) RETURNING id",
+                (session_id, title, tags)
             )
             chat_id = cur.fetchone()['id']
             
@@ -116,6 +118,35 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
                 'isBase64Encoded': False,
                 'body': json.dumps({'success': True, 'chat_id': chat_id})
+            }
+        
+        elif method == 'PUT':
+            body_data = json.loads(event.get('body', '{}'))
+            chat_id = body_data.get('chat_id')
+            tags = body_data.get('tags', [])
+            
+            if not chat_id:
+                return {
+                    'statusCode': 400,
+                    'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                    'isBase64Encoded': False,
+                    'body': json.dumps({'error': 'chat_id required'})
+                }
+            
+            cur.execute(
+                "UPDATE chats SET tags = %s, updated_at = NOW() WHERE id = %s",
+                (tags, chat_id)
+            )
+            
+            conn.commit()
+            cur.close()
+            conn.close()
+            
+            return {
+                'statusCode': 200,
+                'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                'isBase64Encoded': False,
+                'body': json.dumps({'success': True})
             }
         
         elif method == 'DELETE':

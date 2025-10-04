@@ -6,6 +6,7 @@ import ChatContainer from '@/components/ChatContainer';
 import SuggestionsGrid from '@/components/SuggestionsGrid';
 import FeaturesGrid from '@/components/FeaturesGrid';
 import Footer from '@/components/Footer';
+import AIToolsPanel from '@/components/AIToolsPanel';
 
 const AI_CHAT_URL = 'https://functions.poehali.dev/95328c78-94a6-4f98-a89c-a4b1b840ea99';
 const CHAT_HISTORY_URL = 'https://functions.poehali.dev/824196a4-a71d-49e7-acbc-08d9f8801ff2';
@@ -24,7 +25,7 @@ export default function Index() {
   const [messages, setMessages] = useState<Array<{ role: 'user' | 'ai'; text: string; file?: any; imageUrl?: string }>>([]);
   const [inputMessage, setInputMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [chatHistory, setChatHistory] = useState<Array<{ id: number; title: string; created_at: string; messages: Array<{ role: string; text: string }> }>>([]);
+  const [chatHistory, setChatHistory] = useState<Array<{ id: number; title: string; created_at: string; messages: Array<{ role: string; text: string }>; tags?: string[] }>>([]);
   const [currentChatId, setCurrentChatId] = useState<number | null>(null);
   const [currentFileId, setCurrentFileId] = useState<number | null>(null);
   const [isGeneratingImage, setIsGeneratingImage] = useState(false);
@@ -89,6 +90,29 @@ export default function Index() {
     } catch (error) {
       console.error('Delete error:', error);
     }
+  };
+
+  const updateChatTags = async (chatId: number, tags: string[]) => {
+    try {
+      await fetch(CHAT_HISTORY_URL, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ chat_id: chatId, tags })
+      });
+      
+      await loadChatHistory();
+      toast({ title: 'Теги обновлены' });
+    } catch (error) {
+      console.error('Update tags error:', error);
+    }
+  };
+
+  const handleToolSelect = (toolPrompt: string) => {
+    setInputMessage(toolPrompt);
+    toast({ 
+      title: 'Инструмент выбран',
+      description: 'Допиши свой текст и отправь сообщение'
+    });
   };
 
   useEffect(() => {
@@ -229,6 +253,7 @@ export default function Index() {
                 onClose={() => setShowHistory(false)}
                 onLoadChat={loadChat}
                 onDeleteChat={deleteChat}
+                onUpdateTags={updateChatTags}
               />
             )}
             
@@ -244,6 +269,8 @@ export default function Index() {
               onExportChat={exportChat}
               onClearChat={clearChat}
             />
+
+            <AIToolsPanel onSelectTool={handleToolSelect} />
 
             <SuggestionsGrid onSelectSuggestion={setInputMessage} />
 
