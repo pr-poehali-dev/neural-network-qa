@@ -12,6 +12,8 @@ import AIToolsPanel from '@/components/AIToolsPanel';
 import ExportMenu from '@/components/ExportMenu';
 import PromptTemplates from '@/components/PromptTemplates';
 import ApiKeyNotice from '@/components/ApiKeyNotice';
+import SettingsPanel from '@/components/SettingsPanel';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 const AI_CHAT_URL = 'https://functions.poehali.dev/95328c78-94a6-4f98-a89c-a4b1b840ea99';
 const CHAT_HISTORY_URL = 'https://functions.poehali.dev/824196a4-a71d-49e7-acbc-08d9f8801ff2';
@@ -38,7 +40,9 @@ export default function Index() {
   const [showExportMenu, setShowExportMenu] = useState(false);
   const [showTemplates, setShowTemplates] = useState(false);
   const [showApiNotice, setShowApiNotice] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
   const { toast } = useToast();
+  const { t } = useLanguage();
 
   const loadChatHistory = async () => {
     try {
@@ -241,14 +245,19 @@ export default function Index() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-cyan-50">
+    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-cyan-50 dark:from-gray-900 dark:via-purple-900 dark:to-gray-900">
       <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAxMCAwIEwgMCAwIDAgMTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzYzNjZmMSIgc3Ryb2tlLW9wYWNpdHk9IjAuMDUiIHN0cm9rZS13aWR0aD0iMSIvPjwvcGF0dGVybj48L2RlZnM+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0idXJsKCNncmlkKSIvPjwvc3ZnPg==')] opacity-50"></div>
       
       <div className="relative z-10">
         <Header 
           chatHistoryLength={chatHistory.length}
           onToggleHistory={() => setShowHistory(!showHistory)}
+          onOpenSettings={() => setShowSettings(true)}
         />
+
+        {showSettings && (
+          <SettingsPanel onClose={() => setShowSettings(false)} />
+        )}
 
         {showExportMenu && (
           <ExportMenu 
@@ -274,10 +283,10 @@ export default function Index() {
         <main className="container mx-auto px-6 py-12">
           <section className="text-center mb-12 animate-fade-in">
             <h2 className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-indigo-600 via-purple-600 to-cyan-500 bg-clip-text text-transparent">
-              Богдан
+              {t('main.title')}
             </h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Ваш умный помощник, который всегда готов ответить на вопросы
+            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+              {t('main.subtitle')}
             </p>
           </section>
 
