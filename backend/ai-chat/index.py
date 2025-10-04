@@ -24,61 +24,38 @@ def extract_text_from_file(file_content: bytes, file_name: str) -> str:
     else:
         return file_content.decode('utf-8', errors='ignore')[:10000]
 
-def call_free_api(message: str) -> str:
-    import re
+def simple_search_answer(question: str, knowledge_base: str) -> str:
+    """Простой поиск по ключевым словам и возврат релевантных частей"""
+    question_lower = question.lower()
+    kb_lower = knowledge_base.lower()
     
-    # Получаем vqd токен
-    headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
-        "Accept": "text/event-stream",
-        "x-vqd-accept": "1"
-    }
+    # Ключевые слова для поиска
+    words = [w.strip('?.,!') for w in question_lower.split() if len(w) > 3]
     
-    status_response = requests.get("https://duckduckgo.com/duckchat/v1/status", headers=headers)
-    vqd = status_response.headers.get("x-vqd-4", "")
+    # Разбиваем базу знаний на предложения
+    sentences = knowledge_base.split('\n')
     
-    if not vqd:
-        return "Извините, сервис временно недоступен. Попробуйте позже."
+    # Находим релевантные предложения
+    relevant = []
+    for sentence in sentences:
+        if len(sentence.strip()) < 10:
+            continue
+        sentence_lower = sentence.lower()
+        score = sum(1 for word in words if word in sentence_lower)
+        if score > 0:
+            relevant.append((score, sentence.strip()))
     
-    # Отправляем запрос в чат
-    chat_headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
-        "Accept": "text/event-stream",
-        "Content-Type": "application/json",
-        "x-vqd-4": vqd
-    }
+    # Сортируем по релевантности
+    relevant.sort(reverse=True, key=lambda x: x[0])
     
-    payload = {
-        "model": "gpt-3.5-turbo-0125",
-        "messages": [
-            {"role": "system", "content": "Ты виртуальный помощник. Отвечай ТОЛЬКО на основе предоставленной информации. Если информации нет - скажи 'Информация не найдена в загруженных данных'."},
-            {"role": "user", "content": message}
-        ]
-    }
+    if not relevant:
+        return "К сожалению, я не нашёл информацию по вашему вопросу в загруженных документах."
     
-    chat_response = requests.post(
-        "https://duckduckgo.com/duckchat/v1/chat",
-        headers=chat_headers,
-        json=payload,
-        timeout=25,
-        stream=True
-    )
+    # Берём топ-5 самых релевантных предложений
+    answer_parts = [s[1] for s in relevant[:5]]
+    answer = "\n\n".join(answer_parts)
     
-    full_text = ""
-    for line in chat_response.iter_lines():
-        if line:
-            line_str = line.decode('utf-8')
-            if line_str.startswith('data: '):
-                data_str = line_str[6:]
-                if data_str != "[DONE]":
-                    try:
-                        data = json.loads(data_str)
-                        if 'message' in data:
-                            full_text += data['message']
-                    except:
-                        pass
-    
-    return full_text if full_text else "Не удалось получить ответ"
+    return f"На основе загруженных документов:\n\n{answer}"
 
 def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     '''
@@ -155,10 +132,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             'body': json.dumps({'error': 'Загрузите хотя бы один файл с данными для ответов помощника'})
         }
     
-    full_message = f"{knowledge_base}\n\nВОПРОС ПОЛЬЗОВАТЕЛЯ: {user_message}\n\nОтветь на основе ТОЛЬКО информации из базы знаний выше."
-    
-    ai_response = call_free_api(full_message)
-    model_used = "DuckDuckGo AI"
+    ai_response = simple_search_answer(user_message, knowledge_base)
+    model_used = "Поиск по документам"
     
     return {
         'statusCode': 200,
