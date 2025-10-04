@@ -24,23 +24,28 @@ def extract_text_from_file(file_content: bytes, file_name: str) -> str:
     else:
         return file_content.decode('utf-8', errors='ignore')[:10000]
 
-def call_groq(message: str, api_key: str) -> str:
-    url = "https://api.groq.com/openai/v1/chat/completions"
+def call_huggingface(message: str, api_key: str) -> str:
+    url = "https://api-inference.huggingface.co/models/microsoft/Phi-3-mini-4k-instruct"
     headers = {
-        "Content-Type": "application/json",
-        "Authorization": f"Bearer {api_key}"
+        "Authorization": f"Bearer {api_key}",
+        "Content-Type": "application/json"
     }
     payload = {
-        "messages": [
-            {"role": "user", "content": message}
-        ],
-        "model": "llama-3.1-8b-instant"
+        "inputs": f"Ты Богдан ИИ - умный помощник. Отвечай кратко на русском.\n\nВопрос: {message}\nОтвет:",
+        "parameters": {
+            "max_new_tokens": 500,
+            "temperature": 0.7,
+            "return_full_text": False
+        }
     }
     
-    response = requests.post(url, headers=headers, json=payload, timeout=20)
+    response = requests.post(url, headers=headers, json=payload, timeout=30)
     response.raise_for_status()
     result = response.json()
-    return result['choices'][0]['message']['content']
+    
+    if isinstance(result, list) and len(result) > 0:
+        return result[0].get('generated_text', 'Ошибка генерации')
+    return str(result)
 
 def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     '''
@@ -83,15 +88,15 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             'body': json.dumps({'error': 'Message is required'})
         }
     
-    deepseek_key = os.environ.get('DEEPSEEK_API_KEY')
+    hf_key = os.environ.get('HUGGINGFACE_API_KEY')
     database_url = os.environ.get('DATABASE_URL')
     
-    if not deepseek_key:
+    if not hf_key:
         return {
             'statusCode': 500,
             'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
             'isBase64Encoded': False,
-            'body': json.dumps({'error': 'DEEPSEEK_API_KEY не установлен. Добавьте ключ в секреты.'})
+            'body': json.dumps({'error': 'HUGGINGFACE_API_KEY не установлен. Получите бесплатно на https://huggingface.co/settings/tokens'})
         }
     
     file_context = ""
@@ -117,27 +122,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     
     full_message = user_message + file_context
     
-    url = "https://api.deepseek.com/v1/chat/completions"
-    headers = {
-        "Content-Type": "application/json",
-        "Authorization": f"Bearer {deepseek_key}"
-    }
-    payload = {
-        "messages": [
-            {"role": "system", "content": "Ты Богдан ИИ - умный AI-помощник на базе DeepSeek. Отвечай кратко и точно на русском языке."},
-            {"role": "user", "content": full_message}
-        ],
-        "model": "deepseek-chat",
-        "stream": False,
-        "temperature": 0.7,
-        "max_tokens": 2000
-    }
-    
-    response = requests.post(url, headers=headers, json=payload, timeout=30)
-    response.raise_for_status()
-    result = response.json()
-    ai_response = result['choices'][0]['message']['content']
-    model_used = "DeepSeek"
+    ai_response = call_huggingface(full_message, hf_key)
+    model_used = "Hugging Face (Phi-3)"
     
     return {
         'statusCode': 200,
