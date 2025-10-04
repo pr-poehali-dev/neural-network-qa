@@ -14,26 +14,26 @@ export default function FeaturesGrid() {
 
       <Card className="p-6 border-2 border-purple-200 text-center hover:shadow-lg transition-shadow">
         <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-pink-100 flex items-center justify-center">
-          <Icon name="Image" className="text-pink-600" size={32} />
-        </div>
-        <h4 className="font-bold text-gray-900 mb-2">Генерация изображений</h4>
-        <p className="text-sm text-gray-600">Создавай картинки по описанию</p>
-      </Card>
-
-      <Card className="p-6 border-2 border-purple-200 text-center hover:shadow-lg transition-shadow">
-        <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-green-100 flex items-center justify-center">
-          <Icon name="FileText" className="text-green-600" size={32} />
+          <Icon name="FileText" className="text-pink-600" size={32} />
         </div>
         <h4 className="font-bold text-gray-900 mb-2">Анализ документов</h4>
         <p className="text-sm text-gray-600">Загружай файлы через админку</p>
       </Card>
 
       <Card className="p-6 border-2 border-purple-200 text-center hover:shadow-lg transition-shadow">
+        <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-green-100 flex items-center justify-center">
+          <Icon name="Code2" className="text-green-600" size={32} />
+        </div>
+        <h4 className="font-bold text-gray-900 mb-2">Помощь с кодом</h4>
+        <p className="text-sm text-gray-600">Разбор задач по программированию</p>
+      </Card>
+
+      <Card className="p-6 border-2 border-purple-200 text-center hover:shadow-lg transition-shadow">
         <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-cyan-100 flex items-center justify-center">
           <Icon name="Brain" className="text-cyan-600" size={32} />
         </div>
-        <h4 className="font-bold text-gray-900 mb-2">Grok AI</h4>
-        <p className="text-sm text-gray-600">Мощная языковая модель от X.AI</p>
+        <h4 className="font-bold text-gray-900 mb-2">DeepSeek AI</h4>
+        <p className="text-sm text-gray-600">Мощная модель для рассуждений</p>
       </Card>
     </div>
   );
