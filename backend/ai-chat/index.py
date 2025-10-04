@@ -25,31 +25,59 @@ def extract_text_from_file(file_content: bytes, file_name: str) -> str:
         return file_content.decode('utf-8', errors='ignore')[:10000]
 
 def call_free_api(message: str) -> str:
-    url = "https://nexra.aryahcr.cc/api/chat/complements"
+    import re
+    
+    # Получаем vqd токен
     headers = {
-        "Content-Type": "application/json"
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+        "Accept": "text/event-stream",
+        "x-vqd-accept": "1"
     }
+    
+    status_response = requests.get("https://duckduckgo.com/duckchat/v1/status", headers=headers)
+    vqd = status_response.headers.get("x-vqd-4", "")
+    
+    if not vqd:
+        return "Извините, сервис временно недоступен. Попробуйте позже."
+    
+    # Отправляем запрос в чат
+    chat_headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+        "Accept": "text/event-stream",
+        "Content-Type": "application/json",
+        "x-vqd-4": vqd
+    }
+    
     payload = {
+        "model": "gpt-3.5-turbo-0125",
         "messages": [
-            {
-                "role": "user",
-                "content": f"Ты Богдан ИИ - умный помощник. Отвечай кратко и точно на русском языке.\n\n{message}"
-            }
-        ],
-        "markdown": False,
-        "stream": False,
-        "model": "chatgpt"
+            {"role": "user", "content": f"Ты Богдан ИИ. Отвечай кратко на русском: {message}"}
+        ]
     }
     
-    response = requests.post(url, headers=headers, json=payload, timeout=30)
-    response.raise_for_status()
-    result = response.json()
+    chat_response = requests.post(
+        "https://duckduckgo.com/duckchat/v1/chat",
+        headers=chat_headers,
+        json=payload,
+        timeout=25,
+        stream=True
+    )
     
-    if 'message' in result:
-        return result['message']
-    elif 'gpt' in result:
-        return result['gpt']
-    return str(result)
+    full_text = ""
+    for line in chat_response.iter_lines():
+        if line:
+            line_str = line.decode('utf-8')
+            if line_str.startswith('data: '):
+                data_str = line_str[6:]
+                if data_str != "[DONE]":
+                    try:
+                        data = json.loads(data_str)
+                        if 'message' in data:
+                            full_text += data['message']
+                    except:
+                        pass
+    
+    return full_text if full_text else "Не удалось получить ответ"
 
 def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     '''
@@ -118,7 +146,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     full_message = user_message + file_context
     
     ai_response = call_free_api(full_message)
-    model_used = "Free AI (ChatGPT)"
+    model_used = "DuckDuckGo AI"
     
     return {
         'statusCode': 200,
