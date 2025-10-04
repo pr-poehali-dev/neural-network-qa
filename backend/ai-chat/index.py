@@ -96,13 +96,10 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     
     if not xai_key:
         return {
-            'statusCode': 200,
+            'statusCode': 500,
             'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
             'isBase64Encoded': False,
-            'body': json.dumps({
-                'response': f'Я получил ваш вопрос: "{user_message}". Система работает в демо-режиме. Добавьте XAI_API_KEY для полной функциональности.',
-                'demo': True
-            })
+            'body': json.dumps({'error': 'XAI_API_KEY не установлен. Добавьте ключ в секреты проекта.'})
         }
     
     if generate_image:
@@ -115,8 +112,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 'isBase64Encoded': False,
                 'body': json.dumps({
                     'response': f'🎨 Изображение готово!',
-                    'image_url': image_url,
-                    'demo': False
+                    'image_url': image_url
                 }, ensure_ascii=False)
             }
         except Exception as e:
@@ -187,23 +183,17 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             'isBase64Encoded': False,
             'body': json.dumps({
                 'response': ai_response,
-                'demo': False,
                 'file_analyzed': bool(file_id and file_context)
             }, ensure_ascii=False)
         }
         
     except requests.exceptions.HTTPError as e:
         if e.response.status_code == 403:
-            demo_response = f'Я получил ваш вопрос: "{user_message}"{file_name_info}\n\n⚠️ API ключ X.AI недействителен или истёк. Обновите XAI_API_KEY в секретах проекта для подключения к Grok AI.\n\nПока работаю в демо-режиме!'
-            
             return {
-                'statusCode': 200,
+                'statusCode': 403,
                 'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
                 'isBase64Encoded': False,
-                'body': json.dumps({
-                    'response': demo_response,
-                    'demo': True
-                }, ensure_ascii=False)
+                'body': json.dumps({'error': 'API ключ X.AI недействителен. Проверьте XAI_API_KEY в секретах проекта.'})
             }
         else:
             return {
