@@ -4,6 +4,8 @@ import { Card } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import Icon from '@/components/ui/icon';
 import { useLanguage } from '@/contexts/LanguageContext';
+import ChatAvatar from '@/components/ChatAvatar';
+import ReactMarkdown from 'react-markdown';
 
 interface Message {
   role: 'user' | 'ai';
@@ -136,7 +138,8 @@ export default function ChatContainer({
           </div>
         ) : (
           messages.map((msg, idx) => (
-            <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'} animate-fade-in group`}>
+            <div key={idx} className={`flex gap-3 ${msg.role === 'user' ? 'justify-end' : 'justify-start'} animate-fade-in group`}>
+              {msg.role === 'assistant' && <ChatAvatar type="ai" size={40} />}
               <div className={`max-w-[80%] rounded-2xl px-5 py-4 relative ${
                 msg.role === 'user' 
                   ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white' 
@@ -155,28 +158,40 @@ export default function ChatContainer({
                   </button>
                 )}
                 <div className="flex items-start justify-between gap-3">
-                  <div className="flex-1">
-                    {msg.role === 'ai' && (
-                      <Icon name="Sparkles" className="inline mr-2 text-purple-600" size={18} />
+                  <div className="flex-1 prose prose-sm dark:prose-invert max-w-none">
+                    {msg.role === 'ai' ? (
+                      <ReactMarkdown>{msg.text}</ReactMarkdown>
+                    ) : (
+                      <span className="text-base whitespace-pre-wrap">{msg.text}</span>
                     )}
-                    <span className="text-base">{msg.text}</span>
                   </div>
-                  {msg.role === 'ai' && (
+                  <div className="flex gap-1">
                     <button
-                      onClick={() => speakText(msg.text, idx)}
-                      className={`flex-shrink-0 p-2 rounded-lg transition-all ${
-                        speakingIndex === idx
-                          ? 'bg-purple-600 text-white'
-                          : 'bg-purple-100 dark:bg-purple-900 text-purple-600 dark:text-purple-300 hover:bg-purple-200 dark:hover:bg-purple-800'
-                      }`}
-                      title={speakingIndex === idx ? t('chat.stop') : t('chat.speak')}
+                      onClick={() => {
+                        navigator.clipboard.writeText(msg.text);
+                      }}
+                      className="flex-shrink-0 p-2 rounded-lg transition-all opacity-0 group-hover:opacity-100 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
+                      title={t('chat.copy')}
                     >
-                      <Icon 
-                        name={speakingIndex === idx ? 'VolumeX' : 'Volume2'} 
-                        size={18} 
-                      />
+                      <Icon name="Copy" size={16} />
                     </button>
-                  )}
+                    {msg.role === 'ai' && (
+                      <button
+                        onClick={() => speakText(msg.text, idx)}
+                        className={`flex-shrink-0 p-2 rounded-lg transition-all ${
+                          speakingIndex === idx
+                            ? 'bg-purple-600 text-white'
+                            : 'bg-purple-100 dark:bg-purple-900 text-purple-600 dark:text-purple-300 hover:bg-purple-200 dark:hover:bg-purple-800'
+                        }`}
+                        title={speakingIndex === idx ? t('chat.stop') : t('chat.speak')}
+                      >
+                        <Icon 
+                          name={speakingIndex === idx ? 'VolumeX' : 'Volume2'} 
+                          size={16} 
+                        />
+                      </button>
+                    )}
+                  </div>
                 </div>
                 {msg.imageUrl && (
                   <div className="mt-3">

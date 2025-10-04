@@ -13,6 +13,7 @@ import ExportMenu from '@/components/ExportMenu';
 import PromptTemplates from '@/components/PromptTemplates';
 import ApiKeyNotice from '@/components/ApiKeyNotice';
 import SettingsPanel from '@/components/SettingsPanel';
+import FileDropZone from '@/components/FileDropZone';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 const AI_CHAT_URL = 'https://functions.poehali.dev/95328c78-94a6-4f98-a89c-a4b1b840ea99';
@@ -218,10 +219,28 @@ export default function Index() {
       const data = await response.json();
       
       if (data.response) {
+        const aiText = data.response;
         setMessages(prev => [...prev, { 
           role: 'ai', 
-          text: data.response
+          text: ''
         }]);
+        
+        let currentIndex = 0;
+        const typingInterval = setInterval(() => {
+          if (currentIndex < aiText.length) {
+            setMessages(prev => {
+              const newMessages = [...prev];
+              newMessages[newMessages.length - 1] = {
+                role: 'ai',
+                text: aiText.substring(0, currentIndex + 1)
+              };
+              return newMessages;
+            });
+            currentIndex++;
+          } else {
+            clearInterval(typingInterval);
+          }
+        }, 20);
         
         if (data.demo) {
           setShowApiNotice(true);
@@ -244,8 +263,40 @@ export default function Index() {
     }
   };
 
+  const handleFileDrop = async (files: File[]) => {
+    if (files.length === 0) return;
+    
+    const formData = new FormData();
+    formData.append('file', files[0]);
+    formData.append('session_id', getSessionId());
+    
+    try {
+      const response = await fetch(FILE_UPLOAD_URL, {
+        method: 'POST',
+        body: formData
+      });
+      
+      const data = await response.json();
+      
+      if (data.file_id) {
+        setCurrentFileId(data.file_id);
+        toast({
+          title: 'Файл загружен',
+          description: `${files[0].name} готов к использованию`
+        });
+      }
+    } catch (error) {
+      toast({
+        title: 'Ошибка',
+        description: 'Не удалось загрузить файл',
+        variant: 'destructive'
+      });
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-cyan-50 dark:from-gray-900 dark:via-purple-900 dark:to-gray-900">
+      <FileDropZone onFileDrop={handleFileDrop} />
       <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAxMCAwIEwgMCAwIDAgMTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzYzNjZmMSIgc3Ryb2tlLW9wYWNpdHk9IjAuMDUiIHN0cm9rZS13aWR0aD0iMSIvPjwvcGF0dGVybj48L2RlZnM+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0idXJsKCNncmlkKSIvPjwvc3ZnPg==')] opacity-50"></div>
       
       <div className="relative z-10">

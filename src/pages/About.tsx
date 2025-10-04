@@ -4,11 +4,11 @@ import { Button } from '@/components/ui/button';
 
 export default function About() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-cyan-50">
+    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-cyan-50 dark:from-gray-900 dark:via-purple-950 dark:to-gray-900">
       <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAxMCAwIEwgMCAwIDAgMTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzYzNjZmMSIgc3Ryb2tlLW9wYWNpdHk9IjAuMDUiIHN0cm9rZS13aWR0aD0iMSIvPjwvcGF0dGVybj48L2RlZnM+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0idXJsKCNncmlkKSIvPjwvc3ZnPg==')] opacity-50"></div>
       
       <div className="relative z-10">
-        <header className="border-b border-white/20 backdrop-blur-md bg-white/30">
+        <header className="border-b border-white/20 dark:border-gray-700 backdrop-blur-md bg-white/30 dark:bg-gray-900/50">
           <div className="container mx-auto px-6 py-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
@@ -20,9 +20,9 @@ export default function About() {
                 </h1>
               </div>
               <nav className="flex gap-6 items-center">
-                <a href="/" className="text-gray-700 hover:text-indigo-600 transition-colors">Главная</a>
-                <a href="/about" className="text-indigo-600 font-medium">О сервисе</a>
-                <a href="/admin" className="text-gray-700 hover:text-indigo-600 transition-colors">
+                <a href="/" className="text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">Главная</a>
+                <a href="/about" className="text-indigo-600 dark:text-indigo-400 font-medium">О сервисе</a>
+                <a href="/admin" className="text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
                   <Icon name="Shield" className="inline mr-1" size={16} />
                   Админ
                 </a>
@@ -36,106 +36,102 @@ export default function About() {
             <h2 className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-indigo-600 via-purple-600 to-cyan-500 bg-clip-text text-transparent">
               О сервисе
             </h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Виртуальный помощник на основе загруженных данных
+            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+              Умный помощник, который знает ответы на ваши вопросы
             </p>
           </section>
 
           <div className="max-w-4xl mx-auto space-y-8">
-            <Card className="p-8 border-2 border-purple-200 animate-slide-up">
+            <Card className="p-8 border-2 border-purple-200 dark:border-purple-800 dark:bg-gray-800 animate-slide-up">
               <div className="flex items-start gap-4 mb-6">
                 <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center flex-shrink-0">
                   <Icon name="Sparkles" className="text-white" size={24} />
                 </div>
                 <div>
-                  <h3 className="text-2xl font-bold text-gray-900 mb-3">Что это такое?</h3>
-                  <p className="text-gray-700 leading-relaxed">
-                    Богдан — это виртуальный помощник, который отвечает на вопросы только на основе загруженных вами документов. Система позволяет загружать файлы и получать точные ответы, извлекая информацию исключительно из вашей базы знаний.
+                  <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">Что это такое?</h3>
+                  <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
+                    Богдан — это умный виртуальный помощник, который всегда готов ответить на ваши вопросы. Задавайте любые вопросы и получайте точные ответы на основе базы знаний сервиса.
                   </p>
                 </div>
               </div>
             </Card>
 
-            <Card className="p-8 border-2 border-purple-200 animate-slide-up" style={{ animationDelay: '0.1s' }}>
+            <Card className="p-8 border-2 border-purple-200 dark:border-purple-800 dark:bg-gray-800 animate-slide-up" style={{ animationDelay: '0.1s' }}>
               <div className="flex items-start gap-4 mb-6">
                 <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-purple-500 to-cyan-500 flex items-center justify-center flex-shrink-0">
                   <Icon name="Zap" className="text-white" size={24} />
                 </div>
                 <div>
-                  <h3 className="text-2xl font-bold text-gray-900 mb-4">Возможности</h3>
-                  <ul className="space-y-3 text-gray-700">
+                  <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Что я могу?</h3>
+                  <ul className="space-y-3 text-gray-700 dark:text-gray-300">
                     <li className="flex items-start gap-3">
-                      <Icon name="Check" className="text-green-600 mt-1 flex-shrink-0" size={20} />
-                      <span><strong>Работа с документами</strong> — загружайте файлы и задавайте вопросы по их содержанию</span>
+                      <Icon name="Check" className="text-green-600 dark:text-green-400 mt-1 flex-shrink-0" size={20} />
+                      <span><strong>Отвечать на вопросы</strong> — задавайте любые вопросы и получайте быстрые ответы</span>
                     </li>
                     <li className="flex items-start gap-3">
-                      <Icon name="Check" className="text-green-600 mt-1 flex-shrink-0" size={20} />
-                      <span><strong>История диалогов</strong> — все чаты сохраняются в базе данных</span>
+                      <Icon name="Check" className="text-green-600 dark:text-green-400 mt-1 flex-shrink-0" size={20} />
+                      <span><strong>Помнить историю</strong> — все наши диалоги сохраняются для вашего удобства</span>
                     </li>
                     <li className="flex items-start gap-3">
-                      <Icon name="Check" className="text-green-600 mt-1 flex-shrink-0" size={20} />
-                      <span><strong>Экспорт данных</strong> — сохраняйте важные диалоги в текстовые файлы</span>
+                      <Icon name="Check" className="text-green-600 dark:text-green-400 mt-1 flex-shrink-0" size={20} />
+                      <span><strong>Сохранять переписку</strong> — экспортируйте важные диалоги в текстовые файлы</span>
                     </li>
                     <li className="flex items-start gap-3">
-                      <Icon name="Check" className="text-green-600 mt-1 flex-shrink-0" size={20} />
-                      <span><strong>Поиск по документам</strong> — быстрое извлечение информации из загруженных файлов</span>
+                      <Icon name="Check" className="text-green-600 dark:text-green-400 mt-1 flex-shrink-0" size={20} />
+                      <span><strong>Работать с голосом</strong> — слушайте ответы и задавайте вопросы голосом</span>
                     </li>
                     <li className="flex items-start gap-3">
-                      <Icon name="Check" className="text-green-600 mt-1 flex-shrink-0" size={20} />
-                      <span><strong>Админ-панель</strong> — управление файлами, статистика и настройки</span>
-                    </li>
-                    <li className="flex items-start gap-3">
-                      <Icon name="Check" className="text-green-600 mt-1 flex-shrink-0" size={20} />
-                      <span><strong>Голосовые функции</strong> — озвучка ответов и голосовой ввод вопросов</span>
+                      <Icon name="Check" className="text-green-600 dark:text-green-400 mt-1 flex-shrink-0" size={20} />
+                      <span><strong>Быть на связи 24/7</strong> — всегда готов помочь в любое время</span>
                     </li>
                   </ul>
                 </div>
               </div>
             </Card>
 
-            <Card className="p-8 border-2 border-purple-200 animate-slide-up" style={{ animationDelay: '0.2s' }}>
+            <Card className="p-8 border-2 border-purple-200 dark:border-purple-800 dark:bg-gray-800 animate-slide-up" style={{ animationDelay: '0.2s' }}>
               <div className="flex items-start gap-4 mb-6">
                 <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-cyan-500 to-indigo-500 flex items-center justify-center flex-shrink-0">
                   <Icon name="Shield" className="text-white" size={24} />
                 </div>
                 <div>
-                  <h3 className="text-2xl font-bold text-gray-900 mb-3">Безопасность и приватность</h3>
-                  <p className="text-gray-700 leading-relaxed mb-4">
-                    Ваши данные надежно защищены. Все диалоги хранятся в защищенной базе данных PostgreSQL. Доступ к админ-панели защищен паролем. API ключи хранятся в зашифрованном виде и недоступны извне.
+                  <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">Безопасность и приватность</h3>
+                  <p className="text-gray-700 dark:text-gray-300 leading-relaxed mb-4">
+                    Ваши данные надежно защищены. Все диалоги хранятся в защищенной базе данных. Мы не передаём ваши разговоры третьим лицам и строго соблюдаем политику конфиденциальности.
                   </p>
                   <div className="grid md:grid-cols-2 gap-4">
-                    <div className="flex items-center gap-3 bg-indigo-50 p-4 rounded-lg">
-                      <Icon name="Lock" className="text-indigo-600" size={20} />
-                      <span className="text-sm text-gray-700">Шифрование данных</span>
+                    <div className="flex items-center gap-3 bg-indigo-50 dark:bg-indigo-950/30 p-4 rounded-lg">
+                      <Icon name="Lock" className="text-indigo-600 dark:text-indigo-400" size={20} />
+                      <span className="text-sm text-gray-700 dark:text-gray-300">Шифрование данных</span>
                     </div>
-                    <div className="flex items-center gap-3 bg-purple-50 p-4 rounded-lg">
-                      <Icon name="Database" className="text-purple-600" size={20} />
-                      <span className="text-sm text-gray-700">Защищенная БД</span>
+                    <div className="flex items-center gap-3 bg-purple-50 dark:bg-purple-950/30 p-4 rounded-lg">
+                      <Icon name="Database" className="text-purple-600 dark:text-purple-400" size={20} />
+                      <span className="text-sm text-gray-700 dark:text-gray-300">Защищенная БД</span>
                     </div>
                   </div>
                 </div>
               </div>
             </Card>
 
-            <Card className="p-8 border-2 border-purple-200 animate-slide-up" style={{ animationDelay: '0.3s' }}>
+            <Card className="p-8 border-2 border-purple-200 dark:border-purple-800 dark:bg-gray-800 animate-slide-up" style={{ animationDelay: '0.3s' }}>
               <div className="flex items-start gap-4">
                 <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-indigo-500 to-cyan-500 flex items-center justify-center flex-shrink-0">
                   <Icon name="Rocket" className="text-white" size={24} />
                 </div>
                 <div className="flex-1">
-                  <h3 className="text-2xl font-bold text-gray-900 mb-3">Технологии</h3>
+                  <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">Технологии</h3>
                   <div className="grid md:grid-cols-3 gap-4">
-                    <div className="bg-gradient-to-br from-indigo-50 to-purple-50 p-4 rounded-lg">
-                      <p className="font-semibold text-gray-900 mb-1">Frontend</p>
-                      <p className="text-sm text-gray-600">React + TypeScript + Tailwind CSS</p>
+                    <div className="bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-950/30 dark:to-purple-950/30 p-4 rounded-lg">
+                      <p className="font-semibold text-gray-900 dark:text-white mb-1">Frontend</p>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">React + TypeScript + Tailwind CSS</p>
                     </div>
-                    <div className="bg-gradient-to-br from-purple-50 to-cyan-50 p-4 rounded-lg">
-                      <p className="font-semibold text-gray-900 mb-1">Backend</p>
-                      <p className="text-sm text-gray-600">Python + Cloud Functions</p>
+                    <div className="bg-gradient-to-br from-purple-50 to-cyan-50 dark:from-purple-950/30 dark:to-cyan-950/30 p-4 rounded-lg">
+                      <p className="font-semibold text-gray-900 dark:text-white mb-1">Backend</p>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">Python + Cloud Functions</p>
                     </div>
-                    <div className="bg-gradient-to-br from-cyan-50 to-indigo-50 p-4 rounded-lg">
-                      <p className="font-semibold text-gray-900 mb-1">DB</p>
-                      <p className="text-sm text-gray-600">PostgreSQL</p>
+                    <div className="bg-gradient-to-br from-cyan-50 to-indigo-50 dark:from-cyan-950/30 dark:to-indigo-950/30 p-4 rounded-lg">
+                      <p className="font-semibold text-gray-900 dark:text-white mb-1">DB</p>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">PostgreSQL</p>
                     </div>
                   </div>
                 </div>
@@ -155,8 +151,8 @@ export default function About() {
           </div>
         </main>
 
-        <footer className="border-t border-purple-200 mt-20 py-8 bg-white/50 backdrop-blur-sm">
-          <div className="container mx-auto px-6 text-center text-gray-600">
+        <footer className="border-t border-purple-200 dark:border-gray-700 mt-20 py-8 bg-white/50 dark:bg-gray-900/50 backdrop-blur-sm">
+          <div className="container mx-auto px-6 text-center text-gray-600 dark:text-gray-400">
             <p>© 2024 Умный Помощник. Все права защищены.</p>
           </div>
         </footer>

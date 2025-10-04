@@ -37,6 +37,7 @@ const translations: Translations = {
   'chat.stop': { ru: 'Остановить', en: 'Stop' },
   'chat.listening': { ru: 'Слушаю...', en: 'Listening...' },
   'chat.voiceInput': { ru: 'Голосовой ввод', en: 'Voice input' },
+  'chat.copy': { ru: 'Копировать', en: 'Copy' },
   
   // Examples
   'examples.title': { ru: 'Примеры вопросов', en: 'Example questions' },
