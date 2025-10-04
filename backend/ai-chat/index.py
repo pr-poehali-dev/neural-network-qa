@@ -166,7 +166,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         'isBase64Encoded': False,
         'body': json.dumps({
             'response': ai_response,
-            'file_analyzed': bool(file_id and file_context),
+            'file_analyzed': bool(knowledge_base),
             'model': model_used
         }, ensure_ascii=False)
     }
