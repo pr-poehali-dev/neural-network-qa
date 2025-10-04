@@ -66,14 +66,16 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         }
     
     deepseek_key = os.environ.get('DEEPSEEK_API_KEY')
+    openrouter_key = os.environ.get('OPENROUTER_API_KEY')
     database_url = os.environ.get('DATABASE_URL')
     
-    if not deepseek_key:
+    use_fallback = False
+    if not deepseek_key and not openrouter_key:
         return {
             'statusCode': 500,
             'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
             'isBase64Encoded': False,
-            'body': json.dumps({'error': 'DEEPSEEK_API_KEY не установлен. Добавьте ключ в секреты проекта.'})
+            'body': json.dumps({'error': 'API ключ не установлен. Добавьте DEEPSEEK_API_KEY или OPENROUTER_API_KEY.'})
         }
     
     file_context = ""
@@ -100,29 +102,49 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         except Exception as e:
             file_context = f"\n\n(Ошибка чтения файла: {str(e)})"
     
+    full_message = user_message + file_context
+    
     try:
-        url = "https://api.deepseek.com/v1/chat/completions"
-        
-        headers = {
-            "Content-Type": "application/json",
-            "Authorization": f"Bearer {deepseek_key}"
-        }
-        
-        full_message = user_message + file_context
-        
-        payload = {
-            "messages": [
-                {
-                    "role": "system",
-                    "content": "Ты Богдан ИИ - умный AI-помощник на базе DeepSeek. Анализируешь документы, отвечаешь на вопросы кратко и точно на русском языке. Если прикреплен файл - обязательно анализируй его содержимое в контексте вопроса."
-                },
-                {"role": "user", "content": full_message}
-            ],
-            "model": "deepseek-chat",
-            "stream": False,
-            "temperature": 0.7,
-            "max_tokens": 2000
-        }
+        if deepseek_key:
+            url = "https://api.deepseek.com/v1/chat/completions"
+            headers = {
+                "Content-Type": "application/json",
+                "Authorization": f"Bearer {deepseek_key}"
+            }
+            payload = {
+                "messages": [
+                    {
+                        "role": "system",
+                        "content": "Ты Богдан ИИ - умный AI-помощник на базе DeepSeek. Анализируешь документы, отвечаешь на вопросы кратко и точно на русском языке. Если прикреплен файл - обязательно анализируй его содержимое в контексте вопроса."
+                    },
+                    {"role": "user", "content": full_message}
+                ],
+                "model": "deepseek-chat",
+                "stream": False,
+                "temperature": 0.7,
+                "max_tokens": 2000
+            }
+        else:
+            use_fallback = True
+            url = "https://openrouter.ai/api/v1/chat/completions"
+            headers = {
+                "Content-Type": "application/json",
+                "Authorization": f"Bearer {openrouter_key}",
+                "HTTP-Referer": "https://poehali.dev",
+                "X-Title": "Богдан ИИ"
+            }
+            payload = {
+                "messages": [
+                    {
+                        "role": "system",
+                        "content": "Ты Богдан ИИ - умный AI-помощник. Анализируешь документы, отвечаешь на вопросы кратко и точно на русском языке."
+                    },
+                    {"role": "user", "content": full_message}
+                ],
+                "model": "meta-llama/llama-3.2-3b-instruct:free",
+                "temperature": 0.7,
+                "max_tokens": 1500
+            }
         
         response = requests.post(url, headers=headers, json=payload, timeout=30)
         response.raise_for_status()
@@ -130,31 +152,71 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         result = response.json()
         ai_response = result['choices'][0]['message']['content']
         
+        model_name = "OpenRouter (Llama 3.2)" if use_fallback else "DeepSeek"
+        
         return {
             'statusCode': 200,
             'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
             'isBase64Encoded': False,
             'body': json.dumps({
                 'response': ai_response,
-                'file_analyzed': bool(file_id and file_context)
+                'file_analyzed': bool(file_id and file_context),
+                'model': model_name
             }, ensure_ascii=False)
         }
         
     except requests.exceptions.HTTPError as e:
         if e.response.status_code in [401, 403]:
+            error_msg = 'API ключ недействителен. Проверьте ключ в секретах.'
             return {
                 'statusCode': 403,
                 'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
                 'isBase64Encoded': False,
-                'body': json.dumps({'error': 'API ключ DeepSeek недействителен. Проверьте DEEPSEEK_API_KEY в секретах проекта.'})
+                'body': json.dumps({'error': error_msg})
             }
-        else:
-            return {
-                'statusCode': 500,
-                'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-                'isBase64Encoded': False,
-                'body': json.dumps({'error': f'AI processing error: {str(e)}'})
-            }
+        elif e.response.status_code == 402 and deepseek_key and openrouter_key:
+            try:
+                url = "https://openrouter.ai/api/v1/chat/completions"
+                headers = {
+                    "Content-Type": "application/json",
+                    "Authorization": f"Bearer {openrouter_key}",
+                    "HTTP-Referer": "https://poehali.dev",
+                    "X-Title": "Богдан ИИ"
+                }
+                payload = {
+                    "messages": [
+                        {"role": "system", "content": "Ты Богдан ИИ - AI-помощник. Отвечай кратко на русском."},
+                        {"role": "user", "content": full_message}
+                    ],
+                    "model": "meta-llama/llama-3.2-3b-instruct:free",
+                    "temperature": 0.7,
+                    "max_tokens": 1500
+                }
+                
+                fallback_response = requests.post(url, headers=headers, json=payload, timeout=30)
+                fallback_response.raise_for_status()
+                fallback_result = fallback_response.json()
+                fallback_ai_response = fallback_result['choices'][0]['message']['content']
+                
+                return {
+                    'statusCode': 200,
+                    'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                    'isBase64Encoded': False,
+                    'body': json.dumps({
+                        'response': fallback_ai_response + "\n\n⚠️ (Ответ от бесплатной модели - DeepSeek требует пополнения)",
+                        'file_analyzed': bool(file_id and file_context),
+                        'model': 'OpenRouter Fallback (Llama 3.2)'
+                    }, ensure_ascii=False)
+                }
+            except:
+                pass
+        
+        return {
+            'statusCode': 500,
+            'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+            'isBase64Encoded': False,
+            'body': json.dumps({'error': f'AI processing error: {str(e)}'})
+        }
     except Exception as e:
         return {
             'statusCode': 500,
