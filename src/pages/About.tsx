@@ -16,7 +16,7 @@ export default function About() {
                   <Icon name="Brain" className="text-white" size={24} />
                 </div>
                 <h1 className="text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-                  Умный Помощник
+                  Богдан AI
                 </h1>
               </div>
               <nav className="flex gap-6 items-center">
@@ -37,7 +37,7 @@ export default function About() {
               О сервисе
             </h2>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Современный AI-ассистент для работы с данными
+              Богдан — твой умный помощник с суперспособностями
             </p>
           </section>
 
@@ -50,7 +50,7 @@ export default function About() {
                 <div>
                   <h3 className="text-2xl font-bold text-gray-900 mb-3">Что это такое?</h3>
                   <p className="text-gray-700 leading-relaxed">
-                    Умный Помощник — это интеллектуальная платформа, которая использует современные языковые модели AI (Grok, GPT-4) для анализа данных и ответов на вопросы. Система позволяет загружать документы через админ-панель и получать мгновенные ответы на любые вопросы.
+                    Богдан — это умный AI-помощник с суперспособностями, который использует современные языковые модели (Grok, GPT-4) для анализа данных и ответов на вопросы. Система позволяет загружать документы, работать с файлами и получать мгновенные ответы на любые вопросы.
                   </p>
                 </div>
               </div>
@@ -78,7 +78,11 @@ export default function About() {
                     </li>
                     <li className="flex items-start gap-3">
                       <Icon name="Check" className="text-green-600 mt-1 flex-shrink-0" size={20} />
-                      <span><strong>Админ-панель</strong> — управление данными и загрузка документов</span>
+                      <span><strong>Загрузка файлов</strong> — прикрепляйте документы прямо в чат для анализа</span>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <Icon name="Check" className="text-green-600 mt-1 flex-shrink-0" size={20} />
+                      <span><strong>Админ-панель</strong> — управление файлами, статистика и настройки</span>
                     </li>
                     <li className="flex items-start gap-3">
                       <Icon name="Check" className="text-green-600 mt-1 flex-shrink-0" size={20} />
