@@ -14,6 +14,8 @@ interface Message {
   file?: any;
   imageUrl?: string;
   isFavorite?: boolean;
+  detectedLanguage?: string;
+  translatedFrom?: string;
 }
 
 interface ChatContainerProps {
@@ -67,6 +69,27 @@ export default function ChatContainer({
     window.speechSynthesis.speak(utterance);
   };
 
+  const getLanguageName = (code: string): string => {
+    const languages: Record<string, string> = {
+      'ru': 'Русский',
+      'en': 'English',
+      'es': 'Español',
+      'fr': 'Français',
+      'de': 'Deutsch',
+      'zh': '中文',
+      'ja': '日本語',
+      'ar': 'العربية',
+      'pt': 'Português',
+      'it': 'Italiano',
+      'ko': '한국어',
+      'tr': 'Türkçe',
+      'pl': 'Polski',
+      'uk': 'Українська',
+      'hi': 'हिन्दी'
+    };
+    return languages[code] || code.toUpperCase();
+  };
+
   const translateText = async (text: string, sourceLang: string, targetLang: string): Promise<string> => {
     try {
       const response = await fetch(
@@ -106,7 +129,7 @@ export default function ChatContainer({
         
         if (sourceLangCode !== translateToLanguage) {
           const translated = await translateText(transcript, sourceLangCode, translateToLanguage);
-          onInputChange(`${translated} (переведено с ${sourceLangCode})`);
+          onInputChange(`🌐 ${translated}\n\n📍 ${getLanguageName(sourceLangCode)} → ${getLanguageName(translateToLanguage)}`);
         } else {
           onInputChange(transcript);
         }
