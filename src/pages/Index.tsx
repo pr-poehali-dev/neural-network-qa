@@ -22,11 +22,26 @@ export default function Index() {
   const [messages, setMessages] = useState<Array<{ role: 'user' | 'ai'; text: string; file?: any; imageUrl?: string }>>([]);
   const [inputMessage, setInputMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [chatHistory, setChatHistory] = useState<Array<{ id: string; title: string; messages: Array<{ role: 'user' | 'ai'; text: string }> }>>([]);
-  const [currentChatId, setCurrentChatId] = useState<string | null>(null);
+  const [chatHistory, setChatHistory] = useState<Array<{ id: number; title: string; created_at: string; messages: Array<{ role: string; text: string }> }>>([]);
+  const [currentChatId, setCurrentChatId] = useState<number | null>(null);
   const [currentFileId, setCurrentFileId] = useState<number | null>(null);
   const [isGeneratingImage, setIsGeneratingImage] = useState(false);
+  const [showHistory, setShowHistory] = useState(false);
   const { toast } = useToast();
+
+  const loadChatHistory = async () => {
+    try {
+      const sessionId = getSessionId();
+      const response = await fetch(`${CHAT_HISTORY_URL}?session_id=${sessionId}`);
+      const data = await response.json();
+      
+      if (data.chats) {
+        setChatHistory(data.chats);
+      }
+    } catch (error) {
+      console.error('Load history error:', error);
+    }
+  };
 
   const saveChat = async () => {
     if (messages.length === 0) return;
@@ -35,17 +50,48 @@ export default function Index() {
       const sessionId = getSessionId();
       const title = messages[0]?.text.substring(0, 50) || 'Новый чат';
       
-      await fetch(CHAT_HISTORY_URL, {
+      const response = await fetch(CHAT_HISTORY_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ session_id: sessionId, title, messages })
       });
       
+      const data = await response.json();
+      
+      if (data.chat_id) {
+        setCurrentChatId(data.chat_id);
+      }
+      
+      await loadChatHistory();
       toast({ title: 'Чат сохранен' });
     } catch (error) {
       console.error('Save error:', error);
     }
   };
+
+  const loadChat = (chat: any) => {
+    setMessages(chat.messages.map((m: any) => ({ role: m.role, text: m.text })));
+    setCurrentChatId(chat.id);
+    setShowHistory(false);
+    toast({ title: `Загружен чат: ${chat.title}` });
+  };
+
+  const deleteChat = async (chatId: number) => {
+    try {
+      await fetch(`${CHAT_HISTORY_URL}?chat_id=${chatId}`, {
+        method: 'DELETE'
+      });
+      
+      await loadChatHistory();
+      toast({ title: 'Чат удалён' });
+    } catch (error) {
+      console.error('Delete error:', error);
+    }
+  };
+
+  useEffect(() => {
+    loadChatHistory();
+  }, []);
 
   const clearChat = async () => {
     await saveChat();
@@ -171,6 +217,15 @@ export default function Index() {
                 </h1>
               </div>
               <nav className="flex gap-6 items-center">
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => setShowHistory(!showHistory)}
+                  className="border-purple-200"
+                >
+                  <Icon name="History" className="mr-2" size={16} />
+                  История ({chatHistory.length})
+                </Button>
                 <a href="/" className="text-indigo-600 font-medium">Главная</a>
                 <a href="/about" className="text-gray-700 hover:text-indigo-600 transition-colors">О сервисе</a>
                 <a href="/admin" className="text-gray-700 hover:text-indigo-600 transition-colors">
@@ -192,7 +247,47 @@ export default function Index() {
             </p>
           </section>
 
-          <div className="max-w-5xl mx-auto">
+          <div className="max-w-5xl mx-auto relative">
+            {showHistory && (
+              <Card className="absolute left-0 top-0 w-80 max-h-[600px] overflow-y-auto border-2 border-purple-200 p-4 z-20 shadow-xl bg-white">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="font-bold text-lg text-gray-900">История чатов</h3>
+                  <Button variant="ghost" size="sm" onClick={() => setShowHistory(false)}>
+                    <Icon name="X" size={16} />
+                  </Button>
+                </div>
+                
+                {chatHistory.length === 0 ? (
+                  <p className="text-sm text-gray-500 text-center py-8">Нет сохранённых чатов</p>
+                ) : (
+                  <div className="space-y-2">
+                    {chatHistory.map((chat) => (
+                      <div 
+                        key={chat.id}
+                        className="p-3 rounded-lg border border-gray-200 hover:border-indigo-400 hover:bg-indigo-50 transition-all cursor-pointer group"
+                      >
+                        <div onClick={() => loadChat(chat)}>
+                          <p className="font-medium text-sm text-gray-900 truncate">{chat.title}</p>
+                          <p className="text-xs text-gray-500 mt-1">
+                            {chat.messages.length} сообщений
+                          </p>
+                        </div>
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          className="mt-2 text-red-500 hover:text-red-700 w-full opacity-0 group-hover:opacity-100 transition-opacity"
+                          onClick={(e) => { e.stopPropagation(); deleteChat(chat.id); }}
+                        >
+                          <Icon name="Trash2" size={14} className="mr-1" />
+                          Удалить
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </Card>
+            )}
+            
             <Card className="p-8 border-2 border-purple-200 flex flex-col animate-slide-up min-h-[600px]">
               <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-3">
