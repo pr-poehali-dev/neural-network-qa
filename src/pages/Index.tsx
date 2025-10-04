@@ -277,7 +277,7 @@ export default function Index() {
               Богдан
             </h2>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Отвечает только на основе загруженных тобой данных
+              Ваш умный помощник, который знает всё о вашей компании
             </p>
           </section>
 
