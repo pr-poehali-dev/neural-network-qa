@@ -5,7 +5,7 @@ import Icon from '@/components/ui/icon';
 import Header from '@/components/Header';
 import ChatHistoryPanel from '@/components/ChatHistoryPanel';
 import ChatContainer from '@/components/ChatContainer';
-import SuggestionsGrid from '@/components/SuggestionsGrid';
+
 import FeaturesGrid from '@/components/FeaturesGrid';
 import Footer from '@/components/Footer';
 import AIToolsPanel from '@/components/AIToolsPanel';
@@ -353,7 +353,7 @@ export default function Index() {
 
             />
 
-            <SuggestionsGrid onSelectSuggestion={setInputMessage} />
+
 
             <FeaturesGrid />
           </div>

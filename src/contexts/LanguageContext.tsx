@@ -22,7 +22,7 @@ const translations: Translations = {
   
   // Main page
   'main.title': { ru: 'Богдан AI', en: 'Bogdan AI' },
-  'main.subtitle': { ru: 'Твой личный AI-помощник для общения и решения задач', en: 'Your personal AI assistant for communication and tasks' },
+  'main.subtitle': { ru: 'Твой ассистент', en: 'Your assistant' },
   
   // Chat
   'chat.title': { ru: 'Чат', en: 'Chat' },
