@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
@@ -38,6 +39,28 @@ export default function ChatContainer({
   onClearChat,
   onToggleFavorite
 }: ChatContainerProps) {
+  const [speakingIndex, setSpeakingIndex] = useState<number | null>(null);
+
+  const speakText = (text: string, index: number) => {
+    if (speakingIndex === index) {
+      window.speechSynthesis.cancel();
+      setSpeakingIndex(null);
+      return;
+    }
+
+    window.speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = 'ru-RU';
+    utterance.rate = 1.0;
+    utterance.pitch = 1.0;
+    
+    utterance.onend = () => setSpeakingIndex(null);
+    utterance.onerror = () => setSpeakingIndex(null);
+    
+    setSpeakingIndex(index);
+    window.speechSynthesis.speak(utterance);
+  };
+
   return (
     <Card className="p-8 border-2 border-purple-200 flex flex-col animate-slide-up min-h-[600px]">
       <div className="flex items-center justify-between mb-6">
@@ -94,10 +117,30 @@ export default function ChatContainer({
                     <Icon name="Star" size={14} fill={msg.isFavorite ? 'currentColor' : 'none'} />
                   </button>
                 )}
-                {msg.role === 'ai' && (
-                  <Icon name="Sparkles" className="inline mr-2 text-purple-600" size={18} />
-                )}
-                <span className="text-base">{msg.text}</span>
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex-1">
+                    {msg.role === 'ai' && (
+                      <Icon name="Sparkles" className="inline mr-2 text-purple-600" size={18} />
+                    )}
+                    <span className="text-base">{msg.text}</span>
+                  </div>
+                  {msg.role === 'ai' && (
+                    <button
+                      onClick={() => speakText(msg.text, idx)}
+                      className={`flex-shrink-0 p-2 rounded-lg transition-all ${
+                        speakingIndex === idx
+                          ? 'bg-purple-600 text-white'
+                          : 'bg-purple-100 text-purple-600 hover:bg-purple-200'
+                      }`}
+                      title={speakingIndex === idx ? 'Остановить' : 'Озвучить'}
+                    >
+                      <Icon 
+                        name={speakingIndex === idx ? 'VolumeX' : 'Volume2'} 
+                        size={18} 
+                      />
+                    </button>
+                  )}
+                </div>
                 {msg.imageUrl && (
                   <div className="mt-3">
                     <img src={msg.imageUrl} alt="Generated" className="rounded-lg max-w-full" />
