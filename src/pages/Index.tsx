@@ -274,7 +274,7 @@ export default function Index() {
         <main className="container mx-auto px-6 py-12">
           <section className="text-center mb-12 animate-fade-in">
             <h2 className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-indigo-600 via-purple-600 to-cyan-500 bg-clip-text text-transparent">
-              Виртуальный помощник
+              Богдан
             </h2>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto">
               Отвечает только на основе загруженных тобой данных
