@@ -76,6 +76,35 @@ export default function Admin() {
     }
   }, []);
 
+  useEffect(() => {
+    if (isAuthenticated) {
+      loadFilesFromBackend();
+    }
+  }, [isAuthenticated]);
+
+  const loadFilesFromBackend = async () => {
+    try {
+      const response = await fetch(FILE_UPLOAD_URL, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' }
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        if (data.files) {
+          setUploadedFiles(data.files.map((f: any) => ({
+            name: f.name,
+            size: f.size,
+            type: f.type,
+            uploadedAt: f.uploadedAt
+          })));
+        }
+      }
+    } catch (error) {
+      console.error('Error loading files:', error);
+    }
+  };
+
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
     setIsDragging(true);

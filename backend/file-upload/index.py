@@ -18,12 +18,59 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             'statusCode': 200,
             'headers': {
                 'Access-Control-Allow-Origin': '*',
-                'Access-Control-Allow-Methods': 'POST, OPTIONS',
+                'Access-Control-Allow-Methods': 'GET, POST, DELETE, OPTIONS',
                 'Access-Control-Allow-Headers': 'Content-Type',
                 'Access-Control-Max-Age': '86400'
             },
             'body': ''
         }
+    
+    if method == 'GET':
+        database_url = os.environ.get('DATABASE_URL')
+        
+        if not database_url:
+            return {
+                'statusCode': 500,
+                'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                'body': json.dumps({'error': 'Database not configured'})
+            }
+        
+        try:
+            conn = psycopg2.connect(database_url)
+            cursor = conn.cursor(cursor_factory=RealDictCursor)
+            
+            cursor.execute(
+                "SELECT id, file_name, file_type, file_size, session_id, uploaded_at FROM files ORDER BY uploaded_at DESC"
+            )
+            
+            files = cursor.fetchall()
+            
+            cursor.close()
+            conn.close()
+            
+            files_list = []
+            for f in files:
+                files_list.append({
+                    'id': f['id'],
+                    'name': f['file_name'],
+                    'type': f['file_type'],
+                    'size': f['file_size'],
+                    'uploadedAt': f['uploaded_at'].isoformat() if f['uploaded_at'] else None
+                })
+            
+            return {
+                'statusCode': 200,
+                'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                'isBase64Encoded': False,
+                'body': json.dumps({'files': files_list})
+            }
+        
+        except Exception as e:
+            return {
+                'statusCode': 500,
+                'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                'body': json.dumps({'error': str(e)})
+            }
     
     if method != 'POST':
         return {
