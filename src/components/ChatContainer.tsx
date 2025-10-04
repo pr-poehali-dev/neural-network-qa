@@ -132,7 +132,7 @@ export default function ChatContainer({
         <div className="flex gap-2">
           <Button 
             onClick={onSendMessage}
-            className="flex-1 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 shadow-lg"
+            className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 shadow-lg"
             size="lg"
             disabled={isLoading || isGeneratingImage}
           >
@@ -142,19 +142,6 @@ export default function ChatContainer({
               <Icon name="MessageSquare" size={20} className="mr-2" />
             )}
             Ответить
-          </Button>
-          <Button 
-            onClick={onGenerateImage}
-            className="flex-1 bg-gradient-to-r from-pink-500 to-orange-500 hover:from-pink-600 hover:to-orange-600 shadow-lg"
-            size="lg"
-            disabled={isLoading || isGeneratingImage}
-          >
-            {isGeneratingImage ? (
-              <Icon name="Loader2" size={20} className="animate-spin mr-2" />
-            ) : (
-              <Icon name="Image" size={20} className="mr-2" />
-            )}
-            Нарисовать
           </Button>
         </div>
       </div>
