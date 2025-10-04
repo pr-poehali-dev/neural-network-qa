@@ -51,7 +51,8 @@ def call_free_api(message: str) -> str:
     payload = {
         "model": "gpt-3.5-turbo-0125",
         "messages": [
-            {"role": "user", "content": f"Ты Богдан ИИ. Отвечай кратко на русском: {message}"}
+            {"role": "system", "content": "Ты виртуальный помощник. Отвечай ТОЛЬКО на основе предоставленной информации. Если информации нет - скажи 'Информация не найдена в загруженных данных'."},
+            {"role": "user", "content": message}
         ]
     }
     
@@ -122,28 +123,39 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     
     database_url = os.environ.get('DATABASE_URL')
     
-    file_context = ""
+    knowledge_base = ""
     
-    if file_id and database_url:
+    # Загружаем ВСЕ файлы как базу знаний
+    if database_url:
         try:
             conn = psycopg2.connect(database_url)
             cursor = conn.cursor(cursor_factory=RealDictCursor)
             
-            cursor.execute("SELECT file_name, file_data FROM files WHERE id = %s", (file_id,))
-            file_record = cursor.fetchone()
+            cursor.execute("SELECT file_name, file_data FROM files ORDER BY id DESC LIMIT 10")
+            files = cursor.fetchall()
             
-            if file_record:
-                file_content = bytes(file_record['file_data'])
-                file_name = file_record['file_name']
-                file_text = extract_text_from_file(file_content, file_name)
-                file_context = f"\n\nСодержимое прикрепленного файла '{file_name}':\n{file_text[:15000]}"
+            if files:
+                knowledge_base = "\n\n=== БАЗА ЗНАНИЙ ===\n"
+                for file_record in files:
+                    file_content = bytes(file_record['file_data'])
+                    file_name = file_record['file_name']
+                    file_text = extract_text_from_file(file_content, file_name)
+                    knowledge_base += f"\n--- Файл: {file_name} ---\n{file_text[:5000]}\n"
             
             cursor.close()
             conn.close()
         except Exception as e:
-            file_context = f"\n\n(Ошибка чтения файла: {str(e)})"
+            knowledge_base = ""
     
-    full_message = user_message + file_context
+    if not knowledge_base:
+        return {
+            'statusCode': 400,
+            'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+            'isBase64Encoded': False,
+            'body': json.dumps({'error': 'Загрузите хотя бы один файл с данными для ответов помощника'})
+        }
+    
+    full_message = f"{knowledge_base}\n\nВОПРОС ПОЛЬЗОВАТЕЛЯ: {user_message}\n\nОтветь на основе ТОЛЬКО информации из базы знаний выше."
     
     ai_response = call_free_api(full_message)
     model_used = "DuckDuckGo AI"
