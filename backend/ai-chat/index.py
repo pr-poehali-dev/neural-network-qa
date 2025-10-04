@@ -26,7 +26,7 @@ def extract_text_from_file(file_content: bytes, file_name: str) -> str:
 
 def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     '''
-    Business: AI chat - вопросы через DeepSeek + анализ файлов
+    Business: AI chat - вопросы через DeepSeek AI + анализ файлов
     Args: event с httpMethod, body (message, file_id)
           context с request_id
     Returns: HTTP response с ответом от AI
