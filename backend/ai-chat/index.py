@@ -25,18 +25,16 @@ def extract_text_from_file(file_content: bytes, file_name: str) -> str:
         return file_content.decode('utf-8', errors='ignore')[:10000]
 
 def call_huggingface(message: str, api_key: str) -> str:
-    url = "https://api-inference.huggingface.co/models/meta-llama/Llama-3.2-3B-Instruct"
+    url = "https://api-inference.huggingface.co/models/google/flan-t5-large"
     headers = {
         "Authorization": f"Bearer {api_key}",
         "Content-Type": "application/json"
     }
     payload = {
-        "inputs": message,
+        "inputs": f"Ответь на русском языке кратко: {message}",
         "parameters": {
-            "max_new_tokens": 800,
-            "temperature": 0.7,
-            "top_p": 0.9,
-            "return_full_text": False
+            "max_new_tokens": 500,
+            "temperature": 0.7
         }
     }
     
@@ -126,7 +124,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     full_message = user_message + file_context
     
     ai_response = call_huggingface(full_message, hf_key)
-    model_used = "Hugging Face (Llama 3.2)"
+    model_used = "Hugging Face (Flan-T5)"
     
     return {
         'statusCode': 200,
