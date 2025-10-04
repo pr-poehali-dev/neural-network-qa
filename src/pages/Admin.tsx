@@ -10,7 +10,30 @@ export default function Admin() {
   const [isDragging, setIsDragging] = useState(false);
   const [password, setPassword] = useState('');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [notes, setNotes] = useState('');
   const { toast } = useToast();
+
+  const exportAllData = () => {
+    const data = {
+      files: uploadedFiles.map(f => ({ name: f.name, size: f.size, type: f.type })),
+      notes: notes,
+      exportDate: new Date().toISOString()
+    };
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `данные-${Date.now()}.json`;
+    a.click();
+    toast({ title: 'Данные экспортированы' });
+  };
+
+  const clearAllData = () => {
+    if (confirm('Удалить все загруженные файлы?')) {
+      setUploadedFiles([]);
+      toast({ title: 'Все файлы удалены' });
+    }
+  };
 
   const handleLogin = () => {
     if (password === 'admin123') {
@@ -74,7 +97,7 @@ export default function Admin() {
             <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center">
               <Icon name="Lock" className="text-white" size={24} />
             </div>
-            <h1 className="text-2xl font-bold text-gray-900">Админ-панель</h1>
+            <h1 className="text-2xl font-bold text-gray-900">Панель управления</h1>
           </div>
           
           <p className="text-gray-600 mb-6">Введите пароль для доступа</p>
@@ -113,7 +136,7 @@ export default function Admin() {
                   <Icon name="Shield" className="text-white" size={24} />
                 </div>
                 <h1 className="text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-                  Админ-панель
+                  Панель управления
                 </h1>
               </div>
               <div className="flex gap-4">
@@ -217,32 +240,66 @@ export default function Admin() {
               </div>
             </Card>
 
-            <div className="mt-8 grid md:grid-cols-3 gap-6">
+            <div className="mt-8 space-y-6">
               <Card className="p-6 border-2 border-purple-200">
-                <div className="flex items-center gap-3 mb-2">
-                  <Icon name="FileText" className="text-indigo-600" size={24} />
-                  <h4 className="font-bold text-gray-900">Файлов</h4>
+                <div className="flex items-center gap-3 mb-4">
+                  <Icon name="FileEdit" className="text-indigo-600" size={24} />
+                  <h4 className="font-bold text-gray-900">Заметки</h4>
                 </div>
-                <p className="text-3xl font-bold text-indigo-600">{uploadedFiles.length}</p>
+                <textarea
+                  className="w-full p-4 border border-purple-200 rounded-lg focus:border-indigo-500 outline-none resize-none"
+                  rows={4}
+                  placeholder="Добавьте заметки о загруженных данных..."
+                  value={notes}
+                  onChange={(e) => setNotes(e.target.value)}
+                />
               </Card>
 
-              <Card className="p-6 border-2 border-purple-200">
-                <div className="flex items-center gap-3 mb-2">
-                  <Icon name="HardDrive" className="text-purple-600" size={24} />
-                  <h4 className="font-bold text-gray-900">Размер</h4>
-                </div>
-                <p className="text-3xl font-bold text-purple-600">
-                  {(uploadedFiles.reduce((sum, f) => sum + f.size, 0) / 1024).toFixed(1)} KB
-                </p>
-              </Card>
+              <div className="grid md:grid-cols-3 gap-6">
+                <Card className="p-6 border-2 border-purple-200">
+                  <div className="flex items-center gap-3 mb-2">
+                    <Icon name="FileText" className="text-indigo-600" size={24} />
+                    <h4 className="font-bold text-gray-900">Файлов</h4>
+                  </div>
+                  <p className="text-3xl font-bold text-indigo-600">{uploadedFiles.length}</p>
+                </Card>
 
-              <Card className="p-6 border-2 border-purple-200">
-                <div className="flex items-center gap-3 mb-2">
-                  <Icon name="Zap" className="text-cyan-600" size={24} />
-                  <h4 className="font-bold text-gray-900">Статус</h4>
-                </div>
-                <p className="text-lg font-bold text-cyan-600">Готов</p>
-              </Card>
+                <Card className="p-6 border-2 border-purple-200">
+                  <div className="flex items-center gap-3 mb-2">
+                    <Icon name="HardDrive" className="text-purple-600" size={24} />
+                    <h4 className="font-bold text-gray-900">Размер</h4>
+                  </div>
+                  <p className="text-3xl font-bold text-purple-600">
+                    {(uploadedFiles.reduce((sum, f) => sum + f.size, 0) / 1024).toFixed(1)} KB
+                  </p>
+                </Card>
+
+                <Card className="p-6 border-2 border-purple-200">
+                  <div className="flex items-center gap-3 mb-2">
+                    <Icon name="Zap" className="text-cyan-600" size={24} />
+                    <h4 className="font-bold text-gray-900">Статус</h4>
+                  </div>
+                  <p className="text-lg font-bold text-cyan-600">Готов</p>
+                </Card>
+              </div>
+
+              <div className="flex gap-4">
+                <Button 
+                  onClick={exportAllData}
+                  className="flex-1 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700"
+                >
+                  <Icon name="Download" className="mr-2" size={20} />
+                  Экспортировать все данные
+                </Button>
+                <Button 
+                  onClick={clearAllData}
+                  variant="outline"
+                  className="flex-1 border-red-300 text-red-600 hover:bg-red-50"
+                >
+                  <Icon name="Trash2" className="mr-2" size={20} />
+                  Очистить все
+                </Button>
+              </div>
             </div>
           </div>
         </main>

@@ -4,7 +4,7 @@ from typing import Dict, Any
 
 def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     '''
-    Business: AI chat endpoint - процессирует вопросы пользователей через OpenAI
+    Business: AI chat endpoint - процессирует вопросы пользователей через Grok или OpenAI
     Args: event с httpMethod, body (содержит message)
           context с request_id
     Returns: HTTP response с ответом от AI
@@ -42,15 +42,18 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             'body': json.dumps({'error': 'Message is required'})
         }
     
+    xai_key = os.environ.get('XAI_API_KEY')
     openai_key = os.environ.get('OPENAI_API_KEY')
     
-    if not openai_key:
+    api_key = xai_key or openai_key
+    
+    if not api_key:
         return {
             'statusCode': 200,
             'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
             'isBase64Encoded': False,
             'body': json.dumps({
-                'response': f'Я получил ваш вопрос: "{user_message}". Система анализа данных работает. (Демо-режим - добавьте OPENAI_API_KEY для полной функциональности)',
+                'response': f'Я получил ваш вопрос: "{user_message}". Система работает в демо-режиме. Добавьте XAI_API_KEY или OPENAI_API_KEY для полной функциональности.',
                 'demo': True
             })
         }
@@ -58,18 +61,26 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     try:
         import openai
         
-        client = openai.OpenAI(api_key=openai_key)
+        if xai_key:
+            client = openai.OpenAI(
+                api_key=xai_key,
+                base_url="https://api.x.ai/v1"
+            )
+            model = "grok-beta"
+        else:
+            client = openai.OpenAI(api_key=openai_key)
+            model = "gpt-4o-mini"
         
         completion = client.chat.completions.create(
-            model="gpt-4o-mini",
+            model=model,
             messages=[
                 {
                     "role": "system", 
-                    "content": "Ты умный AI-ассистент, который помогает анализировать данные пользователей. Отвечай кратко и по делу на русском языке."
+                    "content": "Ты Умный Помощник - AI-ассистент, который помогает пользователям с любыми вопросами. Отвечай кратко, по делу и на русском языке."
                 },
                 {"role": "user", "content": user_message}
             ],
-            max_tokens=500,
+            max_tokens=800,
             temperature=0.7
         )
         

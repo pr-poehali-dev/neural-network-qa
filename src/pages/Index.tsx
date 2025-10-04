@@ -11,7 +11,30 @@ export default function Index() {
   const [messages, setMessages] = useState<Array<{ role: 'user' | 'ai'; text: string }>>([]);
   const [inputMessage, setInputMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [chatHistory, setChatHistory] = useState<Array<{ id: string; title: string; messages: Array<{ role: 'user' | 'ai'; text: string }> }>>([]);
+  const [currentChatId, setCurrentChatId] = useState<string | null>(null);
   const { toast } = useToast();
+
+  const clearChat = () => {
+    if (messages.length > 0) {
+      const chatId = Date.now().toString();
+      const chatTitle = messages[0]?.text.substring(0, 30) + '...';
+      setChatHistory(prev => [{ id: chatId, title: chatTitle, messages }, ...prev]);
+    }
+    setMessages([]);
+    setCurrentChatId(null);
+  };
+
+  const exportChat = () => {
+    const chatText = messages.map(m => `${m.role === 'user' ? 'Пользователь' : 'AI'}: ${m.text}`).join('\n\n');
+    const blob = new Blob([chatText], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `чат-${Date.now()}.txt`;
+    a.click();
+    toast({ title: 'Чат экспортирован' });
+  };
 
   const handleSendMessage = async () => {
     if (!inputMessage.trim() || isLoading) return;
@@ -68,7 +91,7 @@ export default function Index() {
                   <Icon name="Brain" className="text-white" size={24} />
                 </div>
                 <h1 className="text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-                  AI Assistant
+                  Умный Помощник
                 </h1>
               </div>
               <nav className="flex gap-6 items-center">
@@ -86,20 +109,36 @@ export default function Index() {
         <main className="container mx-auto px-6 py-12">
           <section className="text-center mb-12 animate-fade-in">
             <h2 className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-indigo-600 via-purple-600 to-cyan-500 bg-clip-text text-transparent">
-              Задайте вопрос AI-ассистенту
+              Умный Помощник
             </h2>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Получите умные ответы на основе загруженных данных
+              Задайте любой вопрос и получите умный ответ
             </p>
           </section>
 
           <div className="max-w-5xl mx-auto">
             <Card className="p-8 border-2 border-purple-200 flex flex-col animate-slide-up min-h-[600px]">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-purple-500 to-cyan-500 flex items-center justify-center">
-                  <Icon name="MessageSquare" className="text-white" size={24} />
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-purple-500 to-cyan-500 flex items-center justify-center">
+                    <Icon name="MessageSquare" className="text-white" size={24} />
+                  </div>
+                  <h3 className="text-2xl font-bold text-gray-900">Чат</h3>
                 </div>
-                <h3 className="text-2xl font-bold text-gray-900">AI Чат</h3>
+                <div className="flex gap-2">
+                  {messages.length > 0 && (
+                    <>
+                      <Button variant="outline" size="sm" onClick={exportChat}>
+                        <Icon name="Download" className="mr-2" size={16} />
+                        Экспорт
+                      </Button>
+                      <Button variant="outline" size="sm" onClick={clearChat}>
+                        <Icon name="Trash2" className="mr-2" size={16} />
+                        Очистить
+                      </Button>
+                    </>
+                  )}
+                </div>
               </div>
 
               <div className="flex-1 bg-gradient-to-br from-gray-50 to-purple-50/30 rounded-xl p-6 mb-6 overflow-y-auto space-y-4">
@@ -107,23 +146,7 @@ export default function Index() {
                   <div className="text-center text-gray-500 mt-32">
                     <Icon name="Sparkles" className="mx-auto mb-6 text-purple-400" size={64} />
                     <h4 className="text-2xl font-bold text-gray-700 mb-3">Начните диалог</h4>
-                    <p className="text-lg">Задайте любой вопрос по загруженным данным</p>
-                    <div className="mt-8 grid gap-3 max-w-md mx-auto">
-                      <Button 
-                        variant="outline" 
-                        className="border-purple-300 hover:bg-purple-50"
-                        onClick={() => setInputMessage('Какие данные доступны?')}
-                      >
-                        Какие данные доступны?
-                      </Button>
-                      <Button 
-                        variant="outline" 
-                        className="border-purple-300 hover:bg-purple-50"
-                        onClick={() => setInputMessage('Покажи статистику')}
-                      >
-                        Покажи статистику
-                      </Button>
-                    </div>
+                    <p className="text-lg">Задайте любой вопрос</p>
                   </div>
                 ) : (
                   messages.map((msg, idx) => (
