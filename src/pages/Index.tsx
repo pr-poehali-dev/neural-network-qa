@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
+import { Button } from '@/components/ui/button';
+import Icon from '@/components/ui/icon';
 import Header from '@/components/Header';
 import ChatHistoryPanel from '@/components/ChatHistoryPanel';
 import ChatContainer from '@/components/ChatContainer';
@@ -7,6 +9,8 @@ import SuggestionsGrid from '@/components/SuggestionsGrid';
 import FeaturesGrid from '@/components/FeaturesGrid';
 import Footer from '@/components/Footer';
 import AIToolsPanel from '@/components/AIToolsPanel';
+import ExportMenu from '@/components/ExportMenu';
+import PromptTemplates from '@/components/PromptTemplates';
 
 const AI_CHAT_URL = 'https://functions.poehali.dev/95328c78-94a6-4f98-a89c-a4b1b840ea99';
 const CHAT_HISTORY_URL = 'https://functions.poehali.dev/824196a4-a71d-49e7-acbc-08d9f8801ff2';
@@ -22,7 +26,7 @@ const getSessionId = () => {
 };
 
 export default function Index() {
-  const [messages, setMessages] = useState<Array<{ role: 'user' | 'ai'; text: string; file?: any; imageUrl?: string }>>([]);
+  const [messages, setMessages] = useState<Array<{ role: 'user' | 'ai'; text: string; file?: any; imageUrl?: string; isFavorite?: boolean }>>([]);
   const [inputMessage, setInputMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [chatHistory, setChatHistory] = useState<Array<{ id: number; title: string; created_at: string; messages: Array<{ role: string; text: string }>; tags?: string[] }>>([]);
@@ -30,6 +34,8 @@ export default function Index() {
   const [currentFileId, setCurrentFileId] = useState<number | null>(null);
   const [isGeneratingImage, setIsGeneratingImage] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
+  const [showExportMenu, setShowExportMenu] = useState(false);
+  const [showTemplates, setShowTemplates] = useState(false);
   const { toast } = useToast();
 
   const loadChatHistory = async () => {
@@ -127,14 +133,16 @@ export default function Index() {
   };
 
   const exportChat = () => {
-    const chatText = messages.map(m => `${m.role === 'user' ? 'Пользователь' : 'AI'}: ${m.text}`).join('\n\n');
-    const blob = new Blob([chatText], { type: 'text/plain' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `чат-${Date.now()}.txt`;
-    a.click();
-    toast({ title: 'Чат экспортирован' });
+    setShowExportMenu(true);
+  };
+
+  const toggleFavorite = (index: number) => {
+    setMessages(prev => prev.map((msg, i) => 
+      i === index ? { ...msg, isFavorite: !msg.isFavorite } : msg
+    ));
+    toast({ 
+      title: messages[index].isFavorite ? 'Удалено из избранного' : 'Добавлено в избранное'
+    });
   };
 
   const handleGenerateImage = async () => {
@@ -236,6 +244,23 @@ export default function Index() {
           onToggleHistory={() => setShowHistory(!showHistory)}
         />
 
+        {showExportMenu && (
+          <ExportMenu 
+            messages={messages}
+            onClose={() => setShowExportMenu(false)}
+          />
+        )}
+
+        {showTemplates && (
+          <PromptTemplates
+            onSelectTemplate={(prompt) => {
+              setInputMessage(prompt);
+              setShowTemplates(false);
+            }}
+            onClose={() => setShowTemplates(false)}
+          />
+        )}
+
         <main className="container mx-auto px-6 py-12">
           <section className="text-center mb-12 animate-fade-in">
             <h2 className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-indigo-600 via-purple-600 to-cyan-500 bg-clip-text text-transparent">
@@ -257,6 +282,16 @@ export default function Index() {
               />
             )}
             
+            <div className="mb-4 flex gap-2 justify-end">
+              <Button
+                onClick={() => setShowTemplates(true)}
+                className="bg-gradient-to-r from-pink-500 to-orange-500 hover:from-pink-600 hover:to-orange-600"
+              >
+                <Icon name="BookmarkPlus" size={16} className="mr-2" />
+                Шаблоны
+              </Button>
+            </div>
+
             <ChatContainer
               messages={messages}
               inputMessage={inputMessage}
@@ -268,6 +303,7 @@ export default function Index() {
               onSaveChat={saveChat}
               onExportChat={exportChat}
               onClearChat={clearChat}
+              onToggleFavorite={toggleFavorite}
             />
 
             <AIToolsPanel onSelectTool={handleToolSelect} />

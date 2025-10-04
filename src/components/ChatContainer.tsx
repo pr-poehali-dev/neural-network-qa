@@ -8,6 +8,7 @@ interface Message {
   text: string;
   file?: any;
   imageUrl?: string;
+  isFavorite?: boolean;
 }
 
 interface ChatContainerProps {
@@ -21,6 +22,7 @@ interface ChatContainerProps {
   onSaveChat: () => void;
   onExportChat: () => void;
   onClearChat: () => void;
+  onToggleFavorite?: (index: number) => void;
 }
 
 export default function ChatContainer({
@@ -33,7 +35,8 @@ export default function ChatContainer({
   onGenerateImage,
   onSaveChat,
   onExportChat,
-  onClearChat
+  onClearChat,
+  onToggleFavorite
 }: ChatContainerProps) {
   return (
     <Card className="p-8 border-2 border-purple-200 flex flex-col animate-slide-up min-h-[600px]">
@@ -73,12 +76,24 @@ export default function ChatContainer({
           </div>
         ) : (
           messages.map((msg, idx) => (
-            <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'} animate-fade-in`}>
-              <div className={`max-w-[80%] rounded-2xl px-5 py-4 ${
+            <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'} animate-fade-in group`}>
+              <div className={`max-w-[80%] rounded-2xl px-5 py-4 relative ${
                 msg.role === 'user' 
                   ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white' 
                   : 'bg-white border border-purple-200 text-gray-900 shadow-sm'
               }`}>
+                {onToggleFavorite && (
+                  <button
+                    onClick={() => onToggleFavorite(idx)}
+                    className={`absolute -top-2 -right-2 w-6 h-6 rounded-full flex items-center justify-center transition-all opacity-0 group-hover:opacity-100 ${
+                      msg.isFavorite 
+                        ? 'bg-yellow-400 text-white' 
+                        : 'bg-gray-200 text-gray-600 hover:bg-yellow-400 hover:text-white'
+                    }`}
+                  >
+                    <Icon name="Star" size={14} fill={msg.isFavorite ? 'currentColor' : 'none'} />
+                  </button>
+                )}
                 {msg.role === 'ai' && (
                   <Icon name="Sparkles" className="inline mr-2 text-purple-600" size={18} />
                 )}
