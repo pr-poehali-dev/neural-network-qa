@@ -22,7 +22,7 @@ const translations: Translations = {
   
   // Main page
   'main.title': { ru: 'Богдан AI', en: 'Bogdan AI' },
-  'main.subtitle': { ru: 'Демо-версия чат-бота с красивым интерфейсом', en: 'Demo chatbot with beautiful interface' },
+  'main.subtitle': { ru: 'Твой личный AI-помощник для общения и решения задач', en: 'Your personal AI assistant for communication and tasks' },
   
   // Chat
   'chat.title': { ru: 'Чат', en: 'Chat' },
@@ -40,15 +40,15 @@ const translations: Translations = {
   'chat.copy': { ru: 'Копировать', en: 'Copy' },
   
   // Examples
-  'examples.title': { ru: 'Готовые шаблоны', en: 'Ready templates' },
-  'examples.prices': { ru: 'Расскажи анекдот', en: 'Tell me a joke' },
-  'examples.pricesDesc': { ru: 'Развлекательный контент', en: 'Fun content' },
-  'examples.contacts': { ru: 'Помоги с идеей для проекта', en: 'Help with project idea' },
-  'examples.contactsDesc': { ru: 'Мозговой штурм', en: 'Brainstorming' },
-  'examples.summary': { ru: 'Объясни простыми словами что такое AI', en: 'Explain AI in simple words' },
-  'examples.summaryDesc': { ru: 'Простые объяснения', en: 'Simple explanations' },
-  'examples.dates': { ru: 'Дай совет по продуктивности', en: 'Give productivity advice' },
-  'examples.datesDesc': { ru: 'Полезные советы', en: 'Useful tips' },
+  'examples.title': { ru: 'Попробуйте спросить', en: 'Try asking' },
+  'examples.prices': { ru: 'Что такое искусственный интеллект?', en: 'What is artificial intelligence?' },
+  'examples.pricesDesc': { ru: 'Узнайте больше об AI', en: 'Learn more about AI' },
+  'examples.contacts': { ru: 'Как начать изучать программирование?', en: 'How to start learning programming?' },
+  'examples.contactsDesc': { ru: 'Советы для начинающих', en: 'Tips for beginners' },
+  'examples.summary': { ru: 'Расскажи интересный факт', en: 'Tell me an interesting fact' },
+  'examples.summaryDesc': { ru: 'Развивайте кругозор', en: 'Expand your knowledge' },
+  'examples.dates': { ru: 'Помоги составить план на день', en: 'Help me plan my day' },
+  'examples.datesDesc': { ru: 'Организуйте время', en: 'Organize your time' },
   
   // Settings
   'settings.title': { ru: 'Настройки', en: 'Settings' },

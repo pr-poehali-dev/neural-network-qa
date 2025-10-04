@@ -10,7 +10,7 @@ import FeaturesGrid from '@/components/FeaturesGrid';
 import Footer from '@/components/Footer';
 import AIToolsPanel from '@/components/AIToolsPanel';
 import ExportMenu from '@/components/ExportMenu';
-import PromptTemplates from '@/components/PromptTemplates';
+
 import ApiKeyNotice from '@/components/ApiKeyNotice';
 import SettingsPanel from '@/components/SettingsPanel';
 import FileDropZone from '@/components/FileDropZone';
@@ -39,7 +39,7 @@ export default function Index() {
   const [isGeneratingImage, setIsGeneratingImage] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
   const [showExportMenu, setShowExportMenu] = useState(false);
-  const [showTemplates, setShowTemplates] = useState(false);
+
   const [showApiNotice, setShowApiNotice] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const { toast } = useToast();
@@ -143,31 +143,7 @@ export default function Index() {
     setShowExportMenu(true);
   };
 
-  const toggleFavorite = (index: number) => {
-    const updatedMessages = messages.map((msg, i) => 
-      i === index ? { ...msg, isFavorite: !msg.isFavorite } : msg
-    );
-    setMessages(updatedMessages);
-    
-    const favMessage = updatedMessages[index];
-    const favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
-    
-    if (favMessage.isFavorite) {
-      favorites.push({
-        text: favMessage.text,
-        role: favMessage.role,
-        timestamp: new Date().toISOString()
-      });
-      toast({ title: 'Добавлено в избранное' });
-    } else {
-      const filtered = favorites.filter((f: any) => f.text !== favMessage.text);
-      localStorage.setItem('favorites', JSON.stringify(filtered));
-      toast({ title: 'Удалено из избранного' });
-      return;
-    }
-    
-    localStorage.setItem('favorites', JSON.stringify(favorites));
-  };
+
 
   const handleGenerateImage = async () => {
     if (!inputMessage.trim() || isLoading || isGeneratingImage) return;
@@ -334,15 +310,7 @@ export default function Index() {
           />
         )}
 
-        {showTemplates && (
-          <PromptTemplates
-            onSelectTemplate={(prompt) => {
-              setInputMessage(prompt);
-              setShowTemplates(false);
-            }}
-            onClose={() => setShowTemplates(false)}
-          />
-        )}
+
 
         {showApiNotice && (
           <ApiKeyNotice onClose={() => setShowApiNotice(false)} />
@@ -369,15 +337,7 @@ export default function Index() {
               />
             )}
             
-            <div className="mb-4 flex gap-2 justify-end">
-              <Button
-                onClick={() => setShowTemplates(true)}
-                className="bg-gradient-to-r from-pink-500 to-orange-500 hover:from-pink-600 hover:to-orange-600"
-              >
-                <Icon name="BookmarkPlus" size={16} className="mr-2" />
-                Шаблоны
-              </Button>
-            </div>
+
 
             <ChatContainer
               messages={messages}
@@ -390,7 +350,7 @@ export default function Index() {
               onSaveChat={saveChat}
               onExportChat={exportChat}
               onClearChat={clearChat}
-              onToggleFavorite={toggleFavorite}
+
             />
 
             <SuggestionsGrid onSelectSuggestion={setInputMessage} />

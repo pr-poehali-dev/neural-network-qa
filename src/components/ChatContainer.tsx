@@ -133,9 +133,7 @@ export default function ChatContainer({
         </div>
       </div>
 
-      {messages.length > 3 && (
-        <SearchMessages messages={messages} onResultClick={(idx) => console.log('Scroll to:', idx)} />
-      )}
+
 
       <div className="flex-1 bg-gradient-to-br from-gray-50 to-purple-50/30 dark:from-gray-800 dark:to-purple-900/20 rounded-xl p-6 mb-6 overflow-y-auto space-y-4">
         {isLoading && messages[messages.length - 1]?.role === 'user' && (
@@ -165,18 +163,7 @@ export default function ChatContainer({
                   ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white' 
                   : 'bg-white dark:bg-gray-800 border border-purple-200 dark:border-purple-800 text-gray-900 dark:text-white shadow-sm'
               }`}>
-                {onToggleFavorite && (
-                  <button
-                    onClick={() => onToggleFavorite(idx)}
-                    className={`absolute -top-2 -right-2 w-6 h-6 rounded-full flex items-center justify-center transition-all opacity-0 group-hover:opacity-100 ${
-                      msg.isFavorite 
-                        ? 'bg-yellow-400 text-white' 
-                        : 'bg-gray-200 text-gray-600 hover:bg-yellow-400 hover:text-white'
-                    }`}
-                  >
-                    <Icon name="Star" size={14} fill={msg.isFavorite ? 'currentColor' : 'none'} />
-                  </button>
-                )}
+
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex-1 prose prose-sm dark:prose-invert max-w-none">
                     {msg.role === 'ai' ? (
