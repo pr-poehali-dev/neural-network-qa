@@ -1,0 +1,28 @@
+{
+  "tests": [
+    {
+      "name": "Test OPTIONS request",
+      "method": "OPTIONS",
+      "path": "/",
+      "expectedStatus": 200
+    },
+    {
+      "name": "Test save chat",
+      "method": "POST",
+      "path": "/",
+      "body": {
+        "session_id": "test-session",
+        "title": "Тестовый чат",
+        "messages": [
+          {"role": "user", "text": "Привет"},
+          {"role": "ai", "text": "Здравствуйте!"}
+        ]
+      },
+      "expectedStatus": 200,
+      "expectedBody": {
+        "success": true
+      },
+      "bodyMatcher": "partial"
+    }
+  ]
+}

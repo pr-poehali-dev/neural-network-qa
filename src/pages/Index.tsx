@@ -6,6 +6,16 @@ import Icon from '@/components/ui/icon';
 import { useToast } from '@/hooks/use-toast';
 
 const AI_CHAT_URL = 'https://functions.poehali.dev/95328c78-94a6-4f98-a89c-a4b1b840ea99';
+const CHAT_HISTORY_URL = 'https://functions.poehali.dev/824196a4-a71d-49e7-acbc-08d9f8801ff2';
+
+const getSessionId = () => {
+  let sessionId = localStorage.getItem('session_id');
+  if (!sessionId) {
+    sessionId = `session-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    localStorage.setItem('session_id', sessionId);
+  }
+  return sessionId;
+};
 
 export default function Index() {
   const [messages, setMessages] = useState<Array<{ role: 'user' | 'ai'; text: string }>>([]);
@@ -15,12 +25,27 @@ export default function Index() {
   const [currentChatId, setCurrentChatId] = useState<string | null>(null);
   const { toast } = useToast();
 
-  const clearChat = () => {
-    if (messages.length > 0) {
-      const chatId = Date.now().toString();
-      const chatTitle = messages[0]?.text.substring(0, 30) + '...';
-      setChatHistory(prev => [{ id: chatId, title: chatTitle, messages }, ...prev]);
+  const saveChat = async () => {
+    if (messages.length === 0) return;
+    
+    try {
+      const sessionId = getSessionId();
+      const title = messages[0]?.text.substring(0, 50) || 'Новый чат';
+      
+      await fetch(CHAT_HISTORY_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ session_id: sessionId, title, messages })
+      });
+      
+      toast({ title: 'Чат сохранен' });
+    } catch (error) {
+      console.error('Save error:', error);
     }
+  };
+
+  const clearChat = async () => {
+    await saveChat();
     setMessages([]);
     setCurrentChatId(null);
   };
@@ -95,8 +120,8 @@ export default function Index() {
                 </h1>
               </div>
               <nav className="flex gap-6 items-center">
-                <a href="#" className="text-gray-700 hover:text-indigo-600 transition-colors">Главная</a>
-                <a href="#" className="text-gray-700 hover:text-indigo-600 transition-colors">О сервисе</a>
+                <a href="/" className="text-indigo-600 font-medium">Главная</a>
+                <a href="/about" className="text-gray-700 hover:text-indigo-600 transition-colors">О сервисе</a>
                 <a href="/admin" className="text-gray-700 hover:text-indigo-600 transition-colors">
                   <Icon name="Shield" className="inline mr-1" size={16} />
                   Админ
@@ -128,13 +153,17 @@ export default function Index() {
                 <div className="flex gap-2">
                   {messages.length > 0 && (
                     <>
+                      <Button variant="outline" size="sm" onClick={saveChat}>
+                        <Icon name="Save" className="mr-2" size={16} />
+                        Сохранить
+                      </Button>
                       <Button variant="outline" size="sm" onClick={exportChat}>
                         <Icon name="Download" className="mr-2" size={16} />
                         Экспорт
                       </Button>
                       <Button variant="outline" size="sm" onClick={clearChat}>
-                        <Icon name="Trash2" className="mr-2" size={16} />
-                        Очистить
+                        <Icon name="Plus" className="mr-2" size={16} />
+                        Новый
                       </Button>
                     </>
                   )}
@@ -166,19 +195,19 @@ export default function Index() {
                 )}
               </div>
 
-              <div className="flex gap-3">
+              <div className="flex gap-3 relative">
                 <Textarea 
-                  placeholder="Спросите что-нибудь о данных..." 
+                  placeholder="Задайте любой вопрос..." 
                   value={inputMessage}
                   onChange={(e) => setInputMessage(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && (e.preventDefault(), handleSendMessage())}
-                  className="resize-none border-purple-200 focus:border-indigo-500 text-base"
+                  className="resize-none border-purple-200 focus:border-indigo-500 text-base pr-4"
                   rows={3}
                   disabled={isLoading}
                 />
                 <Button 
                   onClick={handleSendMessage}
-                  className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 px-8"
+                  className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 px-8 shadow-lg"
                   size="lg"
                   disabled={isLoading}
                 >
@@ -219,9 +248,27 @@ export default function Index() {
           </div>
         </main>
 
-        <footer className="border-t border-purple-200 mt-20 py-8 bg-white/50 backdrop-blur-sm">
-          <div className="container mx-auto px-6 text-center text-gray-600">
-            <p>© 2024 AI Assistant. Все права защищены.</p>
+        <footer className="border-t border-purple-200 mt-20 py-12 bg-white/50 backdrop-blur-sm">
+          <div className="container mx-auto px-6">
+            <div className="flex flex-col md:flex-row justify-between items-center gap-6">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-600 to-purple-600 flex items-center justify-center">
+                  <Icon name="Brain" className="text-white" size={20} />
+                </div>
+                <div>
+                  <p className="font-bold text-gray-900">Умный Помощник</p>
+                  <p className="text-sm text-gray-600">AI-ассистент нового поколения</p>
+                </div>
+              </div>
+              <div className="flex gap-8">
+                <a href="/" className="text-gray-600 hover:text-indigo-600 transition-colors">Главная</a>
+                <a href="/about" className="text-gray-600 hover:text-indigo-600 transition-colors">О сервисе</a>
+                <a href="/admin" className="text-gray-600 hover:text-indigo-600 transition-colors">Админ</a>
+              </div>
+            </div>
+            <div className="text-center text-gray-500 text-sm mt-8 pt-8 border-t border-purple-100">
+              © 2024 Умный Помощник. Все права защищены.
+            </div>
           </div>
         </footer>
       </div>
