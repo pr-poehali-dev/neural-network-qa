@@ -24,9 +24,27 @@ def extract_text_from_file(file_content: bytes, file_name: str) -> str:
     else:
         return file_content.decode('utf-8', errors='ignore')[:10000]
 
+def call_openrouter(message: str, api_key: str) -> str:
+    url = "https://openrouter.ai/api/v1/chat/completions"
+    headers = {
+        "Content-Type": "application/json",
+        "Authorization": f"Bearer {api_key}"
+    }
+    payload = {
+        "messages": [
+            {"role": "user", "content": message}
+        ],
+        "model": "meta-llama/llama-3.2-3b-instruct:free"
+    }
+    
+    response = requests.post(url, headers=headers, json=payload, timeout=20)
+    response.raise_for_status()
+    result = response.json()
+    return result['choices'][0]['message']['content']
+
 def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     '''
-    Business: AI chat - вопросы через DeepSeek AI + анализ файлов
+    Business: AI chat - DeepSeek/OpenRouter с автоматическим fallback
     Args: event с httpMethod, body (message, file_id)
           context с request_id
     Returns: HTTP response с ответом от AI
@@ -69,7 +87,6 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     openrouter_key = os.environ.get('OPENROUTER_API_KEY')
     database_url = os.environ.get('DATABASE_URL')
     
-    use_fallback = False
     if not deepseek_key and not openrouter_key:
         return {
             'statusCode': 500,
@@ -79,7 +96,6 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         }
     
     file_context = ""
-    file_name_info = ""
     
     if file_id and database_url:
         try:
@@ -93,9 +109,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 file_content = bytes(file_record['file_data'])
                 file_name = file_record['file_name']
                 file_text = extract_text_from_file(file_content, file_name)
-                
                 file_context = f"\n\nСодержимое прикрепленного файла '{file_name}':\n{file_text[:15000]}"
-                file_name_info = f" (анализирую файл: {file_name})"
             
             cursor.close()
             conn.close()
@@ -103,9 +117,11 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             file_context = f"\n\n(Ошибка чтения файла: {str(e)})"
     
     full_message = user_message + file_context
+    ai_response = ""
+    model_used = ""
     
-    try:
-        if deepseek_key:
+    if deepseek_key:
+        try:
             url = "https://api.deepseek.com/v1/chat/completions"
             headers = {
                 "Content-Type": "application/json",
@@ -113,10 +129,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             }
             payload = {
                 "messages": [
-                    {
-                        "role": "system",
-                        "content": "Ты Богдан ИИ - умный AI-помощник на базе DeepSeek. Анализируешь документы, отвечаешь на вопросы кратко и точно на русском языке. Если прикреплен файл - обязательно анализируй его содержимое в контексте вопроса."
-                    },
+                    {"role": "system", "content": "Ты Богдан ИИ - умный AI-помощник на базе DeepSeek. Отвечай кратко и точно на русском языке."},
                     {"role": "user", "content": full_message}
                 ],
                 "model": "deepseek-chat",
@@ -124,103 +137,53 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 "temperature": 0.7,
                 "max_tokens": 2000
             }
-        else:
-            use_fallback = True
-            url = "https://openrouter.ai/api/v1/chat/completions"
-            headers = {
-                "Content-Type": "application/json",
-                "Authorization": f"Bearer {openrouter_key}",
-                "HTTP-Referer": "https://poehali.dev",
-                "X-Title": "Богдан ИИ"
-            }
-            payload = {
-                "messages": [
-                    {
-                        "role": "system",
-                        "content": "Ты Богдан ИИ - умный AI-помощник. Анализируешь документы, отвечаешь на вопросы кратко и точно на русском языке."
-                    },
-                    {"role": "user", "content": full_message}
-                ],
-                "model": "meta-llama/llama-3.2-3b-instruct:free",
-                "temperature": 0.7,
-                "max_tokens": 1500
-            }
-        
-        response = requests.post(url, headers=headers, json=payload, timeout=30)
-        response.raise_for_status()
-        
-        result = response.json()
-        ai_response = result['choices'][0]['message']['content']
-        
-        model_name = "OpenRouter (Llama 3.2)" if use_fallback else "DeepSeek"
-        
-        return {
-            'statusCode': 200,
-            'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-            'isBase64Encoded': False,
-            'body': json.dumps({
-                'response': ai_response,
-                'file_analyzed': bool(file_id and file_context),
-                'model': model_name
-            }, ensure_ascii=False)
-        }
-        
-    except requests.exceptions.HTTPError as e:
-        if e.response.status_code in [401, 403]:
-            error_msg = 'API ключ недействителен. Проверьте ключ в секретах.'
-            return {
-                'statusCode': 403,
-                'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-                'isBase64Encoded': False,
-                'body': json.dumps({'error': error_msg})
-            }
-        elif e.response.status_code == 402 and deepseek_key and openrouter_key:
-            try:
-                url = "https://openrouter.ai/api/v1/chat/completions"
-                headers = {
-                    "Content-Type": "application/json",
-                    "Authorization": f"Bearer {openrouter_key}",
-                    "HTTP-Referer": "https://poehali.dev",
-                    "X-Title": "Богдан ИИ"
-                }
-                payload = {
-                    "messages": [
-                        {"role": "system", "content": "Ты Богдан ИИ - AI-помощник. Отвечай кратко на русском."},
-                        {"role": "user", "content": full_message}
-                    ],
-                    "model": "meta-llama/llama-3.2-3b-instruct:free",
-                    "temperature": 0.7,
-                    "max_tokens": 1500
-                }
-                
-                fallback_response = requests.post(url, headers=headers, json=payload, timeout=30)
-                fallback_response.raise_for_status()
-                fallback_result = fallback_response.json()
-                fallback_ai_response = fallback_result['choices'][0]['message']['content']
-                
+            
+            response = requests.post(url, headers=headers, json=payload, timeout=30)
+            response.raise_for_status()
+            result = response.json()
+            ai_response = result['choices'][0]['message']['content']
+            model_used = "DeepSeek"
+            
+        except requests.exceptions.HTTPError as e:
+            if e.response.status_code == 402 and openrouter_key:
+                ai_response = call_openrouter(full_message, openrouter_key)
+                ai_response += "\n\n⚠️ (Бесплатная модель - DeepSeek требует пополнения)"
+                model_used = "OpenRouter Fallback"
+            elif e.response.status_code in [401, 403]:
+                if openrouter_key:
+                    ai_response = call_openrouter(full_message, openrouter_key)
+                    model_used = "OpenRouter Fallback"
+                else:
+                    return {
+                        'statusCode': 403,
+                        'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                        'isBase64Encoded': False,
+                        'body': json.dumps({'error': 'API ключ DeepSeek недействителен'})
+                    }
+            else:
+                raise
+        except Exception as e:
+            if openrouter_key:
+                ai_response = call_openrouter(full_message, openrouter_key)
+                model_used = "OpenRouter Fallback"
+            else:
                 return {
-                    'statusCode': 200,
+                    'statusCode': 500,
                     'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
                     'isBase64Encoded': False,
-                    'body': json.dumps({
-                        'response': fallback_ai_response + "\n\n⚠️ (Ответ от бесплатной модели - DeepSeek требует пополнения)",
-                        'file_analyzed': bool(file_id and file_context),
-                        'model': 'OpenRouter Fallback (Llama 3.2)'
-                    }, ensure_ascii=False)
+                    'body': json.dumps({'error': f'AI error: {str(e)}'})
                 }
-            except:
-                pass
-        
-        return {
-            'statusCode': 500,
-            'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-            'isBase64Encoded': False,
-            'body': json.dumps({'error': f'AI processing error: {str(e)}'})
-        }
-    except Exception as e:
-        return {
-            'statusCode': 500,
-            'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-            'isBase64Encoded': False,
-            'body': json.dumps({'error': f'AI processing error: {str(e)}'})
-        }
+    else:
+        ai_response = call_openrouter(full_message, openrouter_key)
+        model_used = "OpenRouter (Llama 3.2)"
+    
+    return {
+        'statusCode': 200,
+        'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+        'isBase64Encoded': False,
+        'body': json.dumps({
+            'response': ai_response,
+            'file_analyzed': bool(file_id and file_context),
+            'model': model_used
+        }, ensure_ascii=False)
+    }
