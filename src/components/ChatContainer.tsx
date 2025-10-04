@@ -45,7 +45,7 @@ export default function ChatContainer({
 }: ChatContainerProps) {
   const [speakingIndex, setSpeakingIndex] = useState<number | null>(null);
   const [isListening, setIsListening] = useState(false);
-  const { voiceLanguage, t } = useLanguage();
+  const { voiceLanguage, translateToLanguage, autoDetectLanguage, t } = useLanguage();
 
   const speakText = (text: string, index: number) => {
     if (speakingIndex === index) {
@@ -67,6 +67,19 @@ export default function ChatContainer({
     window.speechSynthesis.speak(utterance);
   };
 
+  const translateText = async (text: string, sourceLang: string, targetLang: string): Promise<string> => {
+    try {
+      const response = await fetch(
+        `https://translate.googleapis.com/translate_a/single?client=gtx&sl=${sourceLang}&tl=${targetLang}&dt=t&q=${encodeURIComponent(text)}`
+      );
+      const data = await response.json();
+      return data[0][0][0];
+    } catch (error) {
+      console.error('Translation error:', error);
+      return text;
+    }
+  };
+
   const startVoiceInput = () => {
     if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
       alert('Voice recognition is not supported in your browser');
@@ -76,7 +89,7 @@ export default function ChatContainer({
     const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     const recognition = new SpeechRecognition();
     
-    recognition.lang = voiceLanguage;
+    recognition.lang = autoDetectLanguage ? '' : voiceLanguage;
     recognition.continuous = false;
     recognition.interimResults = false;
 
@@ -84,9 +97,23 @@ export default function ChatContainer({
       setIsListening(true);
     };
 
-    recognition.onresult = (event: any) => {
+    recognition.onresult = async (event: any) => {
       const transcript = event.results[0][0].transcript;
-      onInputChange(transcript);
+      
+      if (autoDetectLanguage && translateToLanguage) {
+        const detectedLang = (event.results[0][0] as any).language || 'auto';
+        const sourceLangCode = detectedLang.split('-')[0];
+        
+        if (sourceLangCode !== translateToLanguage) {
+          const translated = await translateText(transcript, sourceLangCode, translateToLanguage);
+          onInputChange(`${translated} (переведено с ${sourceLangCode})`);
+        } else {
+          onInputChange(transcript);
+        }
+      } else {
+        onInputChange(transcript);
+      }
+      
       setIsListening(false);
     };
 

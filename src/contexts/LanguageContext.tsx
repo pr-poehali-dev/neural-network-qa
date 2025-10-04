@@ -79,8 +79,12 @@ const translations: Translations = {
 interface LanguageContextType {
   language: Language;
   voiceLanguage: string;
+  translateToLanguage: string;
+  autoDetectLanguage: boolean;
   setLanguage: (lang: Language) => void;
   setVoiceLanguage: (lang: string) => void;
+  setTranslateToLanguage: (lang: string) => void;
+  setAutoDetectLanguage: (enabled: boolean) => void;
   t: (key: string) => string;
 }
 
@@ -89,12 +93,19 @@ const LanguageContext = createContext<LanguageContextType | undefined>(undefined
 export function LanguageProvider({ children }: { children: ReactNode }) {
   const [language, setLanguageState] = useState<Language>('ru');
   const [voiceLanguage, setVoiceLanguageState] = useState<string>('ru-RU');
+  const [translateToLanguage, setTranslateToLanguageState] = useState<string>('ru');
+  const [autoDetectLanguage, setAutoDetectLanguageState] = useState<boolean>(true);
 
   useEffect(() => {
     const savedLang = localStorage.getItem('language') as Language;
     const savedVoiceLang = localStorage.getItem('voiceLanguage');
+    const savedTranslateTo = localStorage.getItem('translateToLanguage');
+    const savedAutoDetect = localStorage.getItem('autoDetectLanguage');
+    
     if (savedLang) setLanguageState(savedLang);
     if (savedVoiceLang) setVoiceLanguageState(savedVoiceLang);
+    if (savedTranslateTo) setTranslateToLanguageState(savedTranslateTo);
+    if (savedAutoDetect !== null) setAutoDetectLanguageState(savedAutoDetect === 'true');
   }, []);
 
   const setLanguage = (lang: Language) => {
@@ -107,12 +118,32 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     localStorage.setItem('voiceLanguage', lang);
   };
 
+  const setTranslateToLanguage = (lang: string) => {
+    setTranslateToLanguageState(lang);
+    localStorage.setItem('translateToLanguage', lang);
+  };
+
+  const setAutoDetectLanguage = (enabled: boolean) => {
+    setAutoDetectLanguageState(enabled);
+    localStorage.setItem('autoDetectLanguage', enabled.toString());
+  };
+
   const t = (key: string): string => {
     return translations[key]?.[language] || key;
   };
 
   return (
-    <LanguageContext.Provider value={{ language, voiceLanguage, setLanguage, setVoiceLanguage, t }}>
+    <LanguageContext.Provider value={{ 
+      language, 
+      voiceLanguage, 
+      translateToLanguage,
+      autoDetectLanguage,
+      setLanguage, 
+      setVoiceLanguage, 
+      setTranslateToLanguage,
+      setAutoDetectLanguage,
+      t 
+    }}>
       {children}
     </LanguageContext.Provider>
   );

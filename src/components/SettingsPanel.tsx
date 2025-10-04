@@ -39,8 +39,27 @@ const voiceLanguages = [
   { code: 'id-ID', name: 'Bahasa Indonesia', flag: '🇮🇩' },
 ];
 
+const translateLanguages = [
+  { code: 'ru', name: 'Русский', flag: '🇷🇺' },
+  { code: 'en', name: 'English', flag: '🇺🇸' },
+  { code: 'es', name: 'Español', flag: '🇪🇸' },
+  { code: 'fr', name: 'Français', flag: '🇫🇷' },
+  { code: 'de', name: 'Deutsch', flag: '🇩🇪' },
+  { code: 'it', name: 'Italiano', flag: '🇮🇹' },
+  { code: 'pt', name: 'Português', flag: '🇧🇷' },
+  { code: 'zh', name: '中文', flag: '🇨🇳' },
+  { code: 'ja', name: '日本語', flag: '🇯🇵' },
+  { code: 'ko', name: '한국어', flag: '🇰🇷' },
+  { code: 'ar', name: 'العربية', flag: '🇸🇦' },
+  { code: 'hi', name: 'हिन्दी', flag: '🇮🇳' },
+  { code: 'tr', name: 'Türkçe', flag: '🇹🇷' },
+  { code: 'pl', name: 'Polski', flag: '🇵🇱' },
+  { code: 'nl', name: 'Nederlands', flag: '🇳🇱' },
+  { code: 'uk', name: 'Українська', flag: '🇺🇦' },
+];
+
 export default function SettingsPanel({ onClose }: SettingsPanelProps) {
-  const { language, setLanguage, voiceLanguage, setVoiceLanguage, t } = useLanguage();
+  const { language, setLanguage, voiceLanguage, setVoiceLanguage, translateToLanguage, autoDetectLanguage, setTranslateToLanguage, setAutoDetectLanguage, t } = useLanguage();
   const { theme, setTheme, colorScheme, setColorScheme } = useTheme();
 
   return (
@@ -196,6 +215,58 @@ export default function SettingsPanel({ onClose }: SettingsPanelProps) {
               >
                 🩷 Розовая
               </Button>
+            </div>
+          </div>
+
+          {/* Voice Translation Settings */}
+          <div className="border-t border-gray-200 dark:border-gray-700 pt-6 mt-6">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+              <Icon name="Languages" size={20} />
+              Перевод голосовых сообщений
+            </h3>
+            
+            {/* Auto-detect toggle */}
+            <div className="mb-4">
+              <label className="flex items-center justify-between cursor-pointer">
+                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                  Автоопределение языка
+                </span>
+                <Button
+                  variant={autoDetectLanguage ? 'default' : 'outline'}
+                  size="sm"
+                  className={autoDetectLanguage ? 'bg-gradient-to-r from-green-600 to-emerald-600' : ''}
+                  onClick={() => setAutoDetectLanguage(!autoDetectLanguage)}
+                >
+                  {autoDetectLanguage ? 'Вкл' : 'Выкл'}
+                </Button>
+              </label>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                Автоматически определять язык из голосового сообщения
+              </p>
+            </div>
+
+            {/* Translate to language */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                Переводить на язык
+              </label>
+              <div className="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto">
+                {translateLanguages.map(lang => (
+                  <Button
+                    key={lang.code}
+                    variant={translateToLanguage === lang.code ? 'default' : 'outline'}
+                    className={`justify-start text-sm ${translateToLanguage === lang.code ? 'bg-gradient-to-r from-indigo-600 to-purple-600' : ''}`}
+                    onClick={() => setTranslateToLanguage(lang.code)}
+                    size="sm"
+                  >
+                    <span className="mr-2">{lang.flag}</span>
+                    {lang.name}
+                  </Button>
+                ))}
+              </div>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+                ⚠️ Для работы перевода необходим API ключ (OpenAI или Google Cloud)
+              </p>
             </div>
           </div>
         </div>
