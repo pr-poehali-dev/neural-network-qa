@@ -8,56 +8,56 @@ interface SuggestionsGridProps {
 export default function SuggestionsGrid({ onSelectSuggestion }: SuggestionsGridProps) {
   return (
     <div className="mt-12 mb-8">
-      <h3 className="text-2xl font-bold text-center mb-6 text-gray-800">Попробуй спросить</h3>
+      <h3 className="text-2xl font-bold text-center mb-6 text-gray-800">Примеры вопросов</h3>
       <div className="grid md:grid-cols-2 gap-4 max-w-4xl mx-auto">
         <Card 
           className="p-4 border-2 border-purple-200 hover:border-indigo-400 cursor-pointer transition-all hover:shadow-lg"
-          onClick={() => onSelectSuggestion('Объясни квантовую физику простыми словами')}
+          onClick={() => onSelectSuggestion('Что говорится в документе о ценах?')}
         >
           <div className="flex items-start gap-3">
-            <Icon name="Lightbulb" className="text-yellow-500 mt-1" size={24} />
+            <Icon name="Search" className="text-indigo-500 mt-1" size={24} />
             <div>
-              <p className="font-semibold text-gray-900">Объясни квантовую физику простыми словами</p>
-              <p className="text-xs text-gray-500 mt-1">Получи понятное объяснение</p>
+              <p className="font-semibold text-gray-900">Что говорится о ценах?</p>
+              <p className="text-xs text-gray-500 mt-1">Поиск по документам</p>
             </div>
           </div>
         </Card>
 
         <Card 
           className="p-4 border-2 border-purple-200 hover:border-pink-400 cursor-pointer transition-all hover:shadow-lg"
-          onClick={() => onSelectSuggestion('Космический корабль на орбите планеты')}
+          onClick={() => onSelectSuggestion('Какие контакты указаны в файле?')}
         >
           <div className="flex items-start gap-3">
-            <Icon name="Palette" className="text-pink-500 mt-1" size={24} />
+            <Icon name="Phone" className="text-pink-500 mt-1" size={24} />
             <div>
-              <p className="font-semibold text-gray-900">Нарисуй космический корабль</p>
-              <p className="text-xs text-gray-500 mt-1">Создай изображение с AI</p>
+              <p className="font-semibold text-gray-900">Какие контакты есть?</p>
+              <p className="text-xs text-gray-500 mt-1">Извлечение данных</p>
             </div>
           </div>
         </Card>
 
         <Card 
           className="p-4 border-2 border-purple-200 hover:border-green-400 cursor-pointer transition-all hover:shadow-lg"
-          onClick={() => onSelectSuggestion('Напиши план тренировок на неделю')}
+          onClick={() => onSelectSuggestion('Сделай краткое содержание документа')}
         >
           <div className="flex items-start gap-3">
-            <Icon name="ClipboardList" className="text-green-500 mt-1" size={24} />
+            <Icon name="FileText" className="text-green-500 mt-1" size={24} />
             <div>
-              <p className="font-semibold text-gray-900">Составь план тренировок</p>
-              <p className="text-xs text-gray-500 mt-1">Персональная программа</p>
+              <p className="font-semibold text-gray-900">Кратко перескажи</p>
+              <p className="text-xs text-gray-500 mt-1">Резюме документа</p>
             </div>
           </div>
         </Card>
 
         <Card 
           className="p-4 border-2 border-purple-200 hover:border-orange-400 cursor-pointer transition-all hover:shadow-lg"
-          onClick={() => onSelectSuggestion('Какие книги стоит прочитать по психологии?')}
+          onClick={() => onSelectSuggestion('Перечисли все упомянутые даты')}
         >
           <div className="flex items-start gap-3">
-            <Icon name="BookOpen" className="text-orange-500 mt-1" size={24} />
+            <Icon name="Calendar" className="text-orange-500 mt-1" size={24} />
             <div>
-              <p className="font-semibold text-gray-900">Посоветуй книги по психологии</p>
-              <p className="text-xs text-gray-500 mt-1">Подборка от AI</p>
+              <p className="font-semibold text-gray-900">Найди все даты</p>
+              <p className="text-xs text-gray-500 mt-1">Извлечение дат</p>
             </div>
           </div>
         </Card>
