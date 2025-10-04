@@ -24,12 +24,37 @@ def extract_text_from_file(file_content: bytes, file_name: str) -> str:
     else:
         return file_content.decode('utf-8', errors='ignore')[:10000]
 
+def generate_image_with_ai(prompt: str, api_key: str) -> str:
+    url = "https://api.x.ai/v1/images/generations"
+    
+    headers = {
+        "Content-Type": "application/json",
+        "Authorization": f"Bearer {api_key}"
+    }
+    
+    payload = {
+        "prompt": prompt,
+        "n": 1,
+        "size": "1024x1024",
+        "response_format": "url"
+    }
+    
+    response = requests.post(url, headers=headers, json=payload, timeout=60)
+    response.raise_for_status()
+    
+    result = response.json()
+    
+    if 'data' in result and len(result['data']) > 0:
+        return result['data'][0].get('url')
+    
+    raise Exception('No image generated')
+
 def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     '''
-    Business: AI chat endpoint - процессирует вопросы пользователей через Grok с поддержкой анализа файлов
-    Args: event с httpMethod, body (содержит message, file_id опционально)
+    Business: AI chat - вопросы через Grok + анализ файлов + генерация изображений
+    Args: event с httpMethod, body (message, file_id, generate_image)
           context с request_id
-    Returns: HTTP response с ответом от AI
+    Returns: HTTP response с ответом от AI или изображением
     '''
     method: str = event.get('httpMethod', 'GET')
     
@@ -56,6 +81,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     body_data = json.loads(event.get('body', '{}'))
     user_message: str = body_data.get('message', '')
     file_id: Optional[int] = body_data.get('file_id')
+    generate_image: bool = body_data.get('generate_image', False)
     
     if not user_message:
         return {
@@ -78,6 +104,27 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 'demo': True
             })
         }
+    
+    if generate_image:
+        try:
+            image_url = generate_image_with_ai(user_message, xai_key)
+            
+            return {
+                'statusCode': 200,
+                'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                'isBase64Encoded': False,
+                'body': json.dumps({
+                    'response': f'🎨 Изображение готово!',
+                    'image_url': image_url,
+                    'demo': False
+                }, ensure_ascii=False)
+            }
+        except Exception as e:
+            return {
+                'statusCode': 500,
+                'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                'body': json.dumps({'error': f'Image generation error: {str(e)}'})
+            }
     
     file_context = ""
     file_name_info = ""

@@ -55,6 +55,7 @@ export default function Admin() {
   const handleLogin = () => {
     if (password === 'admin123') {
       setIsAuthenticated(true);
+      localStorage.setItem('admin_auth', 'true');
       toast({
         title: "Вход выполнен",
         description: "Добро пожаловать в админ-панель Богдана",
@@ -67,6 +68,13 @@ export default function Admin() {
       });
     }
   };
+
+  useEffect(() => {
+    const auth = localStorage.getItem('admin_auth');
+    if (auth === 'true') {
+      setIsAuthenticated(true);
+    }
+  }, []);
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
@@ -172,6 +180,14 @@ export default function Admin() {
               className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700"
             >
               Войти
+            </Button>
+            <Button 
+              variant="outline"
+              onClick={() => window.location.href = '/'}
+              className="w-full border-purple-200"
+            >
+              <Icon name="ArrowLeft" className="mr-2" size={16} />
+              Вернуться на сайт
             </Button>
           </div>
         </Card>

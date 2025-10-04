@@ -19,13 +19,13 @@ const getSessionId = () => {
 };
 
 export default function Index() {
-  const [messages, setMessages] = useState<Array<{ role: 'user' | 'ai'; text: string; file?: any }>>([]);
+  const [messages, setMessages] = useState<Array<{ role: 'user' | 'ai'; text: string; file?: any; imageUrl?: string }>>([]);
   const [inputMessage, setInputMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [chatHistory, setChatHistory] = useState<Array<{ id: string; title: string; messages: Array<{ role: 'user' | 'ai'; text: string }> }>>([]);
   const [currentChatId, setCurrentChatId] = useState<string | null>(null);
-  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [currentFileId, setCurrentFileId] = useState<number | null>(null);
+  const [isGeneratingImage, setIsGeneratingImage] = useState(false);
   const { toast } = useToast();
 
   const saveChat = async () => {
@@ -51,50 +51,7 @@ export default function Index() {
     await saveChat();
     setMessages([]);
     setCurrentChatId(null);
-    setUploadedFile(null);
     setCurrentFileId(null);
-  };
-
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    
-    setUploadedFile(file);
-    
-    const reader = new FileReader();
-    reader.onload = async (event) => {
-      const content = event.target?.result as string;
-      
-      try {
-        const response = await fetch(FILE_UPLOAD_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            filename: file.name,
-            fileType: file.type,
-            fileSize: file.size,
-            content: content,
-            sessionId: getSessionId()
-          })
-        });
-        
-        const data = await response.json();
-        
-        if (data.file_id) {
-          setCurrentFileId(data.file_id);
-          toast({ title: `Файл "${file.name}" загружен и готов к анализу` });
-          setMessages(prev => [...prev, { 
-            role: 'user', 
-            text: `📎 Загружен файл: ${file.name}`,
-            file: { name: file.name, type: file.type, size: file.size, id: data.file_id }
-          }]);
-        }
-      } catch (error) {
-        toast({ title: 'Ошибка загрузки файла', variant: 'destructive' });
-      }
-    };
-    
-    reader.readAsText(file);
   };
 
   const exportChat = () => {
@@ -106,6 +63,47 @@ export default function Index() {
     a.download = `чат-${Date.now()}.txt`;
     a.click();
     toast({ title: 'Чат экспортирован' });
+  };
+
+  const handleGenerateImage = async () => {
+    if (!inputMessage.trim() || isLoading || isGeneratingImage) return;
+    
+    const userMsg = inputMessage;
+    setMessages(prev => [...prev, { role: 'user', text: `🎨 Нарисуй: ${userMsg}` }]);
+    setInputMessage('');
+    setIsGeneratingImage(true);
+    
+    try {
+      const response = await fetch(AI_CHAT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: userMsg, generate_image: true })
+      });
+      
+      const data = await response.json();
+      
+      if (data.image_url) {
+        setMessages(prev => [...prev, { 
+          role: 'ai', 
+          text: data.response,
+          imageUrl: data.image_url
+        }]);
+      } else {
+        throw new Error('No image generated');
+      }
+    } catch (error) {
+      toast({
+        title: "Ошибка",
+        description: "Не удалось сгенерировать изображение",
+        variant: "destructive"
+      });
+      setMessages(prev => [...prev, { 
+        role: 'ai', 
+        text: 'Извините, не удалось создать изображение.' 
+      }]);
+    } finally {
+      setIsGeneratingImage(false);
+    }
   };
 
   const handleSendMessage = async () => {
@@ -134,13 +132,9 @@ export default function Index() {
       const data = await response.json();
       
       if (data.response) {
-        const responseText = data.file_analyzed 
-          ? `${data.response}`
-          : data.response;
-          
         setMessages(prev => [...prev, { 
           role: 'ai', 
-          text: responseText
+          text: data.response
         }]);
       } else {
         throw new Error('No response from AI');
@@ -246,6 +240,11 @@ export default function Index() {
                           <Icon name="Sparkles" className="inline mr-2 text-purple-600" size={18} />
                         )}
                         <span className="text-base">{msg.text}</span>
+                        {msg.imageUrl && (
+                          <div className="mt-3">
+                            <img src={msg.imageUrl} alt="Generated" className="rounded-lg max-w-full" />
+                          </div>
+                        )}
                         {msg.file && (
                           <div className="mt-2 pt-2 border-t border-white/20">
                             <Icon name="FileText" className="inline mr-1" size={14} />
@@ -259,59 +258,106 @@ export default function Index() {
               </div>
 
               <div className="space-y-3">
-                {uploadedFile && currentFileId && (
-                  <div className="flex items-center gap-2 p-3 bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg border border-green-200">
-                    <Icon name="CheckCircle" className="text-green-600" size={20} />
-                    <div className="flex-1">
-                      <span className="text-sm font-medium text-green-900">{uploadedFile.name}</span>
-                      <p className="text-xs text-green-700">Готов к анализу. Задайте вопрос о файле!</p>
-                    </div>
-                    <Button 
-                      variant="ghost" 
-                      size="sm" 
-                      onClick={() => { setUploadedFile(null); setCurrentFileId(null); }}
-                    >
-                      <Icon name="X" size={16} />
-                    </Button>
-                  </div>
-                )}
-                
-                <div className="flex gap-3 relative">
+                <div className="flex gap-2">
                   <div className="flex-1 relative">
                     <Textarea 
-                      placeholder="Задайте любой вопрос..." 
+                      placeholder="Задайте вопрос или описание для изображения..." 
                       value={inputMessage}
                       onChange={(e) => setInputMessage(e.target.value)}
                       onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && (e.preventDefault(), handleSendMessage())}
-                      className="resize-none border-purple-200 focus:border-indigo-500 text-base pr-4"
+                      className="resize-none border-purple-200 focus:border-indigo-500 text-base"
                       rows={3}
-                      disabled={isLoading}
+                      disabled={isLoading || isGeneratingImage}
                     />
-                    <label className="absolute bottom-3 right-3 cursor-pointer">
-                      <input 
-                        type="file" 
-                        className="hidden" 
-                        onChange={handleFileUpload}
-                        accept=".txt,.pdf,.doc,.docx,.json"
-                      />
-                      <Icon name="Paperclip" className="text-gray-400 hover:text-indigo-600 transition-colors" size={20} />
-                    </label>
                   </div>
+                </div>
+                <div className="flex gap-2">
                   <Button 
                     onClick={handleSendMessage}
-                    className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 px-8 shadow-lg"
+                    className="flex-1 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 shadow-lg"
                     size="lg"
-                    disabled={isLoading}
+                    disabled={isLoading || isGeneratingImage}
                   >
                     {isLoading ? (
-                      <Icon name="Loader2" size={22} className="animate-spin" />
+                      <Icon name="Loader2" size={20} className="animate-spin mr-2" />
                     ) : (
-                      <Icon name="Send" size={22} />
+                      <Icon name="MessageSquare" size={20} className="mr-2" />
                     )}
+                    Ответить
+                  </Button>
+                  <Button 
+                    onClick={handleGenerateImage}
+                    className="flex-1 bg-gradient-to-r from-pink-500 to-orange-500 hover:from-pink-600 hover:to-orange-600 shadow-lg"
+                    size="lg"
+                    disabled={isLoading || isGeneratingImage}
+                  >
+                    {isGeneratingImage ? (
+                      <Icon name="Loader2" size={20} className="animate-spin mr-2" />
+                    ) : (
+                      <Icon name="Image" size={20} className="mr-2" />
+                    )}
+                    Нарисовать
                   </Button>
                 </div>
               </div>
             </Card>
+
+            <div className="mt-12 mb-8">
+              <h3 className="text-2xl font-bold text-center mb-6 text-gray-800">Попробуй спросить</h3>
+              <div className="grid md:grid-cols-2 gap-4 max-w-4xl mx-auto">
+                <Card 
+                  className="p-4 border-2 border-purple-200 hover:border-indigo-400 cursor-pointer transition-all hover:shadow-lg"
+                  onClick={() => setInputMessage('Объясни квантовую физику простыми словами')}
+                >
+                  <div className="flex items-start gap-3">
+                    <Icon name="Lightbulb" className="text-yellow-500 mt-1" size={24} />
+                    <div>
+                      <p className="font-semibold text-gray-900">Объясни квантовую физику простыми словами</p>
+                      <p className="text-xs text-gray-500 mt-1">Получи понятное объяснение</p>
+                    </div>
+                  </div>
+                </Card>
+
+                <Card 
+                  className="p-4 border-2 border-purple-200 hover:border-pink-400 cursor-pointer transition-all hover:shadow-lg"
+                  onClick={() => { setInputMessage('Космический корабль на орбите планеты'); }}
+                >
+                  <div className="flex items-start gap-3">
+                    <Icon name="Palette" className="text-pink-500 mt-1" size={24} />
+                    <div>
+                      <p className="font-semibold text-gray-900">Нарисуй космический корабль</p>
+                      <p className="text-xs text-gray-500 mt-1">Создай изображение с AI</p>
+                    </div>
+                  </div>
+                </Card>
+
+                <Card 
+                  className="p-4 border-2 border-purple-200 hover:border-green-400 cursor-pointer transition-all hover:shadow-lg"
+                  onClick={() => setInputMessage('Напиши план тренировок на неделю')}
+                >
+                  <div className="flex items-start gap-3">
+                    <Icon name="ClipboardList" className="text-green-500 mt-1" size={24} />
+                    <div>
+                      <p className="font-semibold text-gray-900">Составь план тренировок</p>
+                      <p className="text-xs text-gray-500 mt-1">Персональная программа</p>
+                    </div>
+                  </div>
+                </Card>
+
+                <Card 
+                  className="p-4 border-2 border-purple-200 hover:border-orange-400 cursor-pointer transition-all hover:shadow-lg"
+                  onClick={() => setInputMessage('Какие книги стоит прочитать по психологии?')}
+                >
+                  <div className="flex items-start gap-3">
+                    <Icon name="BookOpen" className="text-orange-500 mt-1" size={24} />
+                    <div>
+                      <p className="font-semibold text-gray-900">Посоветуй книги по психологии</p>
+                      <p className="text-xs text-gray-500 mt-1">Подборка от AI</p>
+                    </div>
+                  </div>
+                </Card>
+              </div>
+            </div>
 
             <div className="grid md:grid-cols-4 gap-6 mt-12">
               <Card className="p-6 border-2 border-purple-200 text-center hover:shadow-lg transition-shadow">
@@ -323,27 +369,27 @@ export default function Index() {
               </Card>
 
               <Card className="p-6 border-2 border-purple-200 text-center hover:shadow-lg transition-shadow">
-                <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-purple-100 flex items-center justify-center">
-                  <Icon name="Brain" className="text-purple-600" size={32} />
+                <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-pink-100 flex items-center justify-center">
+                  <Icon name="Image" className="text-pink-600" size={32} />
                 </div>
-                <h4 className="font-bold text-gray-900 mb-2">Умный анализ</h4>
-                <p className="text-sm text-gray-600">AI понимает контекст вопросов</p>
+                <h4 className="font-bold text-gray-900 mb-2">Генерация изображений</h4>
+                <p className="text-sm text-gray-600">Создавай картинки по описанию</p>
               </Card>
 
               <Card className="p-6 border-2 border-purple-200 text-center hover:shadow-lg transition-shadow">
                 <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-green-100 flex items-center justify-center">
                   <Icon name="FileText" className="text-green-600" size={32} />
                 </div>
-                <h4 className="font-bold text-gray-900 mb-2">Работа с файлами</h4>
-                <p className="text-sm text-gray-600">Загружай и анализируй документы</p>
+                <h4 className="font-bold text-gray-900 mb-2">Анализ документов</h4>
+                <p className="text-sm text-gray-600">Загружай файлы через админку</p>
               </Card>
 
               <Card className="p-6 border-2 border-purple-200 text-center hover:shadow-lg transition-shadow">
                 <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-cyan-100 flex items-center justify-center">
-                  <Icon name="Shield" className="text-cyan-600" size={32} />
+                  <Icon name="Brain" className="text-cyan-600" size={32} />
                 </div>
-                <h4 className="font-bold text-gray-900 mb-2">Безопасность</h4>
-                <p className="text-sm text-gray-600">Данные защищены и приватны</p>
+                <h4 className="font-bold text-gray-900 mb-2">Grok AI</h4>
+                <p className="text-sm text-gray-600">Мощная языковая модель от X.AI</p>
               </Card>
             </div>
           </div>
