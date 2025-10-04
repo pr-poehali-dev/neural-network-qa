@@ -1,0 +1,32 @@
+{
+  "tests": [
+    {
+      "name": "Test OPTIONS CORS request",
+      "method": "OPTIONS",
+      "path": "/",
+      "expectedStatus": 200
+    },
+    {
+      "name": "Test chat message",
+      "method": "POST",
+      "path": "/",
+      "body": {
+        "message": "Привет, как дела?"
+      },
+      "expectedStatus": 200,
+      "expectedBody": {
+        "response": "string"
+      },
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Test empty message",
+      "method": "POST",
+      "path": "/",
+      "body": {
+        "message": ""
+      },
+      "expectedStatus": 400
+    }
+  ]
+}
