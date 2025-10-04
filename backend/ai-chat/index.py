@@ -55,7 +55,7 @@ def simple_search_answer(question: str, knowledge_base: str) -> str:
     answer_parts = [s[1] for s in relevant[:5]]
     answer = "\n\n".join(answer_parts)
     
-    return f"На основе загруженных документов:\n\n{answer}"
+    return answer
 
 def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     '''
