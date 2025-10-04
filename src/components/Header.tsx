@@ -16,7 +16,7 @@ export default function Header({ chatHistoryLength, onToggleHistory }: HeaderPro
               <Icon name="Brain" className="text-white" size={24} />
             </div>
             <h1 className="text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-              Богдан AI
+              Богдан ИИ
             </h1>
           </div>
           <nav className="flex gap-6 items-center">

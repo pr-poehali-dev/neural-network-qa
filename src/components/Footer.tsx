@@ -10,7 +10,7 @@ export default function Footer() {
               <Icon name="Brain" className="text-white" size={20} />
             </div>
             <div>
-              <p className="font-bold text-gray-900">Богдан AI</p>
+              <p className="font-bold text-gray-900">Богдан ИИ</p>
               <p className="text-sm text-gray-600">Умный помощник нового поколения</p>
             </div>
           </div>
@@ -21,7 +21,7 @@ export default function Footer() {
           </div>
         </div>
         <div className="text-center text-gray-500 text-sm mt-8 pt-8 border-t border-purple-100">
-          © 2024 Богдан AI. Все права защищены.
+          © 2024 Богдан ИИ. Все права защищены.
         </div>
       </div>
     </footer>

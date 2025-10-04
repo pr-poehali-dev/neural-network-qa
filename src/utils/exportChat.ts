@@ -13,7 +13,7 @@ export const exportToText = (messages: Message[], filename: string = 'chat') => 
 
 export const exportToMarkdown = (messages: Message[], filename: string = 'chat') => {
   const content = [
-    '# Чат с Богдан AI\n',
+    '# Чат с Богдан ИИ\n',
     `*Экспортировано: ${new Date().toLocaleString('ru-RU')}*\n`,
     '---\n',
     ...messages.map(m => {
@@ -32,7 +32,7 @@ export const exportToHTML = (messages: Message[], filename: string = 'chat') => 
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Чат с Богдан AI</title>
+  <title>Чат с Богдан ИИ</title>
   <style>
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
@@ -77,7 +77,7 @@ export const exportToHTML = (messages: Message[], filename: string = 'chat') => 
 </head>
 <body>
   <div class="container">
-    <h1>📝 Чат с Богдан AI</h1>
+    <h1>📝 Чат с Богдан ИИ</h1>
     <div class="meta">Экспортировано: ${new Date().toLocaleString('ru-RU')}</div>
     ${messages.map(m => `
       <div class="message ${m.role}">
@@ -97,7 +97,7 @@ export const exportToHTML = (messages: Message[], filename: string = 'chat') => 
 export const exportToJSON = (messages: Message[], filename: string = 'chat') => {
   const content = JSON.stringify({
     exported_at: new Date().toISOString(),
-    platform: 'Богдан AI',
+    platform: 'Богдан ИИ',
     messages: messages.map(m => ({
       role: m.role,
       content: m.text,
@@ -109,7 +109,7 @@ export const exportToJSON = (messages: Message[], filename: string = 'chat') => 
 };
 
 export const exportToWord = (messages: Message[], filename: string = 'chat') => {
-  const header = `Чат с Богдан AI\nЭкспортировано: ${new Date().toLocaleString('ru-RU')}\n${'='.repeat(60)}\n\n`;
+  const header = `Чат с Богдан ИИ\nЭкспортировано: ${new Date().toLocaleString('ru-RU')}\n${'='.repeat(60)}\n\n`;
   
   const content = header + messages
     .map(m => {

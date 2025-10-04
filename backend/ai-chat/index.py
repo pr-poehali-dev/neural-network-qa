@@ -123,6 +123,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             return {
                 'statusCode': 500,
                 'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                'isBase64Encoded': False,
                 'body': json.dumps({'error': f'Image generation error: {str(e)}'})
             }
     
@@ -164,7 +165,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             "messages": [
                 {
                     "role": "system",
-                    "content": "Ты Богдан - умный AI-помощник с суперспособностями. Анализируешь документы, отвечаешь на вопросы кратко и точно на русском языке. Если прикреплен файл - обязательно анализируй его содержимое в контексте вопроса."
+                    "content": "Ты Богдан ИИ - умный AI-помощник с суперспособностями. Анализируешь документы, отвечаешь на вопросы кратко и точно на русском языке. Если прикреплен файл - обязательно анализируй его содержимое в контексте вопроса."
                 },
                 {"role": "user", "content": full_message}
             ],
@@ -191,6 +192,26 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             }, ensure_ascii=False)
         }
         
+    except requests.exceptions.HTTPError as e:
+        if e.response.status_code == 403:
+            demo_response = f'Я получил ваш вопрос: "{user_message}"{file_name_info}\n\n⚠️ API ключ X.AI недействителен или истёк. Обновите XAI_API_KEY в секретах проекта для подключения к Grok AI.\n\nПока работаю в демо-режиме!'
+            
+            return {
+                'statusCode': 200,
+                'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                'isBase64Encoded': False,
+                'body': json.dumps({
+                    'response': demo_response,
+                    'demo': True
+                }, ensure_ascii=False)
+            }
+        else:
+            return {
+                'statusCode': 500,
+                'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                'isBase64Encoded': False,
+                'body': json.dumps({'error': f'AI processing error: {str(e)}'})
+            }
     except Exception as e:
         return {
             'statusCode': 500,

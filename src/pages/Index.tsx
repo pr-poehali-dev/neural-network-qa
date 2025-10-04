@@ -11,6 +11,7 @@ import Footer from '@/components/Footer';
 import AIToolsPanel from '@/components/AIToolsPanel';
 import ExportMenu from '@/components/ExportMenu';
 import PromptTemplates from '@/components/PromptTemplates';
+import ApiKeyNotice from '@/components/ApiKeyNotice';
 
 const AI_CHAT_URL = 'https://functions.poehali.dev/95328c78-94a6-4f98-a89c-a4b1b840ea99';
 const CHAT_HISTORY_URL = 'https://functions.poehali.dev/824196a4-a71d-49e7-acbc-08d9f8801ff2';
@@ -36,6 +37,7 @@ export default function Index() {
   const [showHistory, setShowHistory] = useState(false);
   const [showExportMenu, setShowExportMenu] = useState(false);
   const [showTemplates, setShowTemplates] = useState(false);
+  const [showApiNotice, setShowApiNotice] = useState(false);
   const { toast } = useToast();
 
   const loadChatHistory = async () => {
@@ -216,6 +218,10 @@ export default function Index() {
           role: 'ai', 
           text: data.response
         }]);
+        
+        if (data.demo) {
+          setShowApiNotice(true);
+        }
       } else {
         throw new Error('No response from AI');
       }
@@ -261,10 +267,14 @@ export default function Index() {
           />
         )}
 
+        {showApiNotice && (
+          <ApiKeyNotice onClose={() => setShowApiNotice(false)} />
+        )}
+
         <main className="container mx-auto px-6 py-12">
           <section className="text-center mb-12 animate-fade-in">
             <h2 className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-indigo-600 via-purple-600 to-cyan-500 bg-clip-text text-transparent">
-              Богдан AI
+              Богдан ИИ
             </h2>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto">
               Твой умный помощник с суперспособностями
