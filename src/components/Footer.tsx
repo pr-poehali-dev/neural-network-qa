@@ -2,7 +2,7 @@ import Icon from '@/components/ui/icon';
 
 export default function Footer() {
   return (
-    <footer className="border-t border-purple-200 mt-20 py-12 bg-white/50 backdrop-blur-sm">
+    <footer className="border-t border-purple-200 dark:border-purple-800 mt-20 py-12 bg-white/50 dark:bg-gray-900/50 backdrop-blur-sm">
       <div className="container mx-auto px-6">
         <div className="flex flex-col md:flex-row justify-between items-center gap-6">
           <div className="flex items-center gap-3">
@@ -10,17 +10,17 @@ export default function Footer() {
               <Icon name="Brain" className="text-white" size={20} />
             </div>
             <div>
-              <p className="font-bold text-gray-900">Богдан ИИ</p>
-              <p className="text-sm text-gray-600">Умный помощник нового поколения</p>
+              <p className="font-bold text-gray-900 dark:text-white">Богдан ИИ</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400">Виртуальный помощник на основе ваших данных</p>
             </div>
           </div>
           <div className="flex gap-8">
-            <a href="/" className="text-gray-600 hover:text-indigo-600 transition-colors">Главная</a>
-            <a href="/about" className="text-gray-600 hover:text-indigo-600 transition-colors">О сервисе</a>
-            <a href="/admin" className="text-gray-600 hover:text-indigo-600 transition-colors">Админ</a>
+            <a href="/" className="text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">Главная</a>
+            <a href="/about" className="text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">О сервисе</a>
+            <a href="/admin" className="text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">Админ</a>
           </div>
         </div>
-        <div className="text-center text-gray-500 text-sm mt-8 pt-8 border-t border-purple-100">
+        <div className="text-center text-gray-500 dark:text-gray-500 text-sm mt-8 pt-8 border-t border-purple-100 dark:border-purple-900">
           © 2024 Богдан ИИ. Все права защищены.
         </div>
       </div>

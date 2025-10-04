@@ -203,10 +203,13 @@ export default function ChatContainer({
               value={inputMessage}
               onChange={(e) => onInputChange(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && (e.preventDefault(), onSendMessage())}
-              className="resize-none border-purple-200 dark:border-purple-800 dark:bg-gray-800 dark:text-white focus:border-indigo-500 text-base"
+              className="resize-none border-purple-200 dark:border-purple-800 dark:bg-gray-800 dark:text-white focus:border-indigo-500 text-base pr-16"
               rows={3}
               disabled={isLoading || isGeneratingImage || isListening}
             />
+            <div className="absolute bottom-2 right-2 text-xs text-gray-400 dark:text-gray-500">
+              {inputMessage.length} / 1000
+            </div>
           </div>
           <Button
             onClick={startVoiceInput}
@@ -219,17 +222,17 @@ export default function ChatContainer({
             <Icon name={isListening ? "MicOff" : "Mic"} size={20} />
           </Button>
         </div>
-        <div className="flex gap-2">
+        <div className="flex items-center gap-2">
           <Button 
             onClick={onSendMessage}
-            className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 shadow-lg"
+            className="flex-1 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 shadow-lg"
             size="lg"
-            disabled={isLoading || isGeneratingImage || isListening}
+            disabled={isLoading || isGeneratingImage || isListening || !inputMessage.trim()}
           >
             {isLoading ? (
               <Icon name="Loader2" size={20} className="animate-spin mr-2" />
             ) : (
-              <Icon name="MessageSquare" size={20} className="mr-2" />
+              <Icon name="Send" size={20} className="mr-2" />
             )}
             {isListening ? t('chat.listening') : t('chat.answer')}
           </Button>

@@ -36,21 +36,21 @@ export default function AIStatusIndicator() {
 
   if (status === 'checking') {
     return (
-      <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-gray-100">
-        <div className="w-2 h-2 rounded-full bg-gray-400 animate-pulse"></div>
-        <span className="text-xs text-gray-600">Проверка...</span>
+      <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-gray-100 dark:bg-gray-700">
+        <div className="w-2 h-2 rounded-full bg-gray-400 dark:bg-gray-500 animate-pulse"></div>
+        <span className="text-xs text-gray-600 dark:text-gray-300">Проверка...</span>
       </div>
     );
   }
 
   if (status === 'offline') {
     return (
-      <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-red-50 border border-red-200">
+      <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800">
         <div className="w-2 h-2 rounded-full bg-red-500"></div>
-        <span className="text-xs text-red-700">Офлайн</span>
+        <span className="text-xs text-red-700 dark:text-red-400">Офлайн</span>
         {error && (
           <button 
-            className="text-red-600 hover:text-red-800"
+            className="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300"
             title={error}
           >
             <Icon name="Info" size={14} />
@@ -61,9 +61,9 @@ export default function AIStatusIndicator() {
   }
 
   return (
-    <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-green-50 border border-green-200">
-      <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
-      <span className="text-xs text-green-700">Онлайн</span>
+    <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-800">
+      <div className="w-2 h-2 rounded-full bg-green-500 dark:bg-green-400 animate-pulse"></div>
+      <span className="text-xs text-green-700 dark:text-green-400">Онлайн</span>
     </div>
   );
 }
