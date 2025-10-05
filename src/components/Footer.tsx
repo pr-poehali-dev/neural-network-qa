@@ -1,4 +1,5 @@
 import Icon from '@/components/ui/icon';
+import { Link } from 'react-router-dom';
 
 export default function Footer() {
   return (
@@ -15,9 +16,9 @@ export default function Footer() {
             </div>
           </div>
           <div className="flex gap-8">
-            <a href="/" className="text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">Главная</a>
-            <a href="/about" className="text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">О сервисе</a>
-            <a href="/admin" className="text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">Админ</a>
+            <Link to="/" className="text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">Главная</Link>
+            <Link to="/about" className="text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">О сервисе</Link>
+            <Link to="/admin" className="text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">Админ</Link>
           </div>
         </div>
         <div className="text-center text-gray-500 dark:text-gray-500 text-sm mt-8 pt-8 border-t border-purple-100 dark:border-purple-900">

@@ -3,6 +3,7 @@ import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import Icon from '@/components/ui/icon';
+import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 
 interface AdminLoginProps {
@@ -12,6 +13,7 @@ interface AdminLoginProps {
 export default function AdminLogin({ onLogin }: AdminLoginProps) {
   const [password, setPassword] = useState('');
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const handleLogin = () => {
     if (password === 'admin123') {
@@ -56,7 +58,7 @@ export default function AdminLogin({ onLogin }: AdminLoginProps) {
           </Button>
           <Button 
             variant="outline"
-            onClick={() => window.location.href = '/'}
+            onClick={() => navigate('/')}
             className="w-full border-purple-200"
           >
             <Icon name="ArrowLeft" className="mr-2" size={16} />

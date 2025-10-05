@@ -1,11 +1,14 @@
 import { Button } from '@/components/ui/button';
 import Icon from '@/components/ui/icon';
+import { useNavigate } from 'react-router-dom';
 
 interface AdminHeaderProps {
   onLogout: () => void;
 }
 
 export default function AdminHeader({ onLogout }: AdminHeaderProps) {
+  const navigate = useNavigate();
+  
   return (
     <header className="border-b border-white/20 backdrop-blur-md bg-white/30">
       <div className="container mx-auto px-6 py-4">
@@ -21,7 +24,7 @@ export default function AdminHeader({ onLogout }: AdminHeaderProps) {
           <div className="flex gap-4">
             <Button 
               variant="outline" 
-              onClick={() => window.location.href = '/'}
+              onClick={() => navigate('/')}
               className="border-purple-300"
             >
               <Icon name="Home" className="mr-2" size={18} />

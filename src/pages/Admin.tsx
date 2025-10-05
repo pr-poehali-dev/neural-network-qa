@@ -12,6 +12,7 @@ import QuickButtonsTab from '@/components/admin/QuickButtonsTab';
 import AnalyticsTab from '@/components/admin/AnalyticsTab';
 import VoiceDiagnostics from '@/components/VoiceDiagnostics';
 import FullControlTab from '@/components/admin/FullControlTab';
+import VisualEditorTab from '@/components/admin/VisualEditorTab';
 
 const FILE_UPLOAD_URL = 'https://functions.poehali.dev/b58abb29-2429-4b6e-aed0-e5aae54d2240';
 
@@ -60,7 +61,7 @@ export default function Admin() {
   const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
   const [isDragging, setIsDragging] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [activeTab, setActiveTab] = useState<'site' | 'files' | 'stats' | 'content' | 'buttons' | 'analytics' | 'voice' | 'control'>('site');
+  const [activeTab, setActiveTab] = useState<'site' | 'files' | 'stats' | 'content' | 'buttons' | 'analytics' | 'voice' | 'control' | 'visual'>('site');
   const [siteSettings, setSiteSettings] = useState<SiteSettings>({
     title: 'Богдан AI',
     subtitle: 'Интеллектуальный помощник нового поколения',
@@ -368,6 +369,14 @@ export default function Admin() {
               <Icon name="Shield" className="mr-2" size={18} />
               Полный контроль
             </Button>
+            <Button 
+              variant={activeTab === 'visual' ? 'default' : 'outline'}
+              onClick={() => setActiveTab('visual')}
+              className={activeTab === 'visual' ? 'bg-gradient-to-r from-green-600 to-emerald-600' : 'border-green-200 dark:border-green-800'}
+            >
+              <Icon name="Layers" className="mr-2" size={18} />
+              Визуальный редактор
+            </Button>
           </div>
 
           {activeTab === 'site' && (
@@ -424,6 +433,10 @@ export default function Admin() {
 
           {activeTab === 'control' && (
             <FullControlTab />
+          )}
+
+          {activeTab === 'visual' && (
+            <VisualEditorTab />
           )}
         </main>
       </div>
