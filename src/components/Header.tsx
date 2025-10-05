@@ -8,11 +8,15 @@ interface HeaderProps {
   onToggleHistory: () => void;
   onOpenSettings: () => void;
   onOpenGamification?: () => void;
+  onOpenProfile?: () => void;
+  onOpenTools?: () => void;
   userLevel?: number;
   userPoints?: number;
+  userName?: string;
+  userAvatar?: string;
 }
 
-export default function Header({ chatHistoryLength, onToggleHistory, onOpenSettings, onOpenGamification, userLevel, userPoints }: HeaderProps) {
+export default function Header({ chatHistoryLength, onToggleHistory, onOpenSettings, onOpenGamification, onOpenProfile, onOpenTools, userLevel, userPoints, userName, userAvatar }: HeaderProps) {
   const { t } = useLanguage();
 
   return (
@@ -31,6 +35,18 @@ export default function Header({ chatHistoryLength, onToggleHistory, onOpenSetti
             <AIStatusIndicator />
           </div>
           <nav className="flex gap-4 items-center">
+            {onOpenProfile && userName && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={onOpenProfile}
+                className="border-purple-200 dark:border-purple-800 gap-2"
+                title="Личный кабинет"
+              >
+                <span className="text-lg">{userAvatar || '👤'}</span>
+                <span className="font-medium">{userName}</span>
+              </Button>
+            )}
             {onOpenGamification && userLevel !== undefined && (
               <Button
                 variant="outline"
@@ -42,6 +58,17 @@ export default function Header({ chatHistoryLength, onToggleHistory, onOpenSetti
                 <span className="text-lg">🎮</span>
                 <span className="font-bold">Ур.{userLevel}</span>
                 <span className="text-xs text-gray-600 dark:text-gray-400">{userPoints} 💎</span>
+              </Button>
+            )}
+            {onOpenTools && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={onOpenTools}
+                className="border-green-200 dark:border-green-800 gap-2"
+                title="Инструменты без ИИ"
+              >
+                <Icon name="Wrench" size={16} />
               </Button>
             )}
             <Button

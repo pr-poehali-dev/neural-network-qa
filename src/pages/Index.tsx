@@ -17,6 +17,9 @@ import QuickButtons from '@/components/QuickButtons';
 import LeadForm from '@/components/LeadForm';
 import ContactButtons from '@/components/ContactButtons';
 import Gamification from '@/components/Gamification';
+import WelcomeForm from '@/components/WelcomeForm';
+import UserProfile from '@/components/UserProfile';
+import NoAITools from '@/components/NoAITools';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useGamification } from '@/hooks/useGamification';
 
@@ -51,6 +54,11 @@ export default function Index() {
   const [contactInfo, setContactInfo] = useState<{whatsapp?: string; telegram?: string}>({});
   const [telegramBotId, setTelegramBotId] = useState<string>();
   const [showGamification, setShowGamification] = useState(false);
+  const [showProfile, setShowProfile] = useState(false);
+  const [showWelcome, setShowWelcome] = useState(true);
+  const [showTools, setShowTools] = useState(false);
+  const [userName, setUserName] = useState('');
+  const [userAvatar, setUserAvatar] = useState('👤');
   const gamification = useGamification();
   const { toast } = useToast();
   const { t } = useLanguage();
@@ -139,6 +147,18 @@ export default function Index() {
   };
 
   useEffect(() => {
+    const savedName = localStorage.getItem('userName');
+    if (savedName) {
+      setUserName(savedName);
+      setShowWelcome(false);
+    }
+    
+    const userData = localStorage.getItem('userData');
+    if (userData) {
+      const parsed = JSON.parse(userData);
+      setUserAvatar(parsed.avatar || '👤');
+    }
+    
     loadChatHistory();
     
     // Load welcome message from settings
@@ -321,8 +341,12 @@ export default function Index() {
           onToggleHistory={() => setShowHistory(!showHistory)}
           onOpenSettings={() => setShowSettings(true)}
           onOpenGamification={() => setShowGamification(true)}
+          onOpenProfile={() => setShowProfile(true)}
+          onOpenTools={() => setShowTools(true)}
           userLevel={gamification.data.level}
           userPoints={gamification.data.points}
+          userName={userName}
+          userAvatar={userAvatar}
         />
 
         {showSettings && (
@@ -353,6 +377,30 @@ export default function Index() {
           <Gamification onClose={() => setShowGamification(false)} />
         )}
 
+        {showProfile && (
+          <UserProfile onClose={() => {
+            setShowProfile(false);
+            const userData = localStorage.getItem('userData');
+            if (userData) {
+              const parsed = JSON.parse(userData);
+              setUserName(parsed.name || '');
+              setUserAvatar(parsed.avatar || '👤');
+            }
+          }} />
+        )}
+
+        {showTools && (
+          <NoAITools onClose={() => setShowTools(false)} />
+        )}
+
+        {showWelcome && (
+          <WelcomeForm onComplete={(name) => {
+            setUserName(name);
+            setShowWelcome(false);
+          }} />
+        )}
+
+        {!showWelcome && (
         <main className="container mx-auto px-6 py-12">
           <section className="text-center mb-12 animate-fade-in">
             <h2 className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-indigo-600 via-purple-600 to-cyan-500 bg-clip-text text-transparent">
@@ -411,13 +459,17 @@ export default function Index() {
             )}
           </div>
         </main>
+        )}
 
-        <ContactButtons 
-          whatsapp={contactInfo.whatsapp}
-          telegram={contactInfo.telegram}
-        />
-
-        <Footer />
+        {!showWelcome && (
+          <>
+            <ContactButtons 
+              whatsapp={contactInfo.whatsapp}
+              telegram={contactInfo.telegram}
+            />
+            <Footer />
+          </>
+        )}
       </div>
     </div>
   );
