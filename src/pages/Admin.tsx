@@ -11,6 +11,7 @@ import StatsTab from '@/components/admin/StatsTab';
 import QuickButtonsTab from '@/components/admin/QuickButtonsTab';
 import AnalyticsTab from '@/components/admin/AnalyticsTab';
 import VoiceDiagnostics from '@/components/VoiceDiagnostics';
+import FullControlTab from '@/components/admin/FullControlTab';
 
 const FILE_UPLOAD_URL = 'https://functions.poehali.dev/b58abb29-2429-4b6e-aed0-e5aae54d2240';
 
@@ -59,7 +60,7 @@ export default function Admin() {
   const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
   const [isDragging, setIsDragging] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [activeTab, setActiveTab] = useState<'site' | 'files' | 'stats' | 'content' | 'buttons' | 'analytics' | 'voice'>('site');
+  const [activeTab, setActiveTab] = useState<'site' | 'files' | 'stats' | 'content' | 'buttons' | 'analytics' | 'voice' | 'control'>('site');
   const [siteSettings, setSiteSettings] = useState<SiteSettings>({
     title: 'Богдан AI',
     subtitle: 'Интеллектуальный помощник нового поколения',
@@ -359,6 +360,14 @@ export default function Admin() {
               <Icon name="Mic" className="mr-2" size={18} />
               Озвучка
             </Button>
+            <Button 
+              variant={activeTab === 'control' ? 'default' : 'outline'}
+              onClick={() => setActiveTab('control')}
+              className={activeTab === 'control' ? 'bg-gradient-to-r from-red-600 to-orange-600' : 'border-red-200 dark:border-red-800'}
+            >
+              <Icon name="Shield" className="mr-2" size={18} />
+              Полный контроль
+            </Button>
           </div>
 
           {activeTab === 'site' && (
@@ -411,6 +420,10 @@ export default function Admin() {
 
           {activeTab === 'voice' && (
             <VoiceDiagnostics />
+          )}
+
+          {activeTab === 'control' && (
+            <FullControlTab />
           )}
         </main>
       </div>

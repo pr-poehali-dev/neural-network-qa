@@ -79,6 +79,14 @@ export default function Header({ chatHistoryLength, onToggleHistory, onOpenSetti
             >
               <Icon name="Settings" size={16} />
             </Button>
+            <a 
+              href="/admin" 
+              className="flex items-center gap-2 px-3 py-2 rounded-lg bg-gradient-to-r from-red-500 to-orange-500 text-white font-medium hover:from-red-600 hover:to-orange-600 transition-all"
+              title="Админ-панель"
+            >
+              <Icon name="Shield" size={16} />
+              <span className="hidden md:inline">Admin</span>
+            </a>
             <a href="/" className="text-indigo-600 font-medium dark:text-indigo-400">{t('header.home')}</a>
             <a href="/about" className="text-gray-700 hover:text-indigo-600 transition-colors dark:text-gray-300 dark:hover:text-indigo-400">{t('header.about')}</a>
           </nav>
