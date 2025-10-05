@@ -59,7 +59,7 @@ const translateLanguages = [
 ];
 
 export default function SettingsPanel({ onClose }: SettingsPanelProps) {
-  const { language, setLanguage, voiceLanguage, setVoiceLanguage, translateToLanguage, autoDetectLanguage, setTranslateToLanguage, setAutoDetectLanguage, voiceSpeed, setVoiceSpeed, t } = useLanguage();
+  const { language, setLanguage, voiceLanguage, setVoiceLanguage, translateToLanguage, autoDetectLanguage, setTranslateToLanguage, setAutoDetectLanguage, voiceSpeed, setVoiceSpeed, voiceGender, setVoiceGender, t } = useLanguage();
   const { theme, setTheme, colorScheme, setColorScheme } = useTheme();
 
   return (
@@ -202,6 +202,31 @@ export default function SettingsPanel({ onClose }: SettingsPanelProps) {
                   🚀 Быстро
                 </Button>
               </div>
+            </div>
+          </div>
+
+          {/* Voice Gender */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+              Голос для озвучки
+            </label>
+            <div className="grid grid-cols-2 gap-3">
+              <Button
+                variant={voiceGender === 'female' ? 'default' : 'outline'}
+                className={voiceGender === 'female' ? 'bg-gradient-to-r from-pink-600 to-purple-600' : ''}
+                onClick={() => setVoiceGender('female')}
+              >
+                <Icon name="User" className="mr-2" size={18} />
+                👩 Женский
+              </Button>
+              <Button
+                variant={voiceGender === 'male' ? 'default' : 'outline'}
+                className={voiceGender === 'male' ? 'bg-gradient-to-r from-blue-600 to-indigo-600' : ''}
+                onClick={() => setVoiceGender('male')}
+              >
+                <Icon name="User" className="mr-2" size={18} />
+                👨 Мужской
+              </Button>
             </div>
           </div>
 

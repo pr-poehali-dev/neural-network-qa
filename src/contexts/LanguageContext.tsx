@@ -82,11 +82,13 @@ interface LanguageContextType {
   translateToLanguage: string;
   autoDetectLanguage: boolean;
   voiceSpeed: number;
+  voiceGender: 'male' | 'female';
   setLanguage: (lang: Language) => void;
   setVoiceLanguage: (lang: string) => void;
   setTranslateToLanguage: (lang: string) => void;
   setAutoDetectLanguage: (enabled: boolean) => void;
   setVoiceSpeed: (speed: number) => void;
+  setVoiceGender: (gender: 'male' | 'female') => void;
   t: (key: string) => string;
 }
 
@@ -98,6 +100,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   const [translateToLanguage, setTranslateToLanguageState] = useState<string>('ru');
   const [autoDetectLanguage, setAutoDetectLanguageState] = useState<boolean>(true);
   const [voiceSpeed, setVoiceSpeedState] = useState<number>(1.0);
+  const [voiceGender, setVoiceGenderState] = useState<'male' | 'female'>('female');
 
   useEffect(() => {
     const savedLang = localStorage.getItem('language') as Language;
@@ -105,12 +108,14 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     const savedTranslateTo = localStorage.getItem('translateToLanguage');
     const savedAutoDetect = localStorage.getItem('autoDetectLanguage');
     const savedVoiceSpeed = localStorage.getItem('voiceSpeed');
+    const savedVoiceGender = localStorage.getItem('voiceGender') as 'male' | 'female' | null;
     
     if (savedLang) setLanguageState(savedLang);
     if (savedVoiceLang) setVoiceLanguageState(savedVoiceLang);
     if (savedTranslateTo) setTranslateToLanguageState(savedTranslateTo);
     if (savedAutoDetect !== null) setAutoDetectLanguageState(savedAutoDetect === 'true');
     if (savedVoiceSpeed) setVoiceSpeedState(parseFloat(savedVoiceSpeed));
+    if (savedVoiceGender) setVoiceGenderState(savedVoiceGender);
   }, []);
 
   const setLanguage = (lang: Language) => {
@@ -138,6 +143,11 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     localStorage.setItem('voiceSpeed', speed.toString());
   };
 
+  const setVoiceGender = (gender: 'male' | 'female') => {
+    setVoiceGenderState(gender);
+    localStorage.setItem('voiceGender', gender);
+  };
+
   const t = (key: string): string => {
     return translations[key]?.[language] || key;
   };
@@ -149,11 +159,13 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
       translateToLanguage,
       autoDetectLanguage,
       voiceSpeed,
+      voiceGender,
       setLanguage, 
       setVoiceLanguage, 
       setTranslateToLanguage,
       setAutoDetectLanguage,
       setVoiceSpeed,
+      setVoiceGender,
       t 
     }}>
       {children}

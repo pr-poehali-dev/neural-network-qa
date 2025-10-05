@@ -47,7 +47,7 @@ export default function ChatContainer({
   onOpenReadingMode
 }: ChatContainerProps) {
   const [showQuickReplies, setShowQuickReplies] = useState(false);
-  const { voiceLanguage, translateToLanguage, autoDetectLanguage, voiceSpeed } = useLanguage();
+  const { voiceLanguage, translateToLanguage, autoDetectLanguage, voiceSpeed, voiceGender } = useLanguage();
   
   const {
     speakingIndex,
@@ -61,6 +61,7 @@ export default function ChatContainer({
   } = useChatVoice({
     voiceLanguage,
     voiceSpeed,
+    voiceGender,
     autoDetectLanguage,
     translateToLanguage,
     onInputChange

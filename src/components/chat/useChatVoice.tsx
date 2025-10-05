@@ -3,6 +3,7 @@ import { useState } from 'react';
 interface UseChatVoiceProps {
   voiceLanguage: string;
   voiceSpeed: number;
+  voiceGender: 'male' | 'female';
   autoDetectLanguage: boolean;
   translateToLanguage: string;
   onInputChange: (value: string) => void;
@@ -11,6 +12,7 @@ interface UseChatVoiceProps {
 export function useChatVoice({
   voiceLanguage,
   voiceSpeed,
+  voiceGender,
   autoDetectLanguage,
   translateToLanguage,
   onInputChange
@@ -83,7 +85,18 @@ export function useChatVoice({
     const utterance = new SpeechSynthesisUtterance(textToSpeak);
     utterance.lang = voiceLanguage;
     utterance.rate = voiceSpeed;
-    utterance.pitch = 1.0;
+    utterance.pitch = voiceGender === 'male' ? 0.8 : 1.2;
+    
+    const voices = window.speechSynthesis.getVoices();
+    const genderPattern = voiceGender === 'male' ? /male|man|мужской/i : /female|woman|женский/i;
+    const langVoices = voices.filter(v => v.lang.startsWith(voiceLanguage.split('-')[0]));
+    const genderVoice = langVoices.find(v => genderPattern.test(v.name));
+    
+    if (genderVoice) {
+      utterance.voice = genderVoice;
+    } else if (langVoices.length > 0) {
+      utterance.voice = langVoices[voiceGender === 'female' ? 0 : Math.min(1, langVoices.length - 1)];
+    }
     
     utterance.onend = () => setSpeakingIndex(null);
     utterance.onerror = () => setSpeakingIndex(null);
