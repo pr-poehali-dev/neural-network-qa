@@ -83,12 +83,14 @@ interface LanguageContextType {
   autoDetectLanguage: boolean;
   voiceSpeed: number;
   voiceGender: 'male' | 'female';
+  favoriteVoiceName: string | null;
   setLanguage: (lang: Language) => void;
   setVoiceLanguage: (lang: string) => void;
   setTranslateToLanguage: (lang: string) => void;
   setAutoDetectLanguage: (enabled: boolean) => void;
   setVoiceSpeed: (speed: number) => void;
   setVoiceGender: (gender: 'male' | 'female') => void;
+  setFavoriteVoiceName: (name: string | null) => void;
   t: (key: string) => string;
 }
 
@@ -101,6 +103,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   const [autoDetectLanguage, setAutoDetectLanguageState] = useState<boolean>(true);
   const [voiceSpeed, setVoiceSpeedState] = useState<number>(1.0);
   const [voiceGender, setVoiceGenderState] = useState<'male' | 'female'>('female');
+  const [favoriteVoiceName, setFavoriteVoiceNameState] = useState<string | null>(null);
 
   useEffect(() => {
     const savedLang = localStorage.getItem('language') as Language;
@@ -109,6 +112,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     const savedAutoDetect = localStorage.getItem('autoDetectLanguage');
     const savedVoiceSpeed = localStorage.getItem('voiceSpeed');
     const savedVoiceGender = localStorage.getItem('voiceGender') as 'male' | 'female' | null;
+    const savedFavoriteVoice = localStorage.getItem('favoriteVoiceName');
     
     if (savedLang) setLanguageState(savedLang);
     if (savedVoiceLang) setVoiceLanguageState(savedVoiceLang);
@@ -116,6 +120,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     if (savedAutoDetect !== null) setAutoDetectLanguageState(savedAutoDetect === 'true');
     if (savedVoiceSpeed) setVoiceSpeedState(parseFloat(savedVoiceSpeed));
     if (savedVoiceGender) setVoiceGenderState(savedVoiceGender);
+    if (savedFavoriteVoice) setFavoriteVoiceNameState(savedFavoriteVoice);
   }, []);
 
   const setLanguage = (lang: Language) => {
@@ -148,6 +153,15 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     localStorage.setItem('voiceGender', gender);
   };
 
+  const setFavoriteVoiceName = (name: string | null) => {
+    setFavoriteVoiceNameState(name);
+    if (name) {
+      localStorage.setItem('favoriteVoiceName', name);
+    } else {
+      localStorage.removeItem('favoriteVoiceName');
+    }
+  };
+
   const t = (key: string): string => {
     return translations[key]?.[language] || key;
   };
@@ -160,12 +174,14 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
       autoDetectLanguage,
       voiceSpeed,
       voiceGender,
+      favoriteVoiceName,
       setLanguage, 
       setVoiceLanguage, 
       setTranslateToLanguage,
       setAutoDetectLanguage,
       setVoiceSpeed,
       setVoiceGender,
+      setFavoriteVoiceName,
       t 
     }}>
       {children}

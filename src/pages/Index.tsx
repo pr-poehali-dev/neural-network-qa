@@ -179,30 +179,7 @@ export default function Index() {
     }
   }, []);
 
-  const handleFileUpload = (file: File) => {
-    const reader = new FileReader();
-    reader.onload = () => {
-      setMessages(prev => [...prev, { 
-        role: 'user', 
-        text: `📎 Загружен файл: ${file.name}`,
-        file: {
-          name: file.name,
-          size: file.size,
-          type: file.type,
-          content: reader.result
-        }
-      }]);
-      toast({ 
-        title: 'Файл загружен',
-        description: `${file.name} (${(file.size / 1024).toFixed(2)} KB)`
-      });
-    };
-    if (file.type.startsWith('image/')) {
-      reader.readAsDataURL(file);
-    } else {
-      reader.readAsText(file);
-    }
-  };
+
 
   const clearChat = async () => {
     await saveChat();
@@ -446,7 +423,6 @@ export default function Index() {
               onOpenReadingMode={() => setShowReadingMode(true)}
               onAddMessage={(msg) => setMessages(prev => [...prev, msg])}
               onOpenLeadForm={() => setShowLeadForm(true)}
-              onFileUpload={handleFileUpload}
               telegramBotId={telegramBotId}
             />
 

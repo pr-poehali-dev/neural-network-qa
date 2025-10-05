@@ -17,7 +17,6 @@ interface ChatInputProps {
   onToggleQuickReplies: () => void;
   onStartDictation: () => void;
   getSmartSuggestions: (input: string) => string[];
-  onFileUpload?: (file: File) => void;
 }
 
 const quickReplies = [
@@ -43,20 +42,8 @@ export default function ChatInput({
   onSendMessage,
   onToggleQuickReplies,
   onStartDictation,
-  getSmartSuggestions,
-  onFileUpload
+  getSmartSuggestions
 }: ChatInputProps) {
-  const fileInputRef = React.useRef<HTMLInputElement>(null);
-
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file && onFileUpload) {
-      onFileUpload(file);
-      if (fileInputRef.current) {
-        fileInputRef.current.value = '';
-      }
-    }
-  };
   const { t } = useLanguage();
 
   return (
@@ -149,27 +136,7 @@ export default function ChatInput({
           >
             <Icon name="MessageCircle" size={20} />
           </Button>
-          {onFileUpload && (
-            <>
-              <input
-                ref={fileInputRef}
-                type="file"
-                className="hidden"
-                onChange={handleFileSelect}
-                accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png"
-              />
-              <Button
-                onClick={() => fileInputRef.current?.click()}
-                variant="outline"
-                size="lg"
-                disabled={isLoading || isGeneratingImage}
-                className="border-purple-200 dark:border-purple-800"
-                title="Прикрепить файл"
-              >
-                <Icon name="Paperclip" size={20} />
-              </Button>
-            </>
-          )}
+
           <Button
             onClick={onStartDictation}
             variant="outline"

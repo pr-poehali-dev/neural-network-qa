@@ -8,7 +8,7 @@ export default function VoiceDiagnostics() {
   const [availableVoices, setAvailableVoices] = useState<SpeechSynthesisVoice[]>([]);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [selectedVoice, setSelectedVoice] = useState<string>('');
-  const { voiceLanguage, voiceSpeed, voiceGender } = useLanguage();
+  const { voiceLanguage, voiceSpeed, voiceGender, favoriteVoiceName, setFavoriteVoiceName } = useLanguage();
 
   useEffect(() => {
     const loadVoices = () => {
@@ -74,6 +74,14 @@ export default function VoiceDiagnostics() {
     setSelectedVoice('');
   };
 
+  const saveFavoriteVoice = (voiceName: string) => {
+    setFavoriteVoiceName(voiceName);
+  };
+
+  const removeFavoriteVoice = () => {
+    setFavoriteVoiceName(null);
+  };
+
   const langCode = voiceLanguage.split('-')[0];
   const relevantVoices = availableVoices.filter(v => 
     v.lang.toLowerCase().startsWith(langCode)
@@ -116,6 +124,7 @@ export default function VoiceDiagnostics() {
             <p>• Пол: {voiceGender === 'male' ? 'Мужской' : 'Женский'}</p>
             <p>• Всего голосов: {availableVoices.length}</p>
             <p>• Подходящих: {relevantVoices.length}</p>
+            {favoriteVoiceName && <p>• ⭐ Избранный: {favoriteVoiceName}</p>}
           </div>
         </div>
 
@@ -184,20 +193,44 @@ export default function VoiceDiagnostics() {
                 >
                   <div className="flex-1 min-w-0">
                     <p className="text-xs font-medium text-gray-900 dark:text-white truncate">
-                      {voice.name}
+                      {favoriteVoiceName === voice.name && '⭐ '}{voice.name}
                     </p>
                     <p className="text-xs text-gray-500 dark:text-gray-400">
                       {voice.lang} • {voice.localService ? 'Локальный' : 'Облачный'}
                     </p>
                   </div>
-                  <Button 
-                    onClick={() => testVoice(voice)} 
-                    disabled={isSpeaking && selectedVoice !== voice.name}
-                    size="sm"
-                    variant="ghost"
-                  >
-                    <Icon name={selectedVoice === voice.name ? "Volume2" : "Play"} size={14} />
-                  </Button>
+                  <div className="flex gap-1">
+                    <Button 
+                      onClick={() => testVoice(voice)} 
+                      disabled={isSpeaking && selectedVoice !== voice.name}
+                      size="sm"
+                      variant="ghost"
+                      title="Прослушать"
+                    >
+                      <Icon name={selectedVoice === voice.name ? "Volume2" : "Play"} size={14} />
+                    </Button>
+                    {favoriteVoiceName === voice.name ? (
+                      <Button 
+                        onClick={removeFavoriteVoice}
+                        size="sm"
+                        variant="ghost"
+                        className="text-yellow-500 hover:text-yellow-600"
+                        title="Убрать из избранного"
+                      >
+                        <Icon name="Star" size={14} fill="currentColor" />
+                      </Button>
+                    ) : (
+                      <Button 
+                        onClick={() => saveFavoriteVoice(voice.name)}
+                        size="sm"
+                        variant="ghost"
+                        className="text-gray-400 hover:text-yellow-500"
+                        title="Добавить в избранное"
+                      >
+                        <Icon name="Star" size={14} />
+                      </Button>
+                    )}
+                  </div>
                 </div>
               ))}
             </div>
@@ -221,20 +254,44 @@ export default function VoiceDiagnostics() {
                 >
                   <div className="flex-1 min-w-0">
                     <p className="text-xs font-medium text-gray-900 dark:text-white truncate">
-                      {voice.name}
+                      {favoriteVoiceName === voice.name && '⭐ '}{voice.name}
                     </p>
                     <p className="text-xs text-gray-500 dark:text-gray-400">
                       {voice.lang} • {voice.localService ? 'Локальный' : 'Облачный'}
                     </p>
                   </div>
-                  <Button 
-                    onClick={() => testVoice(voice)} 
-                    disabled={isSpeaking && selectedVoice !== voice.name}
-                    size="sm"
-                    variant="ghost"
-                  >
-                    <Icon name={selectedVoice === voice.name ? "Volume2" : "Play"} size={14} />
-                  </Button>
+                  <div className="flex gap-1">
+                    <Button 
+                      onClick={() => testVoice(voice)} 
+                      disabled={isSpeaking && selectedVoice !== voice.name}
+                      size="sm"
+                      variant="ghost"
+                      title="Прослушать"
+                    >
+                      <Icon name={selectedVoice === voice.name ? "Volume2" : "Play"} size={14} />
+                    </Button>
+                    {favoriteVoiceName === voice.name ? (
+                      <Button 
+                        onClick={removeFavoriteVoice}
+                        size="sm"
+                        variant="ghost"
+                        className="text-yellow-500 hover:text-yellow-600"
+                        title="Убрать из избранного"
+                      >
+                        <Icon name="Star" size={14} fill="currentColor" />
+                      </Button>
+                    ) : (
+                      <Button 
+                        onClick={() => saveFavoriteVoice(voice.name)}
+                        size="sm"
+                        variant="ghost"
+                        className="text-gray-400 hover:text-yellow-500"
+                        title="Добавить в избранное"
+                      >
+                        <Icon name="Star" size={14} />
+                      </Button>
+                    )}
+                  </div>
                 </div>
               ))}
             </div>

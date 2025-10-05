@@ -133,6 +133,17 @@ export function useChatVoice({
   };
 
   const setVoiceForUtterance = (utterance: SpeechSynthesisUtterance, voices: SpeechSynthesisVoice[]) => {
+    const favoriteVoiceName = localStorage.getItem('favoriteVoiceName');
+    
+    if (favoriteVoiceName) {
+      const favoriteVoice = voices.find(v => v.name === favoriteVoiceName);
+      if (favoriteVoice) {
+        utterance.voice = favoriteVoice;
+        console.log(`Using favorite voice: ${favoriteVoice.name} (${favoriteVoice.lang})`);
+        return;
+      }
+    }
+    
     const langCode = voiceLanguage.split('-')[0];
     const langVoices = voices.filter(v => v.lang.toLowerCase().startsWith(langCode));
     

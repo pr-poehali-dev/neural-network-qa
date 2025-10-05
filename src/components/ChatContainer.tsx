@@ -34,7 +34,6 @@ interface ChatContainerProps {
   onOpenReadingMode?: () => void;
   onAddMessage?: (message: Message) => void;
   onOpenLeadForm?: () => void;
-  onFileUpload?: (file: File) => void;
   telegramBotId?: string;
 }
 
@@ -53,7 +52,6 @@ export default function ChatContainer({
   onOpenReadingMode,
   onAddMessage,
   onOpenLeadForm,
-  onFileUpload,
   telegramBotId
 }: ChatContainerProps) {
   const [showQuickReplies, setShowQuickReplies] = useState(false);
@@ -123,7 +121,6 @@ export default function ChatContainer({
         onToggleQuickReplies={() => setShowQuickReplies(!showQuickReplies)}
         onStartDictation={startDictationMode}
         getSmartSuggestions={getSmartSuggestions}
-        onFileUpload={onFileUpload}
       />
     </Card>
   );
