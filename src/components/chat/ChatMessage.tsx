@@ -9,6 +9,7 @@ interface Message {
   text: string;
   file?: any;
   imageUrl?: string;
+  images?: Array<{name: string; base64: string; mimeType: string}>;
   isFavorite?: boolean;
   detectedLanguage?: string;
   translatedFrom?: string;
@@ -86,6 +87,23 @@ export default function ChatMessage({
         {message.imageUrl && (
           <div className="mt-3">
             <img src={message.imageUrl} alt="Generated" className="rounded-lg max-w-full" />
+          </div>
+        )}
+        {message.images && message.images.length > 0 && (
+          <div className="mt-3 space-y-2">
+            {message.images.map((img, idx) => (
+              <div key={idx} className="border border-purple-200 dark:border-purple-700 rounded-lg overflow-hidden">
+                <img 
+                  src={`data:${img.mimeType || 'image/jpeg'};base64,${img.base64}`} 
+                  alt={img.name} 
+                  className="max-w-full rounded-lg"
+                />
+                <div className="px-3 py-2 bg-gray-50 dark:bg-gray-800 text-xs text-gray-600 dark:text-gray-400">
+                  <Icon name="Image" className="inline mr-1" size={12} />
+                  {img.name}
+                </div>
+              </div>
+            ))}
           </div>
         )}
         {message.file && (

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
 import Icon from '@/components/ui/icon';
 
@@ -11,15 +11,25 @@ export default function FileDropZone({ onFileDrop }: FileDropZoneProps) {
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
+    e.stopPropagation();
     setIsDragging(true);
   };
 
-  const handleDragLeave = () => {
+  const handleDragEnter = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
     setIsDragging(false);
   };
 
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
+    e.stopPropagation();
     setIsDragging(false);
     
     const files = Array.from(e.dataTransfer.files);
@@ -27,6 +37,29 @@ export default function FileDropZone({ onFileDrop }: FileDropZoneProps) {
       onFileDrop(files);
     }
   };
+
+  // Always listen to drag events
+  useEffect(() => {
+    const handleGlobalDragOver = (e: DragEvent) => {
+      e.preventDefault();
+      if (e.dataTransfer?.types.includes('Files')) {
+        setIsDragging(true);
+      }
+    };
+
+    const handleGlobalDrop = (e: DragEvent) => {
+      e.preventDefault();
+      setIsDragging(false);
+    };
+
+    window.addEventListener('dragover', handleGlobalDragOver);
+    window.addEventListener('drop', handleGlobalDrop);
+
+    return () => {
+      window.removeEventListener('dragover', handleGlobalDragOver);
+      window.removeEventListener('drop', handleGlobalDrop);
+    };
+  }, []);
 
   if (!isDragging) return null;
 

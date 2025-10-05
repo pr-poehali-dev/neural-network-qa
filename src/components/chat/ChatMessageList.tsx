@@ -8,6 +8,7 @@ interface Message {
   text: string;
   file?: any;
   imageUrl?: string;
+  images?: Array<{name: string; base64: string; mimeType: string}>;
   isFavorite?: boolean;
   detectedLanguage?: string;
   translatedFrom?: string;

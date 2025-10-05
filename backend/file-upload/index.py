@@ -5,6 +5,11 @@ from typing import Dict, Any
 import psycopg2
 from psycopg2.extras import RealDictCursor
 
+def is_image_file(file_name: str) -> bool:
+    """Check if file is an image based on extension"""
+    image_extensions = ('.jpg', '.jpeg', '.png', '.gif', '.bmp', '.webp', '.svg')
+    return file_name.lower().endswith(image_extensions)
+
 def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     '''
     Business: Handle file uploads and store in database with binary data
@@ -40,7 +45,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             cursor = conn.cursor(cursor_factory=RealDictCursor)
             
             cursor.execute(
-                "SELECT id, file_name, file_type, file_size, session_id, uploaded_at FROM files ORDER BY uploaded_at DESC"
+                "SELECT id, file_name, file_type, file_size, file_data, session_id, uploaded_at FROM files ORDER BY uploaded_at DESC"
             )
             
             files = cursor.fetchall()
@@ -50,13 +55,23 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             
             files_list = []
             for f in files:
-                files_list.append({
+                file_info = {
                     'id': f['id'],
                     'name': f['file_name'],
                     'type': f['file_type'],
                     'size': f['file_size'],
                     'uploadedAt': f['uploaded_at'].isoformat() if f['uploaded_at'] else None
-                })
+                }
+                
+                # Add base64 data for images
+                if is_image_file(f['file_name']):
+                    file_data = bytes(f['file_data'])
+                    file_info['isImage'] = True
+                    file_info['base64'] = base64.b64encode(file_data).decode('utf-8')
+                else:
+                    file_info['isImage'] = False
+                
+                files_list.append(file_info)
             
             return {
                 'statusCode': 200,
@@ -96,7 +111,15 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 'body': json.dumps({'error': 'Database not configured'})
             }
         
-        file_data = content.encode('utf-8')
+        # Handle base64 images or text content
+        if is_image_file(filename):
+            # Decode base64 for images
+            try:
+                file_data = base64.b64decode(content)
+            except:
+                file_data = content.encode('utf-8')
+        else:
+            file_data = content.encode('utf-8')
         
         conn = psycopg2.connect(database_url)
         cursor = conn.cursor(cursor_factory=RealDictCursor)

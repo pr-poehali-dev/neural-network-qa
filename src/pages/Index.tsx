@@ -14,6 +14,7 @@ import ReadingModePanel from '@/components/ReadingModePanel';
 import ApiKeyNotice from '@/components/ApiKeyNotice';
 import SettingsPanel from '@/components/SettingsPanel';
 import FileDropZone from '@/components/FileDropZone';
+import UploadedFilesInfo from '@/components/UploadedFilesInfo';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 const AI_CHAT_URL = 'https://functions.poehali.dev/95328c78-94a6-4f98-a89c-a4b1b840ea99';
@@ -30,7 +31,7 @@ const getSessionId = () => {
 };
 
 export default function Index() {
-  const [messages, setMessages] = useState<Array<{ role: 'user' | 'ai'; text: string; file?: any; imageUrl?: string; isFavorite?: boolean }>>([]);
+  const [messages, setMessages] = useState<Array<{ role: 'user' | 'ai'; text: string; file?: any; imageUrl?: string; images?: Array<{name: string; base64: string; mimeType: string}>; isFavorite?: boolean }>>([]);
   const [inputMessage, setInputMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [chatHistory, setChatHistory] = useState<Array<{ id: number; title: string; created_at: string; messages: Array<{ role: string; text: string }>; tags?: string[] }>>([]);
@@ -213,9 +214,12 @@ export default function Index() {
       
       if (data.response) {
         const aiText = data.response;
+        const aiImages = data.images || [];
+        
         setMessages(prev => [...prev, { 
           role: 'ai', 
-          text: ''
+          text: '',
+          images: aiImages
         }]);
         
         let currentIndex = 0;
@@ -225,7 +229,8 @@ export default function Index() {
               const newMessages = [...prev];
               newMessages[newMessages.length - 1] = {
                 role: 'ai',
-                text: aiText.substring(0, currentIndex + 1)
+                text: aiText.substring(0, currentIndex + 1),
+                images: aiImages
               };
               return newMessages;
             });
@@ -259,31 +264,52 @@ export default function Index() {
   const handleFileDrop = async (files: File[]) => {
     if (files.length === 0) return;
     
-    const formData = new FormData();
-    formData.append('file', files[0]);
-    formData.append('session_id', getSessionId());
+    const file = files[0];
     
-    try {
-      const response = await fetch(FILE_UPLOAD_URL, {
-        method: 'POST',
-        body: formData
-      });
+    // Read file as base64
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+      const content = e.target?.result;
       
-      const data = await response.json();
-      
-      if (data.file_id) {
-        setCurrentFileId(data.file_id);
+      try {
+        const response = await fetch(FILE_UPLOAD_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            filename: file.name,
+            fileType: file.type,
+            fileSize: file.size,
+            content: typeof content === 'string' ? content.split(',')[1] : content,
+            sessionId: getSessionId()
+          })
+        });
+        
+        const data = await response.json();
+        
+        if (data.file_id) {
+          setCurrentFileId(data.file_id);
+          
+          // Show preview for images
+          const isImage = file.type.startsWith('image/');
+          toast({
+            title: isImage ? '🖼️ Изображение загружено' : 'Файл загружен',
+            description: `${file.name} готов к использованию`
+          });
+        }
+      } catch (error) {
         toast({
-          title: 'Файл загружен',
-          description: `${files[0].name} готов к использованию`
+          title: 'Ошибка',
+          description: 'Не удалось загрузить файл',
+          variant: 'destructive'
         });
       }
-    } catch (error) {
-      toast({
-        title: 'Ошибка',
-        description: 'Не удалось загрузить файл',
-        variant: 'destructive'
-      });
+    };
+    
+    // Read as data URL for images, text for others
+    if (file.type.startsWith('image/')) {
+      reader.readAsDataURL(file);
+    } else {
+      reader.readAsText(file);
     }
   };
 
@@ -344,7 +370,10 @@ export default function Index() {
               />
             )}
             
-
+            <UploadedFilesInfo 
+              fileUploadUrl={FILE_UPLOAD_URL}
+              sessionId={getSessionId()}
+            />
 
             <ChatContainer
               messages={messages}

@@ -5,8 +5,16 @@ import psycopg2
 from psycopg2.extras import RealDictCursor
 import requests
 
+def is_image_file(file_name: str) -> bool:
+    """Check if file is an image based on extension"""
+    image_extensions = ('.jpg', '.jpeg', '.png', '.gif', '.bmp', '.webp', '.svg')
+    return file_name.lower().endswith(image_extensions)
+
 def extract_text_from_file(file_content: bytes, file_name: str) -> str:
     file_lower = file_name.lower()
+    
+    if is_image_file(file_name):
+        return f"[Изображение: {file_name}]"
     
     if file_lower.endswith('.txt'):
         return file_content.decode('utf-8', errors='ignore')
@@ -101,6 +109,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     database_url = os.environ.get('DATABASE_URL')
     
     knowledge_base = ""
+    image_files = []
     
     # Загружаем ВСЕ файлы как базу знаний
     if database_url:
@@ -108,7 +117,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             conn = psycopg2.connect(database_url)
             cursor = conn.cursor(cursor_factory=RealDictCursor)
             
-            cursor.execute("SELECT file_name, file_data FROM files ORDER BY id DESC LIMIT 10")
+            cursor.execute("SELECT file_name, file_data, file_type FROM files ORDER BY id DESC LIMIT 10")
             files = cursor.fetchall()
             
             if files:
@@ -116,8 +125,19 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 for file_record in files:
                     file_content = bytes(file_record['file_data'])
                     file_name = file_record['file_name']
-                    file_text = extract_text_from_file(file_content, file_name)
-                    knowledge_base += f"\n--- Файл: {file_name} ---\n{file_text[:5000]}\n"
+                    
+                    # Separate images from text
+                    if is_image_file(file_name):
+                        import base64
+                        image_files.append({
+                            'name': file_name,
+                            'base64': base64.b64encode(file_content).decode('utf-8'),
+                            'mimeType': file_record.get('file_type', 'image/jpeg')
+                        })
+                        knowledge_base += f"\n--- Файл: {file_name} [ИЗОБРАЖЕНИЕ] ---\n"
+                    else:
+                        file_text = extract_text_from_file(file_content, file_name)
+                        knowledge_base += f"\n--- Файл: {file_name} ---\n{file_text[:5000]}\n"
             
             cursor.close()
             conn.close()
@@ -135,13 +155,19 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     ai_response = simple_search_answer(user_message, knowledge_base)
     model_used = "Поиск по документам"
     
+    response_data = {
+        'response': ai_response,
+        'file_analyzed': bool(knowledge_base),
+        'model': model_used
+    }
+    
+    # Add images to response if found
+    if image_files:
+        response_data['images'] = image_files
+    
     return {
         'statusCode': 200,
         'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
         'isBase64Encoded': False,
-        'body': json.dumps({
-            'response': ai_response,
-            'file_analyzed': bool(knowledge_base),
-            'model': model_used
-        }, ensure_ascii=False)
+        'body': json.dumps(response_data, ensure_ascii=False)
     }
