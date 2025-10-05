@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import Icon from '@/components/ui/icon';
 import { useToast } from '@/hooks/use-toast';
-import { Label } from '@/components/ui/label';
-import { Switch } from '@/components/ui/switch';
+import AdminLogin from '@/components/admin/AdminLogin';
+import AdminHeader from '@/components/admin/AdminHeader';
+import SiteSettingsTab from '@/components/admin/SiteSettingsTab';
+import ContentTab from '@/components/admin/ContentTab';
+import FilesTab from '@/components/admin/FilesTab';
+import StatsTab from '@/components/admin/StatsTab';
 
 const FILE_UPLOAD_URL = 'https://functions.poehali.dev/b58abb29-2429-4b6e-aed0-e5aae54d2240';
 
@@ -32,10 +33,22 @@ interface SiteSettings {
   allowedTypes: string;
 }
 
+interface UploadedFile {
+  name: string;
+  size: number;
+  type: string;
+  uploadedAt: string;
+}
+
+interface CustomPage {
+  id: string;
+  title: string;
+  content: string;
+}
+
 export default function Admin() {
-  const [uploadedFiles, setUploadedFiles] = useState<Array<{name: string; size: number; type: string; uploadedAt: string}>>([]);
+  const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
   const [isDragging, setIsDragging] = useState(false);
-  const [password, setPassword] = useState('');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [activeTab, setActiveTab] = useState<'site' | 'files' | 'stats' | 'content'>('site');
   const [siteSettings, setSiteSettings] = useState<SiteSettings>({
@@ -50,7 +63,7 @@ export default function Admin() {
     maxFileSize: '10',
     allowedTypes: '.txt,.pdf,.doc,.docx,.json'
   });
-  const [customPages, setCustomPages] = useState<Array<{id: string; title: string; content: string}>>([]);
+  const [customPages, setCustomPages] = useState<CustomPage[]>([]);
   const { toast } = useToast();
 
   const exportAllData = () => {
@@ -73,23 +86,6 @@ export default function Admin() {
     if (confirm('Удалить все загруженные файлы?')) {
       setUploadedFiles([]);
       toast({ title: 'Все файлы удалены' });
-    }
-  };
-
-  const handleLogin = () => {
-    if (password === 'admin123') {
-      setIsAuthenticated(true);
-      localStorage.setItem('admin_auth', 'true');
-      toast({
-        title: "Вход выполнен",
-        description: "Добро пожаловать в админ-панель",
-      });
-    } else {
-      toast({
-        title: "Ошибка входа",
-        description: "Неверный пароль",
-        variant: "destructive",
-      });
     }
   };
 
@@ -207,13 +203,6 @@ export default function Admin() {
     toast({ title: "Файл удален" });
   };
 
-  const saveSiteSettings = () => {
-    localStorage.setItem('site_settings', JSON.stringify(siteSettings));
-    document.documentElement.style.setProperty('--primary-color', siteSettings.primaryColor);
-    document.documentElement.style.setProperty('--secondary-color', siteSettings.secondaryColor);
-    toast({ title: 'Настройки сайта сохранены' });
-  };
-
   const addNewPage = () => {
     const newPage = {
       id: `page-${Date.now()}`,
@@ -239,43 +228,17 @@ export default function Admin() {
     toast({ title: 'Страницы сохранены' });
   };
 
+  const handleLogin = () => {
+    setIsAuthenticated(true);
+  };
+
+  const handleLogout = () => {
+    setIsAuthenticated(false);
+    localStorage.removeItem('admin_auth');
+  };
+
   if (!isAuthenticated) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-cyan-50 flex items-center justify-center p-6">
-        <Card className="w-full max-w-md p-8 border-2 border-purple-200">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center">
-              <Icon name="Lock" className="text-white" size={24} />
-            </div>
-            <h1 className="text-2xl font-bold text-gray-900">Панель управления</h1>
-          </div>
-          <div className="space-y-4">
-            <Input
-              type="password"
-              placeholder="Введите пароль"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && handleLogin()}
-              className="border-purple-200"
-            />
-            <Button 
-              onClick={handleLogin}
-              className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700"
-            >
-              Войти
-            </Button>
-            <Button 
-              variant="outline"
-              onClick={() => window.location.href = '/'}
-              className="w-full border-purple-200"
-            >
-              <Icon name="ArrowLeft" className="mr-2" size={16} />
-              Вернуться на сайт
-            </Button>
-          </div>
-        </Card>
-      </div>
-    );
+    return <AdminLogin onLogin={handleLogin} />;
   }
 
   return (
@@ -283,41 +246,7 @@ export default function Admin() {
       <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAxMCAwIEwgMCAwIDAgMTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzYzNjZmMSIgc3Ryb2tlLW9wYWNpdHk9IjAuMDUiIHN0cm9rZS13aWR0aD0iMSIvPjwvcGF0dGVybj48L2RlZnM+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0idXJsKCNncmlkKSIvPjwvc3ZnPg==')] opacity-50"></div>
       
       <div className="relative z-10">
-        <header className="border-b border-white/20 backdrop-blur-md bg-white/30">
-          <div className="container mx-auto px-6 py-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-600 to-purple-600 flex items-center justify-center">
-                  <Icon name="Shield" className="text-white" size={24} />
-                </div>
-                <h1 className="text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-                  Админ-панель
-                </h1>
-              </div>
-              <div className="flex gap-4">
-                <Button 
-                  variant="outline" 
-                  onClick={() => window.location.href = '/'}
-                  className="border-purple-300"
-                >
-                  <Icon name="Home" className="mr-2" size={18} />
-                  На главную
-                </Button>
-                <Button 
-                  variant="outline" 
-                  onClick={() => {
-                    setIsAuthenticated(false);
-                    localStorage.removeItem('admin_auth');
-                  }}
-                  className="border-purple-300"
-                >
-                  <Icon name="LogOut" className="mr-2" size={18} />
-                  Выйти
-                </Button>
-              </div>
-            </div>
-          </div>
-        </header>
+        <AdminHeader onLogout={handleLogout} />
 
         <main className="container mx-auto px-6 py-12">
           <div className="flex gap-4 mb-8 overflow-x-auto pb-2">
@@ -356,314 +285,42 @@ export default function Admin() {
           </div>
 
           {activeTab === 'site' && (
-            <Card className="p-8 border-2 border-purple-200">
-              <h2 className="text-2xl font-bold text-gray-900 mb-6">Настройки сайта</h2>
-              
-              <div className="space-y-6">
-                <div className="grid md:grid-cols-2 gap-6">
-                  <div>
-                    <Label className="mb-2">Название сайта</Label>
-                    <Input
-                      value={siteSettings.title}
-                      onChange={(e) => setSiteSettings(prev => ({ ...prev, title: e.target.value }))}
-                      className="border-purple-200"
-                    />
-                  </div>
-
-                  <div>
-                    <Label className="mb-2">Подзаголовок</Label>
-                    <Input
-                      value={siteSettings.subtitle}
-                      onChange={(e) => setSiteSettings(prev => ({ ...prev, subtitle: e.target.value }))}
-                      className="border-purple-200"
-                    />
-                  </div>
-                </div>
-
-                <div className="grid md:grid-cols-2 gap-6">
-                  <div>
-                    <Label className="mb-2">Основной цвет</Label>
-                    <div className="flex gap-2">
-                      <Input
-                        type="color"
-                        value={siteSettings.primaryColor}
-                        onChange={(e) => setSiteSettings(prev => ({ ...prev, primaryColor: e.target.value }))}
-                        className="w-20 h-10 border-purple-200"
-                      />
-                      <Input
-                        value={siteSettings.primaryColor}
-                        onChange={(e) => setSiteSettings(prev => ({ ...prev, primaryColor: e.target.value }))}
-                        className="flex-1 border-purple-200"
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <Label className="mb-2">Дополнительный цвет</Label>
-                    <div className="flex gap-2">
-                      <Input
-                        type="color"
-                        value={siteSettings.secondaryColor}
-                        onChange={(e) => setSiteSettings(prev => ({ ...prev, secondaryColor: e.target.value }))}
-                        className="w-20 h-10 border-purple-200"
-                      />
-                      <Input
-                        value={siteSettings.secondaryColor}
-                        onChange={(e) => setSiteSettings(prev => ({ ...prev, secondaryColor: e.target.value }))}
-                        className="flex-1 border-purple-200"
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                <div>
-                  <Label className="mb-2">Текст в подвале</Label>
-                  <Input
-                    value={siteSettings.footerText}
-                    onChange={(e) => setSiteSettings(prev => ({ ...prev, footerText: e.target.value }))}
-                    className="border-purple-200"
-                  />
-                </div>
-
-                <div className="grid md:grid-cols-2 gap-6">
-                  <div className="flex items-center justify-between p-4 border border-purple-200 rounded-lg">
-                    <Label>Включить чат</Label>
-                    <Switch
-                      checked={siteSettings.enableChat}
-                      onCheckedChange={(checked) => setSiteSettings(prev => ({ ...prev, enableChat: checked }))}
-                    />
-                  </div>
-
-                  <div className="flex items-center justify-between p-4 border border-purple-200 rounded-lg">
-                    <Label>Включить голосового помощника</Label>
-                    <Switch
-                      checked={siteSettings.enableVoice}
-                      onCheckedChange={(checked) => setSiteSettings(prev => ({ ...prev, enableVoice: checked }))}
-                    />
-                  </div>
-                </div>
-
-                <div className="grid md:grid-cols-2 gap-6">
-                  <div>
-                    <Label className="mb-2">Макс. размер файла (MB)</Label>
-                    <Input
-                      type="number"
-                      value={siteSettings.maxFileSize}
-                      onChange={(e) => setSiteSettings(prev => ({ ...prev, maxFileSize: e.target.value }))}
-                      className="border-purple-200"
-                    />
-                  </div>
-
-                  <div>
-                    <Label className="mb-2">Разрешенные типы файлов</Label>
-                    <Input
-                      value={siteSettings.allowedTypes}
-                      onChange={(e) => setSiteSettings(prev => ({ ...prev, allowedTypes: e.target.value }))}
-                      className="border-purple-200"
-                      placeholder=".txt,.pdf,.doc"
-                    />
-                  </div>
-                </div>
-
-                <Button 
-                  onClick={saveSiteSettings}
-                  className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700"
-                >
-                  <Icon name="Save" className="mr-2" size={18} />
-                  Сохранить настройки
-                </Button>
-              </div>
-            </Card>
+            <SiteSettingsTab 
+              settings={siteSettings}
+              onUpdateSettings={setSiteSettings}
+            />
           )}
 
           {activeTab === 'content' && (
-            <div className="space-y-6">
-              <Card className="p-8 border-2 border-purple-200">
-                <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-2xl font-bold text-gray-900">Управление страницами</h2>
-                  <Button 
-                    onClick={addNewPage}
-                    className="bg-gradient-to-r from-indigo-600 to-purple-600"
-                  >
-                    <Icon name="Plus" className="mr-2" size={18} />
-                    Добавить страницу
-                  </Button>
-                </div>
-
-                {customPages.length === 0 ? (
-                  <div className="text-center py-12 text-gray-500">
-                    <Icon name="FileText" className="mx-auto mb-4 text-gray-400" size={48} />
-                    <p>Нет созданных страниц. Нажмите "Добавить страницу"</p>
-                  </div>
-                ) : (
-                  <div className="space-y-6">
-                    {customPages.map(page => (
-                      <Card key={page.id} className="p-6 border border-purple-200">
-                        <div className="space-y-4">
-                          <div className="flex items-center justify-between">
-                            <Input
-                              value={page.title}
-                              onChange={(e) => updatePage(page.id, 'title', e.target.value)}
-                              className="text-lg font-semibold border-purple-200 flex-1 mr-4"
-                              placeholder="Название страницы"
-                            />
-                            <Button 
-                              variant="ghost" 
-                              size="sm"
-                              onClick={() => deletePage(page.id)}
-                            >
-                              <Icon name="Trash2" className="text-red-500" size={18} />
-                            </Button>
-                          </div>
-                          <Textarea
-                            value={page.content}
-                            onChange={(e) => updatePage(page.id, 'content', e.target.value)}
-                            className="min-h-[200px] border-purple-200 font-mono text-sm"
-                            placeholder="HTML контент страницы..."
-                          />
-                        </div>
-                      </Card>
-                    ))}
-                    <Button 
-                      onClick={savePages}
-                      className="w-full bg-gradient-to-r from-indigo-600 to-purple-600"
-                    >
-                      <Icon name="Save" className="mr-2" size={18} />
-                      Сохранить все страницы
-                    </Button>
-                  </div>
-                )}
-              </Card>
-            </div>
+            <ContentTab
+              pages={customPages}
+              onAddPage={addNewPage}
+              onUpdatePage={updatePage}
+              onDeletePage={deletePage}
+              onSavePages={savePages}
+            />
           )}
 
           {activeTab === 'files' && (
-            <div className="space-y-6">
-              <Card className="p-8 border-2 border-purple-200">
-                <h2 className="text-2xl font-bold text-gray-900 mb-6">Управление файлами</h2>
-                
-                <div
-                  onDragOver={handleDragOver}
-                  onDragLeave={handleDragLeave}
-                  onDrop={handleDrop}
-                  className={`border-2 border-dashed rounded-xl p-12 text-center transition-all ${
-                    isDragging 
-                      ? 'border-indigo-500 bg-indigo-50' 
-                      : 'border-purple-300 bg-purple-50/30'
-                  }`}
-                >
-                  <Icon name="Upload" className="mx-auto mb-4 text-purple-500" size={48} />
-                  <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                    Перетащите файлы сюда
-                  </h3>
-                  <p className="text-gray-600 mb-4">или</p>
-                  <label>
-                    <input 
-                      type="file" 
-                      multiple 
-                      onChange={handleFileInput}
-                      className="hidden"
-                      accept={siteSettings.allowedTypes}
-                    />
-                    <Button 
-                      variant="outline" 
-                      className="border-purple-300"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        (e.currentTarget.previousElementSibling as HTMLInputElement)?.click();
-                      }}
-                    >
-                      <Icon name="FolderOpen" className="mr-2" size={18} />
-                      Выбрать файлы
-                    </Button>
-                  </label>
-                </div>
-
-                {uploadedFiles.length > 0 && (
-                  <div className="mt-6">
-                    <div className="flex items-center justify-between mb-4">
-                      <h3 className="text-lg font-semibold text-gray-900">
-                        Загруженные файлы ({uploadedFiles.length})
-                      </h3>
-                      <div className="flex gap-2">
-                        <Button variant="outline" size="sm" onClick={exportAllData}>
-                          <Icon name="Download" className="mr-2" size={16} />
-                          Экспорт
-                        </Button>
-                        <Button variant="outline" size="sm" onClick={clearAllData}>
-                          <Icon name="Trash2" className="mr-2" size={16} />
-                          Очистить
-                        </Button>
-                      </div>
-                    </div>
-                    <div className="space-y-2">
-                      {uploadedFiles.map((file, idx) => (
-                        <div key={idx} className="flex items-center justify-between p-4 bg-white rounded-lg border border-purple-200">
-                          <div className="flex items-center gap-3">
-                            <Icon name="FileText" className="text-indigo-600" size={24} />
-                            <div>
-                              <p className="font-medium text-gray-900">{file.name}</p>
-                              <p className="text-sm text-gray-500">
-                                {(file.size / 1024).toFixed(2)} KB • {file.type || 'unknown'}
-                              </p>
-                            </div>
-                          </div>
-                          <Button 
-                            variant="ghost" 
-                            size="sm" 
-                            onClick={() => handleDeleteFile(idx)}
-                          >
-                            <Icon name="Trash2" className="text-red-500" size={18} />
-                          </Button>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </Card>
-            </div>
+            <FilesTab
+              files={uploadedFiles}
+              isDragging={isDragging}
+              allowedTypes={siteSettings.allowedTypes}
+              onDragOver={handleDragOver}
+              onDragLeave={handleDragLeave}
+              onDrop={handleDrop}
+              onFileInput={handleFileInput}
+              onDeleteFile={handleDeleteFile}
+              onExportAll={exportAllData}
+              onClearAll={clearAllData}
+            />
           )}
 
           {activeTab === 'stats' && (
-            <div className="grid md:grid-cols-3 gap-6">
-              <Card className="p-6 border-2 border-purple-200">
-                <div className="flex items-center gap-4 mb-4">
-                  <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center">
-                    <Icon name="FileText" className="text-white" size={24} />
-                  </div>
-                  <div>
-                    <p className="text-3xl font-bold text-gray-900">{uploadedFiles.length}</p>
-                    <p className="text-sm text-gray-600">Всего файлов</p>
-                  </div>
-                </div>
-              </Card>
-
-              <Card className="p-6 border-2 border-purple-200">
-                <div className="flex items-center gap-4 mb-4">
-                  <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
-                    <Icon name="FileEdit" className="text-white" size={24} />
-                  </div>
-                  <div>
-                    <p className="text-3xl font-bold text-gray-900">{customPages.length}</p>
-                    <p className="text-sm text-gray-600">Страниц создано</p>
-                  </div>
-                </div>
-              </Card>
-
-              <Card className="p-6 border-2 border-purple-200">
-                <div className="flex items-center gap-4 mb-4">
-                  <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-green-500 to-emerald-500 flex items-center justify-center">
-                    <Icon name="HardDrive" className="text-white" size={24} />
-                  </div>
-                  <div>
-                    <p className="text-3xl font-bold text-gray-900">
-                      {(uploadedFiles.reduce((acc, f) => acc + f.size, 0) / 1024).toFixed(2)}
-                    </p>
-                    <p className="text-sm text-gray-600">KB использовано</p>
-                  </div>
-                </div>
-              </Card>
-            </div>
+            <StatsTab 
+              files={uploadedFiles}
+              pages={customPages}
+            />
           )}
         </main>
       </div>
