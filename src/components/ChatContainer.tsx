@@ -47,12 +47,14 @@ export default function ChatContainer({
 }: ChatContainerProps) {
   const [speakingIndex, setSpeakingIndex] = useState<number | null>(null);
   const [isListening, setIsListening] = useState(false);
+  const [isTranslating, setIsTranslating] = useState(false);
   const { voiceLanguage, translateToLanguage, autoDetectLanguage, t } = useLanguage();
 
   const speakText = async (text: string, index: number) => {
     if (speakingIndex === index) {
       window.speechSynthesis.cancel();
       setSpeakingIndex(null);
+      setIsTranslating(false);
       return;
     }
 
@@ -64,9 +66,12 @@ export default function ChatContainer({
 
     if (targetLang !== 'ru') {
       try {
+        setIsTranslating(true);
         textToSpeak = await translateText(text, 'ru', targetLang);
+        setIsTranslating(false);
       } catch (error) {
         console.error('Translation failed, using original text');
+        setIsTranslating(false);
       }
     }
 
@@ -245,20 +250,28 @@ export default function ChatContainer({
                       <Icon name="Copy" size={16} />
                     </button>
                     {msg.role === 'ai' && (
-                      <button
-                        onClick={() => speakText(msg.text, idx)}
-                        className={`flex-shrink-0 p-2 rounded-lg transition-all ${
-                          speakingIndex === idx
-                            ? 'bg-purple-600 text-white'
-                            : 'bg-purple-100 dark:bg-purple-900 text-purple-600 dark:text-purple-300 hover:bg-purple-200 dark:hover:bg-purple-800'
-                        }`}
-                        title={speakingIndex === idx ? t('chat.stop') : t('chat.speak')}
-                      >
-                        <Icon 
-                          name={speakingIndex === idx ? 'VolumeX' : 'Volume2'} 
-                          size={16} 
-                        />
-                      </button>
+                      <div className="relative">
+                        <button
+                          onClick={() => speakText(msg.text, idx)}
+                          className={`flex-shrink-0 p-2 rounded-lg transition-all ${
+                            speakingIndex === idx
+                              ? 'bg-purple-600 text-white'
+                              : 'bg-purple-100 dark:bg-purple-900 text-purple-600 dark:text-purple-300 hover:bg-purple-200 dark:hover:bg-purple-800'
+                          }`}
+                          title={speakingIndex === idx ? t('chat.stop') : t('chat.speak')}
+                        >
+                          <Icon 
+                            name={speakingIndex === idx ? 'VolumeX' : 'Volume2'} 
+                            size={16} 
+                          />
+                        </button>
+                        {speakingIndex === idx && isTranslating && (
+                          <div className="absolute -top-10 right-0 bg-purple-600 text-white text-xs px-3 py-1.5 rounded-lg whitespace-nowrap shadow-lg animate-fade-in flex items-center gap-1.5">
+                            <Icon name="Languages" size={12} className="animate-pulse" />
+                            <span>Перевожу...</span>
+                          </div>
+                        )}
+                      </div>
                     )}
                   </div>
                 </div>
