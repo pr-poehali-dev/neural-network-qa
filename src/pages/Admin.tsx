@@ -13,6 +13,7 @@ import AnalyticsTab from '@/components/admin/AnalyticsTab';
 import VoiceDiagnostics from '@/components/VoiceDiagnostics';
 import FullControlTab from '@/components/admin/FullControlTab';
 import VisualEditorTab from '@/components/admin/VisualEditorTab';
+import DashboardTab from '@/components/admin/DashboardTab';
 
 const FILE_UPLOAD_URL = 'https://functions.poehali.dev/b58abb29-2429-4b6e-aed0-e5aae54d2240';
 
@@ -61,7 +62,7 @@ export default function Admin() {
   const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
   const [isDragging, setIsDragging] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [activeTab, setActiveTab] = useState<'site' | 'files' | 'stats' | 'content' | 'buttons' | 'analytics' | 'voice' | 'control' | 'visual'>('site');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'site' | 'files' | 'stats' | 'content' | 'buttons' | 'analytics' | 'voice' | 'control' | 'visual'>('dashboard');
   const [siteSettings, setSiteSettings] = useState<SiteSettings>({
     title: 'Богдан AI',
     subtitle: 'Интеллектуальный помощник нового поколения',
@@ -297,87 +298,107 @@ export default function Admin() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-cyan-50">
-      <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAxMCAwIEwgMCAwIDAgMTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzYzNjZmMSIgc3Ryb2tlLW9wYWNpdHk9IjAuMDUiIHN0cm9rZS13aWR0aD0iMSIvPjwvcGF0dGVybj48L2RlZnM+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0idXJsKCNncmlkKSIvPjwvc3ZnPg==')] opacity-50"></div>
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+      <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAiIGhlaWdodD0iODAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI4MCIgaGVpZ2h0PSI4MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PGNpcmNsZSBjeD0iMiIgY3k9IjIiIHI9IjEiIGZpbGw9IiM4YjVjZjYiIGZpbGwtb3BhY2l0eT0iMC4zIi8+PC9wYXR0ZXJuPjwvZGVmcz48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJ1cmwoI2dyaWQpIi8+PC9zdmc+')] opacity-40"></div>
       
       <div className="relative z-10">
         <AdminHeader onLogout={handleLogout} />
 
-        <main className="container mx-auto px-6 py-12">
-          <div className="flex gap-4 mb-8 overflow-x-auto pb-2">
+        <main className="container mx-auto px-6 py-8">
+          <div className="mb-8">
+            <h1 className="text-4xl font-bold text-white mb-2">Панель управления</h1>
+            <p className="text-purple-200">Управляйте контентом и настройками вашего сайта</p>
+          </div>
+          
+          <div className="flex gap-3 mb-8 overflow-x-auto pb-2 scrollbar-hide">
             <Button 
-              variant={activeTab === 'site' ? 'default' : 'outline'}
+              variant={activeTab === 'dashboard' ? 'default' : 'ghost'}
+              onClick={() => setActiveTab('dashboard')}
+              className={`transition-all whitespace-nowrap ${activeTab === 'dashboard' ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg shadow-purple-500/50' : 'text-purple-200 hover:text-white hover:bg-white/10'}`}
+            >
+              <Icon name="LayoutDashboard" className="mr-2" size={18} />
+              Дашборд
+            </Button>
+            <Button 
+              variant={activeTab === 'site' ? 'default' : 'ghost'}
               onClick={() => setActiveTab('site')}
-              className={activeTab === 'site' ? 'bg-gradient-to-r from-indigo-600 to-purple-600' : ''}
+              className={`transition-all whitespace-nowrap ${activeTab === 'site' ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg shadow-purple-500/50' : 'text-purple-200 hover:text-white hover:bg-white/10'}`}
             >
               <Icon name="Globe" className="mr-2" size={18} />
               Настройки сайта
             </Button>
             <Button 
-              variant={activeTab === 'content' ? 'default' : 'outline'}
+              variant={activeTab === 'content' ? 'default' : 'ghost'}
               onClick={() => setActiveTab('content')}
-              className={activeTab === 'content' ? 'bg-gradient-to-r from-indigo-600 to-purple-600' : ''}
+              className={`transition-all whitespace-nowrap ${activeTab === 'content' ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg shadow-purple-500/50' : 'text-purple-200 hover:text-white hover:bg-white/10'}`}
             >
               <Icon name="FileEdit" className="mr-2" size={18} />
               Контент
             </Button>
             <Button 
-              variant={activeTab === 'files' ? 'default' : 'outline'}
+              variant={activeTab === 'files' ? 'default' : 'ghost'}
               onClick={() => setActiveTab('files')}
-              className={activeTab === 'files' ? 'bg-gradient-to-r from-indigo-600 to-purple-600' : ''}
+              className={`transition-all whitespace-nowrap ${activeTab === 'files' ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg shadow-purple-500/50' : 'text-purple-200 hover:text-white hover:bg-white/10'}`}
             >
               <Icon name="FileText" className="mr-2" size={18} />
               Файлы
             </Button>
             <Button 
-              variant={activeTab === 'stats' ? 'default' : 'outline'}
+              variant={activeTab === 'stats' ? 'default' : 'ghost'}
               onClick={() => setActiveTab('stats')}
-              className={activeTab === 'stats' ? 'bg-gradient-to-r from-indigo-600 to-purple-600' : ''}
+              className={`transition-all whitespace-nowrap ${activeTab === 'stats' ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg shadow-purple-500/50' : 'text-purple-200 hover:text-white hover:bg-white/10'}`}
             >
               <Icon name="BarChart" className="mr-2" size={18} />
               Статистика
             </Button>
             <Button 
-              variant={activeTab === 'buttons' ? 'default' : 'outline'}
+              variant={activeTab === 'buttons' ? 'default' : 'ghost'}
               onClick={() => setActiveTab('buttons')}
-              className={activeTab === 'buttons' ? 'bg-gradient-to-r from-indigo-600 to-purple-600' : ''}
+              className={`transition-all whitespace-nowrap ${activeTab === 'buttons' ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg shadow-purple-500/50' : 'text-purple-200 hover:text-white hover:bg-white/10'}`}
             >
               <Icon name="Zap" className="mr-2" size={18} />
               Быстрые кнопки
             </Button>
             <Button 
-              variant={activeTab === 'analytics' ? 'default' : 'outline'}
+              variant={activeTab === 'analytics' ? 'default' : 'ghost'}
               onClick={() => setActiveTab('analytics')}
-              className={activeTab === 'analytics' ? 'bg-gradient-to-r from-indigo-600 to-purple-600' : ''}
+              className={`transition-all whitespace-nowrap ${activeTab === 'analytics' ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg shadow-purple-500/50' : 'text-purple-200 hover:text-white hover:bg-white/10'}`}
             >
               <Icon name="TrendingUp" className="mr-2" size={18} />
               Аналитика
             </Button>
             <Button 
-              variant={activeTab === 'voice' ? 'default' : 'outline'}
+              variant={activeTab === 'voice' ? 'default' : 'ghost'}
               onClick={() => setActiveTab('voice')}
-              className={activeTab === 'voice' ? 'bg-gradient-to-r from-indigo-600 to-purple-600' : ''}
+              className={`transition-all whitespace-nowrap ${activeTab === 'voice' ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg shadow-purple-500/50' : 'text-purple-200 hover:text-white hover:bg-white/10'}`}
             >
               <Icon name="Mic" className="mr-2" size={18} />
               Озвучка
             </Button>
             <Button 
-              variant={activeTab === 'control' ? 'default' : 'outline'}
+              variant={activeTab === 'control' ? 'default' : 'ghost'}
               onClick={() => setActiveTab('control')}
-              className={activeTab === 'control' ? 'bg-gradient-to-r from-red-600 to-orange-600' : 'border-red-200 dark:border-red-800'}
+              className={`transition-all whitespace-nowrap ${activeTab === 'control' ? 'bg-gradient-to-r from-red-500 to-orange-500 text-white shadow-lg shadow-red-500/50' : 'text-purple-200 hover:text-white hover:bg-white/10'}`}
             >
               <Icon name="Shield" className="mr-2" size={18} />
               Полный контроль
             </Button>
             <Button 
-              variant={activeTab === 'visual' ? 'default' : 'outline'}
+              variant={activeTab === 'visual' ? 'default' : 'ghost'}
               onClick={() => setActiveTab('visual')}
-              className={activeTab === 'visual' ? 'bg-gradient-to-r from-green-600 to-emerald-600' : 'border-green-200 dark:border-green-800'}
+              className={`transition-all whitespace-nowrap ${activeTab === 'visual' ? 'bg-gradient-to-r from-green-500 to-emerald-500 text-white shadow-lg shadow-green-500/50' : 'text-purple-200 hover:text-white hover:bg-white/10'}`}
             >
               <Icon name="Layers" className="mr-2" size={18} />
               Визуальный редактор
             </Button>
           </div>
+
+          {activeTab === 'dashboard' && (
+            <DashboardTab 
+              filesCount={uploadedFiles.length}
+              pagesCount={customPages.length}
+            />
+          )}
 
           {activeTab === 'site' && (
             <SiteSettingsTab 

@@ -35,7 +35,7 @@ export default function ChatMessage({
 
   return (
     <div className={`flex gap-3 ${message.role === 'user' ? 'justify-end' : 'justify-start'} animate-fade-in group`}>
-      {message.role === 'assistant' && <ChatAvatar type="ai" size={40} />}
+      {message.role === 'ai' && <ChatAvatar type="ai" size={40} />}
       <div className={`max-w-[80%] rounded-2xl px-5 py-4 relative ${
         message.role === 'user' 
           ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white' 

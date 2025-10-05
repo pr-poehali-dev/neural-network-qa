@@ -10,30 +10,33 @@ export default function AdminHeader({ onLogout }: AdminHeaderProps) {
   const navigate = useNavigate();
   
   return (
-    <header className="border-b border-white/20 backdrop-blur-md bg-white/30">
-      <div className="container mx-auto px-6 py-4">
+    <header className="border-b border-purple-500/30 backdrop-blur-xl bg-black/20">
+      <div className="container mx-auto px-6 py-5">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-600 to-purple-600 flex items-center justify-center">
-              <Icon name="Shield" className="text-white" size={24} />
+            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-purple-600 to-pink-600 flex items-center justify-center shadow-lg shadow-purple-500/50">
+              <Icon name="Shield" className="text-white" size={28} />
             </div>
-            <h1 className="text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-              Админ-панель
-            </h1>
+            <div>
+              <h1 className="text-2xl font-bold text-white">
+                Админ-панель
+              </h1>
+              <p className="text-purple-300 text-sm">Богдан AI</p>
+            </div>
           </div>
-          <div className="flex gap-4">
+          <div className="flex gap-3">
             <Button 
-              variant="outline" 
+              variant="ghost" 
               onClick={() => navigate('/')}
-              className="border-purple-300"
+              className="text-purple-200 hover:text-white hover:bg-white/10"
             >
               <Icon name="Home" className="mr-2" size={18} />
               На главную
             </Button>
             <Button 
-              variant="outline" 
+              variant="ghost" 
               onClick={onLogout}
-              className="border-purple-300"
+              className="text-purple-200 hover:text-white hover:bg-red-500/20 hover:text-red-300"
             >
               <Icon name="LogOut" className="mr-2" size={18} />
               Выйти
