@@ -49,7 +49,7 @@ export default function ChatContainer({
   const [isListening, setIsListening] = useState(false);
   const { voiceLanguage, translateToLanguage, autoDetectLanguage, t } = useLanguage();
 
-  const speakText = (text: string, index: number) => {
+  const speakText = async (text: string, index: number) => {
     if (speakingIndex === index) {
       window.speechSynthesis.cancel();
       setSpeakingIndex(null);
@@ -57,7 +57,20 @@ export default function ChatContainer({
     }
 
     window.speechSynthesis.cancel();
-    const utterance = new SpeechSynthesisUtterance(text);
+    setSpeakingIndex(index);
+
+    const targetLang = voiceLanguage.split('-')[0];
+    let textToSpeak = text;
+
+    if (targetLang !== 'ru') {
+      try {
+        textToSpeak = await translateText(text, 'ru', targetLang);
+      } catch (error) {
+        console.error('Translation failed, using original text');
+      }
+    }
+
+    const utterance = new SpeechSynthesisUtterance(textToSpeak);
     utterance.lang = voiceLanguage;
     utterance.rate = 1.0;
     utterance.pitch = 1.0;
@@ -65,7 +78,6 @@ export default function ChatContainer({
     utterance.onend = () => setSpeakingIndex(null);
     utterance.onerror = () => setSpeakingIndex(null);
     
-    setSpeakingIndex(index);
     window.speechSynthesis.speak(utterance);
   };
 
