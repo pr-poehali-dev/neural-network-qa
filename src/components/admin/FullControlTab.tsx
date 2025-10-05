@@ -75,7 +75,8 @@ export default function FullControlTab() {
 
   const applyCustomJS = () => {
     try {
-      eval(advanced.customJS);
+      const func = new Function(advanced.customJS);
+      func();
       toast({ title: 'JavaScript выполнен!' });
     } catch (e) {
       toast({ title: 'Ошибка в JS', description: String(e), variant: 'destructive' });

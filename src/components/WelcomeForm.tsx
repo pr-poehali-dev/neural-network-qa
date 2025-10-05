@@ -17,7 +17,7 @@ export default function WelcomeForm({ onComplete }: WelcomeFormProps) {
     if (savedName) {
       onComplete(savedName);
     }
-  }, [onComplete]);
+  }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

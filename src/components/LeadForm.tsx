@@ -47,14 +47,14 @@ Email: ${formData.email}
 
     const mailtoLink = `mailto:${adminEmail}?subject=Заявка от ${formData.name}&body=${encodeURIComponent(emailBody)}`;
     
-    window.location.href = mailtoLink;
-
-    setTimeout(() => {
-      onSubmit(formData);
-      toast({ title: 'Заявка готова к отправке', description: 'Откроется почтовое приложение' });
-      setIsSubmitting(false);
-      onClose();
-    }, 500);
+    const link = document.createElement('a');
+    link.href = mailtoLink;
+    link.click();
+    
+    onSubmit(formData);
+    toast({ title: 'Заявка готова к отправке', description: 'Откроется почтовое приложение' });
+    setIsSubmitting(false);
+    onClose();
   };
 
   return (
