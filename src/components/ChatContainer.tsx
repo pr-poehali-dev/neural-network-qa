@@ -48,7 +48,7 @@ export default function ChatContainer({
   const [speakingIndex, setSpeakingIndex] = useState<number | null>(null);
   const [isListening, setIsListening] = useState(false);
   const [isTranslating, setIsTranslating] = useState(false);
-  const { voiceLanguage, translateToLanguage, autoDetectLanguage, t } = useLanguage();
+  const { voiceLanguage, translateToLanguage, autoDetectLanguage, voiceSpeed, t } = useLanguage();
 
   const speakText = async (text: string, index: number) => {
     if (speakingIndex === index) {
@@ -77,7 +77,7 @@ export default function ChatContainer({
 
     const utterance = new SpeechSynthesisUtterance(textToSpeak);
     utterance.lang = voiceLanguage;
-    utterance.rate = 1.0;
+    utterance.rate = voiceSpeed;
     utterance.pitch = 1.0;
     
     utterance.onend = () => setSpeakingIndex(null);

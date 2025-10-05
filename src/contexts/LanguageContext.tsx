@@ -81,10 +81,12 @@ interface LanguageContextType {
   voiceLanguage: string;
   translateToLanguage: string;
   autoDetectLanguage: boolean;
+  voiceSpeed: number;
   setLanguage: (lang: Language) => void;
   setVoiceLanguage: (lang: string) => void;
   setTranslateToLanguage: (lang: string) => void;
   setAutoDetectLanguage: (enabled: boolean) => void;
+  setVoiceSpeed: (speed: number) => void;
   t: (key: string) => string;
 }
 
@@ -95,17 +97,20 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   const [voiceLanguage, setVoiceLanguageState] = useState<string>('ru-RU');
   const [translateToLanguage, setTranslateToLanguageState] = useState<string>('ru');
   const [autoDetectLanguage, setAutoDetectLanguageState] = useState<boolean>(true);
+  const [voiceSpeed, setVoiceSpeedState] = useState<number>(1.0);
 
   useEffect(() => {
     const savedLang = localStorage.getItem('language') as Language;
     const savedVoiceLang = localStorage.getItem('voiceLanguage');
     const savedTranslateTo = localStorage.getItem('translateToLanguage');
     const savedAutoDetect = localStorage.getItem('autoDetectLanguage');
+    const savedVoiceSpeed = localStorage.getItem('voiceSpeed');
     
     if (savedLang) setLanguageState(savedLang);
     if (savedVoiceLang) setVoiceLanguageState(savedVoiceLang);
     if (savedTranslateTo) setTranslateToLanguageState(savedTranslateTo);
     if (savedAutoDetect !== null) setAutoDetectLanguageState(savedAutoDetect === 'true');
+    if (savedVoiceSpeed) setVoiceSpeedState(parseFloat(savedVoiceSpeed));
   }, []);
 
   const setLanguage = (lang: Language) => {
@@ -128,6 +133,11 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     localStorage.setItem('autoDetectLanguage', enabled.toString());
   };
 
+  const setVoiceSpeed = (speed: number) => {
+    setVoiceSpeedState(speed);
+    localStorage.setItem('voiceSpeed', speed.toString());
+  };
+
   const t = (key: string): string => {
     return translations[key]?.[language] || key;
   };
@@ -138,10 +148,12 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
       voiceLanguage, 
       translateToLanguage,
       autoDetectLanguage,
+      voiceSpeed,
       setLanguage, 
       setVoiceLanguage, 
       setTranslateToLanguage,
       setAutoDetectLanguage,
+      setVoiceSpeed,
       t 
     }}>
       {children}

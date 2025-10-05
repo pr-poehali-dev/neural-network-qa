@@ -59,7 +59,7 @@ const translateLanguages = [
 ];
 
 export default function SettingsPanel({ onClose }: SettingsPanelProps) {
-  const { language, setLanguage, voiceLanguage, setVoiceLanguage, translateToLanguage, autoDetectLanguage, setTranslateToLanguage, setAutoDetectLanguage, t } = useLanguage();
+  const { language, setLanguage, voiceLanguage, setVoiceLanguage, translateToLanguage, autoDetectLanguage, setTranslateToLanguage, setAutoDetectLanguage, voiceSpeed, setVoiceSpeed, t } = useLanguage();
   const { theme, setTheme, colorScheme, setColorScheme } = useTheme();
 
   return (
@@ -153,6 +153,55 @@ export default function SettingsPanel({ onClose }: SettingsPanelProps) {
                   {lang.name}
                 </Button>
               ))}
+            </div>
+          </div>
+
+          {/* Voice Speed */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+              Скорость озвучки
+            </label>
+            <div className="space-y-3">
+              <div className="flex items-center gap-4">
+                <input 
+                  type="range" 
+                  min="0.5" 
+                  max="2" 
+                  step="0.1" 
+                  value={voiceSpeed}
+                  onChange={(e) => setVoiceSpeed(parseFloat(e.target.value))}
+                  className="flex-1 h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-purple-600"
+                />
+                <span className="text-sm font-semibold text-gray-900 dark:text-white min-w-[60px] text-center">
+                  {voiceSpeed.toFixed(1)}×
+                </span>
+              </div>
+              <div className="grid grid-cols-3 gap-2">
+                <Button
+                  variant={voiceSpeed === 0.75 ? 'default' : 'outline'}
+                  size="sm"
+                  className={voiceSpeed === 0.75 ? 'bg-gradient-to-r from-indigo-600 to-purple-600' : ''}
+                  onClick={() => setVoiceSpeed(0.75)}
+                >
+                  🐢 Медленно
+                </Button>
+                <Button
+                  variant={voiceSpeed === 1.0 ? 'default' : 'outline'}
+                  size="sm"
+                  className={voiceSpeed === 1.0 ? 'bg-gradient-to-r from-indigo-600 to-purple-600' : ''}
+                  onClick={() => setVoiceSpeed(1.0)}
+                >
+                  ⚡ Нормально
+                </Button>
+                <Button
+                  variant={voiceSpeed === 1.5 ? 'default' : 'outline'}
+                  size="sm"
+                  className={voiceSpeed === 1.5 ? 'bg-gradient-to-r from-indigo-600 to-purple-600' : ''}
+                  onClick={() => setVoiceSpeed(1.5)}
+                >
+                  🚀 Быстро
+                </Button>
+              </div>
             </div>
           </div>
 
