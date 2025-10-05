@@ -130,10 +130,15 @@ export default function Admin() {
         const data = await response.json();
         if (data.files) {
           setUploadedFiles(data.files.map((f: any) => ({
+            id: f.id,
             name: f.name,
             size: f.size,
             type: f.type,
-            uploadedAt: f.uploadedAt
+            uploadedAt: f.uploadedAt,
+            isImage: f.isImage,
+            base64: f.base64,
+            mimeType: f.mimeType,
+            description: f.description
           })));
         }
       }
@@ -217,10 +222,35 @@ export default function Admin() {
     toast({ title: "Файл удален" });
   };
 
-  const handleUpdateDescription = (idx: number, description: string) => {
-    setUploadedFiles(prev => prev.map((file, i) => 
-      i === idx ? { ...file, description } : file
-    ));
+  const handleUpdateDescription = async (idx: number, description: string) => {
+    const file = uploadedFiles[idx];
+    
+    if (!file.id) {
+      toast({ title: 'Ошибка: ID файла не найден', variant: 'destructive' });
+      return;
+    }
+    
+    try {
+      const response = await fetch(FILE_UPLOAD_URL, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          fileId: file.id,
+          description: description
+        })
+      });
+      
+      if (response.ok) {
+        setUploadedFiles(prev => prev.map((f, i) => 
+          i === idx ? { ...f, description } : f
+        ));
+      } else {
+        toast({ title: 'Ошибка сохранения', variant: 'destructive' });
+      }
+    } catch (error) {
+      console.error('Error updating description:', error);
+      toast({ title: 'Ошибка сохранения', variant: 'destructive' });
+    }
   };
 
   const addNewPage = () => {

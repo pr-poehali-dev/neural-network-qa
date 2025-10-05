@@ -19,6 +19,12 @@
         }
       },
       "bodyMatcher": "partial"
+    },
+    {
+      "name": "Get all files",
+      "method": "GET",
+      "expectedStatus": 200,
+      "bodyMatcher": "partial"
     }
   ]
 }

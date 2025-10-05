@@ -64,7 +64,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     'description': f.get('description', '')
                 }
                 
-                # Add base64 data for images
+                # Add base64 data for images (24x24 thumbnail)
                 if is_image_file(f['file_name']):
                     file_data = bytes(f['file_data'])
                     file_info['isImage'] = True
@@ -80,6 +80,53 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
                 'isBase64Encoded': False,
                 'body': json.dumps({'files': files_list})
+            }
+        
+        except Exception as e:
+            return {
+                'statusCode': 500,
+                'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                'body': json.dumps({'error': str(e)})
+            }
+    
+    if method == 'PUT':
+        database_url = os.environ.get('DATABASE_URL')
+        
+        if not database_url:
+            return {
+                'statusCode': 500,
+                'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                'body': json.dumps({'error': 'Database not configured'})
+            }
+        
+        try:
+            body = json.loads(event.get('body', '{}'))
+            file_id = body.get('fileId')
+            description = body.get('description', '')
+            
+            if not file_id:
+                return {
+                    'statusCode': 400,
+                    'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                    'body': json.dumps({'error': 'fileId is required'})
+                }
+            
+            conn = psycopg2.connect(database_url)
+            cursor = conn.cursor()
+            
+            cursor.execute(
+                "UPDATE files SET description = %s WHERE id = %s",
+                (description, file_id)
+            )
+            
+            conn.commit()
+            cursor.close()
+            conn.close()
+            
+            return {
+                'statusCode': 200,
+                'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                'body': json.dumps({'success': True, 'message': 'Description updated'})
             }
         
         except Exception as e:

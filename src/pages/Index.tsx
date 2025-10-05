@@ -132,16 +132,25 @@ export default function Index() {
     
     // Load welcome message from settings
     const savedSettings = localStorage.getItem('site_settings');
+    let welcome = 'Привет! 👋 Я помощник Богдан. Задавайте мне вопросы, и я отвечу на основе загруженных документов.';
+    
     if (savedSettings) {
-      const settings = JSON.parse(savedSettings);
-      const welcome = settings.welcomeMessage || 'Привет! 👋 Я помощник Богдан. Задавайте мне вопросы, и я отвечу на основе загруженных документов.';
-      setWelcomeMessage(welcome);
-      
-      // Show welcome message only if no messages
-      if (messages.length === 0 && !sessionStorage.getItem('welcome_shown')) {
-        setMessages([{ role: 'ai', text: welcome }]);
-        sessionStorage.setItem('welcome_shown', 'true');
+      try {
+        const settings = JSON.parse(savedSettings);
+        if (settings.welcomeMessage) {
+          welcome = settings.welcomeMessage;
+        }
+      } catch (e) {
+        console.error('Error parsing settings:', e);
       }
+    }
+    
+    setWelcomeMessage(welcome);
+    
+    // Show welcome message only if no messages and not shown before
+    if (!sessionStorage.getItem('welcome_shown')) {
+      setMessages([{ role: 'ai', text: welcome }]);
+      sessionStorage.setItem('welcome_shown', 'true');
     }
   }, []);
 
