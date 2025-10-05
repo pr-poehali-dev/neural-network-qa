@@ -40,6 +40,7 @@ export default function Index() {
   const [showReadingMode, setShowReadingMode] = useState(false);
   const [showApiNotice, setShowApiNotice] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
+  const [welcomeMessage, setWelcomeMessage] = useState('');
   const { toast } = useToast();
   const { t } = useLanguage();
 
@@ -128,6 +129,20 @@ export default function Index() {
 
   useEffect(() => {
     loadChatHistory();
+    
+    // Load welcome message from settings
+    const savedSettings = localStorage.getItem('site_settings');
+    if (savedSettings) {
+      const settings = JSON.parse(savedSettings);
+      const welcome = settings.welcomeMessage || 'Привет! 👋 Я помощник Богдан. Задавайте мне вопросы, и я отвечу на основе загруженных документов.';
+      setWelcomeMessage(welcome);
+      
+      // Show welcome message only if no messages
+      if (messages.length === 0 && !sessionStorage.getItem('welcome_shown')) {
+        setMessages([{ role: 'ai', text: welcome }]);
+        sessionStorage.setItem('welcome_shown', 'true');
+      }
+    }
   }, []);
 
   const clearChat = async () => {

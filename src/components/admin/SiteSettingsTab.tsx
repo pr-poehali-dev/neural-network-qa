@@ -1,5 +1,6 @@
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
@@ -13,6 +14,7 @@ interface SiteSettings {
   secondaryColor: string;
   logo: string;
   footerText: string;
+  welcomeMessage: string;
   enableChat: boolean;
   enableVoice: boolean;
   maxFileSize: string;
@@ -102,6 +104,19 @@ export default function SiteSettingsTab({ settings, onUpdateSettings }: SiteSett
             onChange={(e) => onUpdateSettings({ ...settings, footerText: e.target.value })}
             className="border-purple-200"
           />
+        </div>
+
+        <div>
+          <Label className="mb-2">Приветственное сообщение</Label>
+          <Textarea
+            value={settings.welcomeMessage}
+            onChange={(e) => onUpdateSettings({ ...settings, welcomeMessage: e.target.value })}
+            className="border-purple-200 min-h-[100px]"
+            placeholder="Привет! 👋 Я помощник..."
+          />
+          <p className="text-xs text-gray-500 mt-1">
+            Это сообщение увидят пользователи при первом открытии чата
+          </p>
         </div>
 
         <div className="grid md:grid-cols-2 gap-6">

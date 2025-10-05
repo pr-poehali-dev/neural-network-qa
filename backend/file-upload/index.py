@@ -45,7 +45,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             cursor = conn.cursor(cursor_factory=RealDictCursor)
             
             cursor.execute(
-                "SELECT id, file_name, file_type, file_size, file_data, session_id, uploaded_at FROM files ORDER BY uploaded_at DESC"
+                "SELECT id, file_name, file_type, file_size, file_data, session_id, uploaded_at, description FROM files ORDER BY uploaded_at DESC"
             )
             
             files = cursor.fetchall()
@@ -60,7 +60,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     'name': f['file_name'],
                     'type': f['file_type'],
                     'size': f['file_size'],
-                    'uploadedAt': f['uploaded_at'].isoformat() if f['uploaded_at'] else None
+                    'uploadedAt': f['uploaded_at'].isoformat() if f['uploaded_at'] else None,
+                    'description': f.get('description', '')
                 }
                 
                 # Add base64 data for images
@@ -68,6 +69,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     file_data = bytes(f['file_data'])
                     file_info['isImage'] = True
                     file_info['base64'] = base64.b64encode(file_data).decode('utf-8')
+                    file_info['mimeType'] = f['file_type'] or 'image/jpeg'
                 else:
                     file_info['isImage'] = False
                 
@@ -101,6 +103,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         file_size = body.get('fileSize', 0)
         content = body.get('content', '')
         session_id = body.get('sessionId', 'anonymous')
+        description = body.get('description', '')
         
         database_url = os.environ.get('DATABASE_URL')
         
@@ -125,8 +128,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         cursor = conn.cursor(cursor_factory=RealDictCursor)
         
         cursor.execute(
-            "INSERT INTO files (file_name, file_data, file_type, file_size, session_id) VALUES (%s, %s, %s, %s, %s) RETURNING id",
-            (filename, file_data, file_type, file_size, session_id)
+            "INSERT INTO files (file_name, file_data, file_type, file_size, session_id, description) VALUES (%s, %s, %s, %s, %s, %s) RETURNING id",
+            (filename, file_data, file_type, file_size, session_id, description)
         )
         
         file_id = cursor.fetchone()['id']

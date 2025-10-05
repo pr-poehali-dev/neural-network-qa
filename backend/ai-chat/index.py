@@ -32,8 +32,8 @@ def extract_text_from_file(file_content: bytes, file_name: str) -> str:
     else:
         return file_content.decode('utf-8', errors='ignore')[:10000]
 
-def simple_search_answer(question: str, knowledge_base: str) -> str:
-    """Простой поиск по ключевым словам и возврат релевантных частей"""
+def simple_search_answer(question: str, knowledge_base: str, descriptions: list) -> str:
+    """Улучшенный поиск по ключевым словам с учетом описаний файлов"""
     question_lower = question.lower()
     kb_lower = knowledge_base.lower()
     
@@ -50,6 +50,12 @@ def simple_search_answer(question: str, knowledge_base: str) -> str:
             continue
         sentence_lower = sentence.lower()
         score = sum(1 for word in words if word in sentence_lower)
+        
+        # Увеличиваем вес, если совпадает с описанием
+        for desc in descriptions:
+            if desc and any(word in desc.lower() for word in words):
+                score += 2
+        
         if score > 0:
             relevant.append((score, sentence.strip()))
     
@@ -57,10 +63,14 @@ def simple_search_answer(question: str, knowledge_base: str) -> str:
     relevant.sort(reverse=True, key=lambda x: x[0])
     
     if not relevant:
+        # Попробуем найти в описаниях
+        desc_matches = [desc for desc in descriptions if desc and any(word in desc.lower() for word in words)]
+        if desc_matches:
+            return "Информация по вашему запросу:\n\n" + "\n\n".join(desc_matches)
         return "К сожалению, я не нашёл информацию по вашему вопросу в загруженных документах."
     
     # Берём топ-5 самых релевантных предложений
-    answer_parts = [s[1] for s in relevant[:5]]
+    answer_parts = [s[1] for s in relevant[:7]]
     answer = "\n\n".join(answer_parts)
     
     return answer
@@ -110,6 +120,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     
     knowledge_base = ""
     image_files = []
+    descriptions = []
     
     # Загружаем ВСЕ файлы как базу знаний
     if database_url:
@@ -117,7 +128,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             conn = psycopg2.connect(database_url)
             cursor = conn.cursor(cursor_factory=RealDictCursor)
             
-            cursor.execute("SELECT file_name, file_data, file_type FROM files ORDER BY id DESC LIMIT 10")
+            cursor.execute("SELECT file_name, file_data, file_type, description FROM files ORDER BY id DESC LIMIT 10")
             files = cursor.fetchall()
             
             if files:
@@ -125,6 +136,10 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 for file_record in files:
                     file_content = bytes(file_record['file_data'])
                     file_name = file_record['file_name']
+                    file_description = file_record.get('description', '')
+                    
+                    if file_description:
+                        descriptions.append(file_description)
                     
                     # Separate images from text
                     if is_image_file(file_name):
@@ -134,10 +149,17 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                             'base64': base64.b64encode(file_content).decode('utf-8'),
                             'mimeType': file_record.get('file_type', 'image/jpeg')
                         })
-                        knowledge_base += f"\n--- Файл: {file_name} [ИЗОБРАЖЕНИЕ] ---\n"
+                        # Add description to knowledge base for images
+                        if file_description:
+                            knowledge_base += f"\n--- Файл: {file_name} [ИЗОБРАЖЕНИЕ] ---\n{file_description}\n"
+                        else:
+                            knowledge_base += f"\n--- Файл: {file_name} [ИЗОБРАЖЕНИЕ] ---\n"
                     else:
                         file_text = extract_text_from_file(file_content, file_name)
-                        knowledge_base += f"\n--- Файл: {file_name} ---\n{file_text[:5000]}\n"
+                        if file_description:
+                            knowledge_base += f"\n--- Файл: {file_name} ---\nОписание: {file_description}\n{file_text[:5000]}\n"
+                        else:
+                            knowledge_base += f"\n--- Файл: {file_name} ---\n{file_text[:5000]}\n"
             
             cursor.close()
             conn.close()
@@ -152,8 +174,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             'body': json.dumps({'error': 'Загрузите хотя бы один файл с данными для ответов помощника'})
         }
     
-    ai_response = simple_search_answer(user_message, knowledge_base)
-    model_used = "Поиск по документам"
+    ai_response = simple_search_answer(user_message, knowledge_base, descriptions)
+    model_used = "Умный поиск по документам"
     
     response_data = {
         'response': ai_response,

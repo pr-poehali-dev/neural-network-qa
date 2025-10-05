@@ -1,13 +1,21 @@
+import { useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import Icon from '@/components/ui/icon';
 import { useToast } from '@/hooks/use-toast';
 
 interface UploadedFile {
+  id?: number;
   name: string;
   size: number;
   type: string;
   uploadedAt: string;
+  isImage?: boolean;
+  base64?: string;
+  mimeType?: string;
+  description?: string;
 }
 
 interface FilesTabProps {
@@ -19,6 +27,7 @@ interface FilesTabProps {
   onDrop: (e: React.DragEvent) => void;
   onFileInput: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onDeleteFile: (idx: number) => void;
+  onUpdateDescription: (idx: number, description: string) => void;
   onExportAll: () => void;
   onClearAll: () => void;
 }
@@ -32,9 +41,25 @@ export default function FilesTab({
   onDrop,
   onFileInput,
   onDeleteFile,
+  onUpdateDescription,
   onExportAll,
   onClearAll
 }: FilesTabProps) {
+  const [editingId, setEditingId] = useState<number | null>(null);
+  const [tempDescription, setTempDescription] = useState('');
+  const { toast } = useToast();
+
+  const startEdit = (idx: number, currentDescription: string) => {
+    setEditingId(idx);
+    setTempDescription(currentDescription || '');
+  };
+
+  const saveDescription = (idx: number) => {
+    onUpdateDescription(idx, tempDescription);
+    setEditingId(null);
+    toast({ title: 'Описание сохранено' });
+  };
+
   return (
     <div className="space-y-6">
       <Card className="p-8 border-2 border-purple-200">
@@ -54,7 +79,8 @@ export default function FilesTab({
           <h3 className="text-xl font-semibold text-gray-900 mb-2">
             Перетащите файлы сюда
           </h3>
-          <p className="text-gray-600 mb-4">или</p>
+          <p className="text-gray-600 mb-2">Поддерживается массовая загрузка</p>
+          <p className="text-sm text-gray-500 mb-4">JPG, PNG, GIF, PDF, TXT, DOC, JSON</p>
           <label>
             <input 
               type="file" 
@@ -94,26 +120,98 @@ export default function FilesTab({
                 </Button>
               </div>
             </div>
-            <div className="space-y-2">
+            <div className="space-y-4">
               {files.map((file, idx) => (
-                <div key={idx} className="flex items-center justify-between p-4 bg-white rounded-lg border border-purple-200">
-                  <div className="flex items-center gap-3">
-                    <Icon name="FileText" className="text-indigo-600" size={24} />
-                    <div>
-                      <p className="font-medium text-gray-900">{file.name}</p>
-                      <p className="text-sm text-gray-500">
-                        {(file.size / 1024).toFixed(2)} KB • {file.type || 'unknown'}
-                      </p>
+                <Card key={idx} className="p-4 border border-purple-200">
+                  <div className="flex gap-4">
+                    {/* Preview */}
+                    <div className="flex-shrink-0">
+                      {file.isImage && file.base64 ? (
+                        <div className="w-24 h-24 rounded-lg overflow-hidden border-2 border-purple-100">
+                          <img 
+                            src={`data:${file.mimeType || 'image/jpeg'};base64,${file.base64}`}
+                            alt={file.name}
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                      ) : (
+                        <div className="w-24 h-24 rounded-lg bg-indigo-100 flex items-center justify-center">
+                          <Icon name="FileText" className="text-indigo-600" size={32} />
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Info & Description */}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-start justify-between mb-2">
+                        <div className="flex-1">
+                          <p className="font-semibold text-gray-900 truncate">{file.name}</p>
+                          <p className="text-sm text-gray-500">
+                            {(file.size / 1024).toFixed(2)} KB
+                            {file.isImage && (
+                              <span className="ml-2 text-xs bg-purple-100 text-purple-600 px-2 py-0.5 rounded">
+                                Изображение
+                              </span>
+                            )}
+                          </p>
+                        </div>
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          onClick={() => onDeleteFile(idx)}
+                          className="text-red-500 hover:text-red-700"
+                        >
+                          <Icon name="Trash2" size={18} />
+                        </Button>
+                      </div>
+
+                      {/* Description Editor */}
+                      {editingId === idx ? (
+                        <div className="space-y-2">
+                          <Textarea
+                            value={tempDescription}
+                            onChange={(e) => setTempDescription(e.target.value)}
+                            placeholder="Добавьте описание для улучшения поиска..."
+                            className="min-h-[80px] border-purple-200"
+                          />
+                          <div className="flex gap-2">
+                            <Button size="sm" onClick={() => saveDescription(idx)}>
+                              <Icon name="Check" className="mr-1" size={14} />
+                              Сохранить
+                            </Button>
+                            <Button 
+                              size="sm" 
+                              variant="outline" 
+                              onClick={() => setEditingId(null)}
+                            >
+                              Отмена
+                            </Button>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="space-y-2">
+                          {file.description ? (
+                            <p className="text-sm text-gray-700 bg-gray-50 p-3 rounded-lg">
+                              {file.description}
+                            </p>
+                          ) : (
+                            <p className="text-sm text-gray-400 italic">
+                              Нет описания
+                            </p>
+                          )}
+                          <Button 
+                            size="sm" 
+                            variant="outline"
+                            onClick={() => startEdit(idx, file.description || '')}
+                          >
+                            <Icon name="Edit" className="mr-1" size={14} />
+                            {file.description ? 'Редактировать' : 'Добавить описание'}
+                          </Button>
+                        </div>
+                      )}
                     </div>
                   </div>
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    onClick={() => onDeleteFile(idx)}
-                  >
-                    <Icon name="Trash2" className="text-red-500" size={18} />
-                  </Button>
-                </div>
+                </Card>
               ))}
             </div>
           </div>

@@ -27,6 +27,7 @@ interface SiteSettings {
   secondaryColor: string;
   logo: string;
   footerText: string;
+  welcomeMessage: string;
   enableChat: boolean;
   enableVoice: boolean;
   maxFileSize: string;
@@ -34,10 +35,15 @@ interface SiteSettings {
 }
 
 interface UploadedFile {
+  id?: number;
   name: string;
   size: number;
   type: string;
   uploadedAt: string;
+  isImage?: boolean;
+  base64?: string;
+  mimeType?: string;
+  description?: string;
 }
 
 interface CustomPage {
@@ -58,10 +64,11 @@ export default function Admin() {
     secondaryColor: '#a855f7',
     logo: '',
     footerText: '© 2024 Богдан AI. Все права защищены.',
+    welcomeMessage: 'Привет! 👋 Я помощник Богдан. Задавайте мне вопросы, и я отвечу на основе загруженных документов.',
     enableChat: true,
     enableVoice: true,
     maxFileSize: '10',
-    allowedTypes: '.txt,.pdf,.doc,.docx,.json'
+    allowedTypes: '.txt,.pdf,.doc,.docx,.json,.jpg,.jpeg,.png,.gif,.bmp,.webp'
   });
   const [customPages, setCustomPages] = useState<CustomPage[]>([]);
   const { toast } = useToast();
@@ -159,7 +166,11 @@ export default function Admin() {
   };
 
   const uploadFilesToBackend = async (files: File[]) => {
+    let successCount = 0;
+    
     for (const file of files) {
+      const isImage = file.type.startsWith('image/');
+      
       const reader = new FileReader();
       reader.onload = async (event) => {
         const content = event.target?.result as string;
@@ -172,35 +183,44 @@ export default function Admin() {
               filename: file.name,
               fileType: file.type,
               fileSize: file.size,
-              content: content.substring(0, 50000),
+              content: isImage ? content.split(',')[1] : content.substring(0, 50000),
               sessionId: getSessionId()
             })
           });
           
           if (response.ok) {
-            setUploadedFiles(prev => [...prev, {
-              name: file.name,
-              size: file.size,
-              type: file.type,
-              uploadedAt: new Date().toISOString()
-            }]);
+            successCount++;
+            await loadFilesFromBackend();
           }
         } catch (error) {
           console.error('Upload error:', error);
         }
       };
-      reader.readAsText(file);
+      
+      if (isImage) {
+        reader.readAsDataURL(file);
+      } else {
+        reader.readAsText(file);
+      }
     }
     
-    toast({
-      title: "Файлы загружены",
-      description: `Добавлено файлов: ${files.length}`,
-    });
+    setTimeout(() => {
+      toast({
+        title: "Файлы загружены",
+        description: `Добавлено файлов: ${files.length}`,
+      });
+    }, 500);
   };
 
   const handleDeleteFile = (idx: number) => {
     setUploadedFiles(prev => prev.filter((_, i) => i !== idx));
     toast({ title: "Файл удален" });
+  };
+
+  const handleUpdateDescription = (idx: number, description: string) => {
+    setUploadedFiles(prev => prev.map((file, i) => 
+      i === idx ? { ...file, description } : file
+    ));
   };
 
   const addNewPage = () => {
@@ -311,6 +331,7 @@ export default function Admin() {
               onDrop={handleDrop}
               onFileInput={handleFileInput}
               onDeleteFile={handleDeleteFile}
+              onUpdateDescription={handleUpdateDescription}
               onExportAll={exportAllData}
               onClearAll={clearAllData}
             />
