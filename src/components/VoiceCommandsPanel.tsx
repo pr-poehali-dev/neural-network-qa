@@ -143,11 +143,34 @@ export default function VoiceCommandsPanel() {
   };
 
   const speak = (text: string) => {
-    const utterance = new SpeechSynthesisUtterance(text);
+    window.speechSynthesis.cancel();
+    
+    const cleanText = text
+      .replace(/[📅⏰🔢❌💾📝🗑️👋❓]/g, '')
+      .replace(/\n+/g, '. ')
+      .replace(/\s+/g, ' ')
+      .trim();
+
+    if (!cleanText) return;
+
+    const utterance = new SpeechSynthesisUtterance(cleanText);
     utterance.lang = 'ru-RU';
     utterance.rate = 1.0;
     utterance.pitch = 1.0;
-    window.speechSynthesis.cancel();
+    utterance.volume = 1.0;
+    
+    let voices = window.speechSynthesis.getVoices();
+    if (voices.length === 0) {
+      window.speechSynthesis.addEventListener('voiceschanged', () => {
+        voices = window.speechSynthesis.getVoices();
+        const ruVoice = voices.find(v => v.lang.startsWith('ru'));
+        if (ruVoice) utterance.voice = ruVoice;
+      }, { once: true });
+    } else {
+      const ruVoice = voices.find(v => v.lang.startsWith('ru'));
+      if (ruVoice) utterance.voice = ruVoice;
+    }
+    
     window.speechSynthesis.speak(utterance);
   };
 

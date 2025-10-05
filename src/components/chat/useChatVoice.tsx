@@ -82,26 +82,119 @@ export function useChatVoice({
       }
     }
 
-    const utterance = new SpeechSynthesisUtterance(textToSpeak);
-    utterance.lang = voiceLanguage;
-    utterance.rate = voiceSpeed;
-    utterance.pitch = voiceGender === 'male' ? 0.8 : 1.2;
+    const cleanText = textToSpeak
+      .replace(/\*\*/g, '')
+      .replace(/\*/g, '')
+      .replace(/```[\s\S]*?```/g, '')
+      .replace(/`[^`]+`/g, '')
+      .replace(/#{1,6}\s/g, '')
+      .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+      .replace(/\n+/g, '. ')
+      .replace(/\s+/g, ' ')
+      .trim();
+
+    const chunks = splitIntoChunks(cleanText, 200);
     
-    const voices = window.speechSynthesis.getVoices();
-    const genderPattern = voiceGender === 'male' ? /male|man|мужской/i : /female|woman|женский/i;
-    const langVoices = voices.filter(v => v.lang.startsWith(voiceLanguage.split('-')[0]));
-    const genderVoice = langVoices.find(v => genderPattern.test(v.name));
+    const speakChunk = (chunkIndex: number) => {
+      if (chunkIndex >= chunks.length) {
+        setSpeakingIndex(null);
+        return;
+      }
+
+      const utterance = new SpeechSynthesisUtterance(chunks[chunkIndex]);
+      utterance.lang = voiceLanguage;
+      utterance.rate = voiceSpeed;
+      utterance.volume = 1.0;
+      utterance.pitch = voiceGender === 'male' ? 0.85 : 1.1;
+      
+      let voices = window.speechSynthesis.getVoices();
+      if (voices.length === 0) {
+        window.speechSynthesis.addEventListener('voiceschanged', () => {
+          voices = window.speechSynthesis.getVoices();
+          setVoiceForUtterance(utterance, voices);
+        }, { once: true });
+      } else {
+        setVoiceForUtterance(utterance, voices);
+      }
+      
+      utterance.onend = () => {
+        setTimeout(() => speakChunk(chunkIndex + 1), 100);
+      };
+      
+      utterance.onerror = (event) => {
+        console.error('Speech error:', event);
+        setSpeakingIndex(null);
+      };
+      
+      window.speechSynthesis.speak(utterance);
+    };
+
+    speakChunk(0);
+  };
+
+  const setVoiceForUtterance = (utterance: SpeechSynthesisUtterance, voices: SpeechSynthesisVoice[]) => {
+    const langCode = voiceLanguage.split('-')[0];
+    const langVoices = voices.filter(v => v.lang.toLowerCase().startsWith(langCode));
     
-    if (genderVoice) {
-      utterance.voice = genderVoice;
-    } else if (langVoices.length > 0) {
-      utterance.voice = langVoices[voiceGender === 'female' ? 0 : Math.min(1, langVoices.length - 1)];
+    if (langVoices.length === 0) {
+      const anyLangVoice = voices.find(v => v.lang.toLowerCase().includes(langCode));
+      if (anyLangVoice) {
+        utterance.voice = anyLangVoice;
+      }
+      return;
     }
-    
-    utterance.onend = () => setSpeakingIndex(null);
-    utterance.onerror = () => setSpeakingIndex(null);
-    
-    window.speechSynthesis.speak(utterance);
+
+    let selectedVoice: SpeechSynthesisVoice | undefined;
+
+    if (voiceGender === 'male') {
+      selectedVoice = langVoices.find(v => 
+        /male|man|мужской|мужчина|matthew|dmitry|yuri|андрей|артем/i.test(v.name)
+      );
+      
+      if (!selectedVoice) {
+        selectedVoice = langVoices.find(v => 
+          !/female|woman|женский|женщина|alice|oksana|катя|милена/i.test(v.name)
+        );
+      }
+      
+      if (!selectedVoice && langVoices.length > 1) {
+        selectedVoice = langVoices[1];
+      }
+    } else {
+      selectedVoice = langVoices.find(v => 
+        /female|woman|женский|женщина|alice|oksana|катя|милена|samantha|victoria/i.test(v.name)
+      );
+      
+      if (!selectedVoice) {
+        selectedVoice = langVoices[0];
+      }
+    }
+
+    if (selectedVoice) {
+      utterance.voice = selectedVoice;
+      console.log(`Selected voice: ${selectedVoice.name} (${selectedVoice.lang}) - Gender: ${voiceGender}`);
+    }
+  };
+
+  const splitIntoChunks = (text: string, maxLength: number): string[] => {
+    const sentences = text.match(/[^.!?]+[.!?]+/g) || [text];
+    const chunks: string[] = [];
+    let currentChunk = '';
+
+    for (const sentence of sentences) {
+      if ((currentChunk + sentence).length > maxLength && currentChunk) {
+        chunks.push(currentChunk.trim());
+        currentChunk = sentence;
+      } else {
+        currentChunk += sentence;
+      }
+    }
+
+    if (currentChunk) {
+      chunks.push(currentChunk.trim());
+    }
+
+    return chunks.length > 0 ? chunks : [text];
   };
 
   const startVoiceInput = () => {
