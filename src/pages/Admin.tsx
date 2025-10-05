@@ -8,6 +8,8 @@ import SiteSettingsTab from '@/components/admin/SiteSettingsTab';
 import ContentTab from '@/components/admin/ContentTab';
 import FilesTab from '@/components/admin/FilesTab';
 import StatsTab from '@/components/admin/StatsTab';
+import QuickButtonsTab from '@/components/admin/QuickButtonsTab';
+import AnalyticsTab from '@/components/admin/AnalyticsTab';
 
 const FILE_UPLOAD_URL = 'https://functions.poehali.dev/b58abb29-2429-4b6e-aed0-e5aae54d2240';
 
@@ -56,7 +58,7 @@ export default function Admin() {
   const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
   const [isDragging, setIsDragging] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [activeTab, setActiveTab] = useState<'site' | 'files' | 'stats' | 'content'>('site');
+  const [activeTab, setActiveTab] = useState<'site' | 'files' | 'stats' | 'content' | 'buttons' | 'analytics'>('site');
   const [siteSettings, setSiteSettings] = useState<SiteSettings>({
     title: 'Богдан AI',
     subtitle: 'Интеллектуальный помощник нового поколения',
@@ -332,6 +334,22 @@ export default function Admin() {
               <Icon name="BarChart" className="mr-2" size={18} />
               Статистика
             </Button>
+            <Button 
+              variant={activeTab === 'buttons' ? 'default' : 'outline'}
+              onClick={() => setActiveTab('buttons')}
+              className={activeTab === 'buttons' ? 'bg-gradient-to-r from-indigo-600 to-purple-600' : ''}
+            >
+              <Icon name="Zap" className="mr-2" size={18} />
+              Быстрые кнопки
+            </Button>
+            <Button 
+              variant={activeTab === 'analytics' ? 'default' : 'outline'}
+              onClick={() => setActiveTab('analytics')}
+              className={activeTab === 'analytics' ? 'bg-gradient-to-r from-indigo-600 to-purple-600' : ''}
+            >
+              <Icon name="TrendingUp" className="mr-2" size={18} />
+              Аналитика
+            </Button>
           </div>
 
           {activeTab === 'site' && (
@@ -372,6 +390,14 @@ export default function Admin() {
               files={uploadedFiles}
               pages={customPages}
             />
+          )}
+
+          {activeTab === 'buttons' && (
+            <QuickButtonsTab />
+          )}
+
+          {activeTab === 'analytics' && (
+            <AnalyticsTab />
           )}
         </main>
       </div>

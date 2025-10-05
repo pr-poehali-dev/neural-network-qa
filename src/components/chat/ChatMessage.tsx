@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/button';
 import Icon from '@/components/ui/icon';
 import ChatAvatar from '@/components/ChatAvatar';
+import RatingButtons from '@/components/RatingButtons';
 import ReactMarkdown from 'react-markdown';
 import { useLanguage } from '@/contexts/LanguageContext';
 
@@ -111,6 +112,12 @@ export default function ChatMessage({
             <Icon name="FileText" className="inline mr-1" size={14} />
             <span className="text-xs opacity-80">{message.file.name}</span>
           </div>
+        )}
+        {message.role === 'ai' && message.text && (
+          <RatingButtons 
+            messageIndex={index}
+            messageText={message.text}
+          />
         )}
       </div>
     </div>

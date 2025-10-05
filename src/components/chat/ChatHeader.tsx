@@ -1,5 +1,6 @@
 import { Button } from '@/components/ui/button';
 import Icon from '@/components/ui/icon';
+import LiveOperatorButton from '@/components/LiveOperatorButton';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 interface ChatHeaderProps {
@@ -7,13 +8,17 @@ interface ChatHeaderProps {
   onExportChat: () => void;
   onClearChat: () => void;
   onOpenReadingMode?: () => void;
+  onOpenLeadForm?: () => void;
+  telegramBotId?: string;
 }
 
 export default function ChatHeader({
   messageCount,
   onExportChat,
   onClearChat,
-  onOpenReadingMode
+  onOpenReadingMode,
+  onOpenLeadForm,
+  telegramBotId
 }: ChatHeaderProps) {
   const { t } = useLanguage();
 
@@ -33,6 +38,18 @@ export default function ChatHeader({
         </div>
       </div>
       <div className="flex gap-2">
+        <LiveOperatorButton botId={telegramBotId} />
+        {onOpenLeadForm && (
+          <Button 
+            variant="default" 
+            size="sm" 
+            onClick={onOpenLeadForm}
+            className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white"
+          >
+            <Icon name="Mail" className="mr-2" size={16} />
+            Оставить заявку
+          </Button>
+        )}
         {messageCount > 0 && (
           <>
             {onOpenReadingMode && (

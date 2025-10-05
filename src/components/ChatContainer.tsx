@@ -33,6 +33,9 @@ interface ChatContainerProps {
   onToggleFavorite?: (index: number) => void;
   onOpenReadingMode?: () => void;
   onAddMessage?: (message: Message) => void;
+  onOpenLeadForm?: () => void;
+  onFileUpload?: (file: File) => void;
+  telegramBotId?: string;
 }
 
 export default function ChatContainer({
@@ -48,7 +51,10 @@ export default function ChatContainer({
   onClearChat,
   onToggleFavorite,
   onOpenReadingMode,
-  onAddMessage
+  onAddMessage,
+  onOpenLeadForm,
+  onFileUpload,
+  telegramBotId
 }: ChatContainerProps) {
   const [showQuickReplies, setShowQuickReplies] = useState(false);
   const { voiceLanguage, translateToLanguage, autoDetectLanguage, voiceSpeed, voiceGender } = useLanguage();
@@ -92,6 +98,8 @@ export default function ChatContainer({
         onExportChat={onExportChat}
         onClearChat={onClearChat}
         onOpenReadingMode={onOpenReadingMode}
+        onOpenLeadForm={onOpenLeadForm}
+        telegramBotId={telegramBotId}
       />
 
       <ChatMessageList
@@ -115,6 +123,7 @@ export default function ChatContainer({
         onToggleQuickReplies={() => setShowQuickReplies(!showQuickReplies)}
         onStartDictation={startDictationMode}
         getSmartSuggestions={getSmartSuggestions}
+        onFileUpload={onFileUpload}
       />
     </Card>
   );

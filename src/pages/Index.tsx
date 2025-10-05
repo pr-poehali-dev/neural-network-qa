@@ -13,6 +13,9 @@ import ExportDialog from '@/components/ExportDialog';
 import ReadingModePanel from '@/components/ReadingModePanel';
 import ApiKeyNotice from '@/components/ApiKeyNotice';
 import SettingsPanel from '@/components/SettingsPanel';
+import QuickButtons from '@/components/QuickButtons';
+import LeadForm from '@/components/LeadForm';
+import ContactButtons from '@/components/ContactButtons';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 const AI_CHAT_URL = 'https://functions.poehali.dev/95328c78-94a6-4f98-a89c-a4b1b840ea99';
@@ -41,6 +44,10 @@ export default function Index() {
   const [showApiNotice, setShowApiNotice] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [welcomeMessage, setWelcomeMessage] = useState('');
+  const [quickButtons, setQuickButtons] = useState<Array<{id: string; text: string; emoji: string; enabled: boolean}>>([]);
+  const [showLeadForm, setShowLeadForm] = useState(false);
+  const [contactInfo, setContactInfo] = useState<{whatsapp?: string; telegram?: string}>({});
+  const [telegramBotId, setTelegramBotId] = useState<string>();
   const { toast } = useToast();
   const { t } = useLanguage();
 
@@ -140,6 +147,18 @@ export default function Index() {
         if (settings.welcomeMessage) {
           welcome = settings.welcomeMessage;
         }
+        if (settings.whatsappNumber || settings.telegramUsername) {
+          setContactInfo({
+            whatsapp: settings.whatsappNumber,
+            telegram: settings.telegramUsername
+          });
+        }
+        if (settings.telegramBotId) {
+          setTelegramBotId(settings.telegramBotId);
+          if (settings.telegramAdminChatId) {
+            localStorage.setItem('telegram_admin_chat_id', settings.telegramAdminChatId);
+          }
+        }
       } catch (e) {
         console.error('Error parsing settings:', e);
       }
@@ -147,12 +166,43 @@ export default function Index() {
     
     setWelcomeMessage(welcome);
     
+    // Load quick buttons
+    const savedButtons = localStorage.getItem('quick_buttons');
+    if (savedButtons) {
+      setQuickButtons(JSON.parse(savedButtons));
+    }
+    
     // Show welcome message only if no messages and not shown before
     if (!sessionStorage.getItem('welcome_shown')) {
       setMessages([{ role: 'ai', text: welcome }]);
       sessionStorage.setItem('welcome_shown', 'true');
     }
   }, []);
+
+  const handleFileUpload = (file: File) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      setMessages(prev => [...prev, { 
+        role: 'user', 
+        text: `📎 Загружен файл: ${file.name}`,
+        file: {
+          name: file.name,
+          size: file.size,
+          type: file.type,
+          content: reader.result
+        }
+      }]);
+      toast({ 
+        title: 'Файл загружен',
+        description: `${file.name} (${(file.size / 1024).toFixed(2)} KB)`
+      });
+    };
+    if (file.type.startsWith('image/')) {
+      reader.readAsDataURL(file);
+    } else {
+      reader.readAsText(file);
+    }
+  };
 
   const clearChat = async () => {
     await saveChat();
@@ -208,6 +258,37 @@ export default function Index() {
     }
   };
 
+  const trackQuestion = (question: string) => {
+    const stats = JSON.parse(localStorage.getItem('question_stats') || '{"questions":[],"total":0,"today":0,"peakHour":"—"}');
+    const hour = new Date().getHours();
+    const today = new Date().toDateString();
+    
+    const existingQ = stats.questions.find((q: any) => q.question === question);
+    if (existingQ) {
+      existingQ.count++;
+      existingQ.lastAsked = new Date().toISOString();
+    } else {
+      stats.questions.push({
+        question,
+        count: 1,
+        lastAsked: new Date().toISOString()
+      });
+    }
+    
+    stats.total = (stats.total || 0) + 1;
+    
+    if (stats.lastDay !== today) {
+      stats.today = 1;
+      stats.lastDay = today;
+    } else {
+      stats.today = (stats.today || 0) + 1;
+    }
+    
+    stats.peakHour = `${hour}:00`;
+    
+    localStorage.setItem('question_stats', JSON.stringify(stats));
+  };
+
   const handleSendMessage = async () => {
     if (!inputMessage.trim() || isLoading) return;
     
@@ -215,6 +296,8 @@ export default function Index() {
     setMessages(prev => [...prev, { role: 'user', text: userMsg }]);
     setInputMessage('');
     setIsLoading(true);
+    
+    trackQuestion(userMsg);
     
     try {
       const requestBody: any = { message: userMsg };
@@ -340,6 +423,15 @@ export default function Index() {
               />
             )}
 
+            <QuickButtons 
+              buttons={quickButtons}
+              onButtonClick={(text) => {
+                setInputMessage(text);
+                setTimeout(() => handleSendMessage(), 100);
+              }}
+              className="mb-4"
+            />
+
             <ChatContainer
               messages={messages}
               inputMessage={inputMessage}
@@ -353,13 +445,29 @@ export default function Index() {
               onClearChat={clearChat}
               onOpenReadingMode={() => setShowReadingMode(true)}
               onAddMessage={(msg) => setMessages(prev => [...prev, msg])}
+              onOpenLeadForm={() => setShowLeadForm(true)}
+              onFileUpload={handleFileUpload}
+              telegramBotId={telegramBotId}
             />
 
-
-
-
+            {showLeadForm && (
+              <LeadForm
+                onClose={() => setShowLeadForm(false)}
+                onSubmit={(data) => {
+                  toast({ 
+                    title: 'Заявка принята!',
+                    description: `${data.name}, мы свяжемся с вами по ${data.email}`
+                  });
+                }}
+              />
+            )}
           </div>
         </main>
+
+        <ContactButtons 
+          whatsapp={contactInfo.whatsapp}
+          telegram={contactInfo.telegram}
+        />
 
         <Footer />
       </div>

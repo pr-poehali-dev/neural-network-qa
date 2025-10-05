@@ -19,6 +19,10 @@ interface SiteSettings {
   enableVoice: boolean;
   maxFileSize: string;
   allowedTypes: string;
+  whatsappNumber?: string;
+  telegramUsername?: string;
+  telegramBotId?: string;
+  telegramAdminChatId?: string;
 }
 
 interface SiteSettingsTabProps {
@@ -156,6 +160,54 @@ export default function SiteSettingsTab({ settings, onUpdateSettings }: SiteSett
               className="border-purple-200"
               placeholder=".txt,.pdf,.doc"
             />
+          </div>
+        </div>
+
+        <div className="grid md:grid-cols-2 gap-6">
+          <div>
+            <Label className="mb-2">WhatsApp (номер с кодом страны)</Label>
+            <Input
+              value={settings.whatsappNumber || ''}
+              onChange={(e) => onUpdateSettings({ ...settings, whatsappNumber: e.target.value })}
+              className="border-purple-200"
+              placeholder="79991234567"
+            />
+            <p className="text-xs text-gray-500 mt-1">Пример: 79991234567 (без + и пробелов)</p>
+          </div>
+
+          <div>
+            <Label className="mb-2">Telegram (username)</Label>
+            <Input
+              value={settings.telegramUsername || ''}
+              onChange={(e) => onUpdateSettings({ ...settings, telegramUsername: e.target.value })}
+              className="border-purple-200"
+              placeholder="@username или username"
+            />
+            <p className="text-xs text-gray-500 mt-1">Появится плавающая кнопка справа внизу</p>
+          </div>
+        </div>
+
+        <div className="grid md:grid-cols-2 gap-6">
+          <div>
+            <Label className="mb-2">Telegram Bot ID (для живого оператора)</Label>
+            <Input
+              value={settings.telegramBotId || ''}
+              onChange={(e) => onUpdateSettings({ ...settings, telegramBotId: e.target.value })}
+              className="border-purple-200"
+              placeholder="123456789:ABCdefGHIjklMNOpqrsTUVwxyz"
+            />
+            <p className="text-xs text-gray-500 mt-1">Получите у @BotFather в Telegram</p>
+          </div>
+
+          <div>
+            <Label className="mb-2">Telegram Admin Chat ID</Label>
+            <Input
+              value={settings.telegramAdminChatId || ''}
+              onChange={(e) => onUpdateSettings({ ...settings, telegramAdminChatId: e.target.value })}
+              className="border-purple-200"
+              placeholder="123456789"
+            />
+            <p className="text-xs text-gray-500 mt-1">Напишите /start боту, чтобы узнать ID</p>
           </div>
         </div>
 
