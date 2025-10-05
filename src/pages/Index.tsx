@@ -16,7 +16,9 @@ import SettingsPanel from '@/components/SettingsPanel';
 import QuickButtons from '@/components/QuickButtons';
 import LeadForm from '@/components/LeadForm';
 import ContactButtons from '@/components/ContactButtons';
+import Gamification from '@/components/Gamification';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useGamification } from '@/hooks/useGamification';
 
 const AI_CHAT_URL = 'https://functions.poehali.dev/95328c78-94a6-4f98-a89c-a4b1b840ea99';
 const CHAT_HISTORY_URL = 'https://functions.poehali.dev/824196a4-a71d-49e7-acbc-08d9f8801ff2';
@@ -37,7 +39,7 @@ export default function Index() {
   const [chatHistory, setChatHistory] = useState<Array<{ id: number; title: string; created_at: string; messages: Array<{ role: string; text: string }>; tags?: string[] }>>([]);
   const [currentChatId, setCurrentChatId] = useState<number | null>(null);
   const [currentFileId, setCurrentFileId] = useState<number | null>(null);
-  const [isGeneratingImage, setIsGeneratingImage] = useState(false);
+
   const [showHistory, setShowHistory] = useState(false);
   const [showExportMenu, setShowExportMenu] = useState(false);
   const [showReadingMode, setShowReadingMode] = useState(false);
@@ -48,6 +50,8 @@ export default function Index() {
   const [showLeadForm, setShowLeadForm] = useState(false);
   const [contactInfo, setContactInfo] = useState<{whatsapp?: string; telegram?: string}>({});
   const [telegramBotId, setTelegramBotId] = useState<string>();
+  const [showGamification, setShowGamification] = useState(false);
+  const gamification = useGamification();
   const { toast } = useToast();
   const { t } = useLanguage();
 
@@ -194,46 +198,7 @@ export default function Index() {
 
 
 
-  const handleGenerateImage = async () => {
-    if (!inputMessage.trim() || isLoading || isGeneratingImage) return;
-    
-    const userMsg = inputMessage;
-    setMessages(prev => [...prev, { role: 'user', text: `🎨 Нарисуй: ${userMsg}` }]);
-    setInputMessage('');
-    setIsGeneratingImage(true);
-    
-    try {
-      const response = await fetch(AI_CHAT_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: userMsg, generate_image: true })
-      });
-      
-      const data = await response.json();
-      
-      if (data.image_url) {
-        setMessages(prev => [...prev, { 
-          role: 'ai', 
-          text: data.response,
-          imageUrl: data.image_url
-        }]);
-      } else {
-        throw new Error('No image generated');
-      }
-    } catch (error) {
-      toast({
-        title: "Ошибка",
-        description: "Не удалось сгенерировать изображение",
-        variant: "destructive"
-      });
-      setMessages(prev => [...prev, { 
-        role: 'ai', 
-        text: 'Извините, не удалось создать изображение.' 
-      }]);
-    } finally {
-      setIsGeneratingImage(false);
-    }
-  };
+
 
   const trackQuestion = (question: string) => {
     const stats = JSON.parse(localStorage.getItem('question_stats') || '{"questions":[],"total":0,"today":0,"peakHour":"—"}');
@@ -275,6 +240,7 @@ export default function Index() {
     setIsLoading(true);
     
     trackQuestion(userMsg);
+    gamification.trackQuestion();
     
     try {
       const requestBody: any = { message: userMsg };
@@ -318,6 +284,7 @@ export default function Index() {
             currentIndex++;
           } else {
             clearInterval(typingInterval);
+            gamification.trackAnswer();
           }
         }, 20);
         
@@ -353,6 +320,9 @@ export default function Index() {
           chatHistoryLength={chatHistory.length}
           onToggleHistory={() => setShowHistory(!showHistory)}
           onOpenSettings={() => setShowSettings(true)}
+          onOpenGamification={() => setShowGamification(true)}
+          userLevel={gamification.data.level}
+          userPoints={gamification.data.points}
         />
 
         {showSettings && (
@@ -377,6 +347,10 @@ export default function Index() {
 
         {showApiNotice && (
           <ApiKeyNotice onClose={() => setShowApiNotice(false)} />
+        )}
+
+        {showGamification && (
+          <Gamification onClose={() => setShowGamification(false)} />
         )}
 
         <main className="container mx-auto px-6 py-12">
@@ -413,10 +387,8 @@ export default function Index() {
               messages={messages}
               inputMessage={inputMessage}
               isLoading={isLoading}
-              isGeneratingImage={isGeneratingImage}
               onInputChange={setInputMessage}
               onSendMessage={handleSendMessage}
-              onGenerateImage={handleGenerateImage}
               onSaveChat={saveChat}
               onExportChat={exportChat}
               onClearChat={clearChat}

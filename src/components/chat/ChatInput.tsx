@@ -7,7 +7,6 @@ import { useLanguage } from '@/contexts/LanguageContext';
 interface ChatInputProps {
   inputMessage: string;
   isLoading: boolean;
-  isGeneratingImage: boolean;
   isListening: boolean;
   isDictationMode: boolean;
   dictationText: string;
@@ -33,7 +32,6 @@ const quickReplies = [
 export default function ChatInput({
   inputMessage,
   isLoading,
-  isGeneratingImage,
   isListening,
   isDictationMode,
   dictationText,
@@ -119,7 +117,7 @@ export default function ChatInput({
             onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && (e.preventDefault(), onSendMessage())}
             className="resize-none border-purple-200 dark:border-purple-800 dark:bg-gray-800 dark:text-white focus:border-indigo-500 text-base pr-16"
             rows={3}
-            disabled={isLoading || isGeneratingImage || isListening || isDictationMode}
+            disabled={isLoading || isListening || isDictationMode}
           />
           <div className="absolute bottom-2 right-2 text-xs text-gray-400 dark:text-gray-500">
             {inputMessage.length} / 1000
@@ -130,7 +128,7 @@ export default function ChatInput({
             onClick={onToggleQuickReplies}
             variant="outline"
             size="lg"
-            disabled={isLoading || isGeneratingImage || isDictationMode}
+            disabled={isLoading || isDictationMode}
             className="border-purple-200 dark:border-purple-800"
             title="Быстрые ответы"
           >
@@ -141,7 +139,7 @@ export default function ChatInput({
             onClick={onStartDictation}
             variant="outline"
             size="lg"
-            disabled={isLoading || isGeneratingImage}
+            disabled={isLoading}
             className={`border-purple-200 dark:border-purple-800 ${isDictationMode ? 'bg-green-100 dark:bg-green-900 border-green-500 animate-pulse' : ''}`}
             title="Режим диктовки (непрерывная запись)"
           >
@@ -154,7 +152,7 @@ export default function ChatInput({
           onClick={onSendMessage}
           className="flex-1 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 shadow-lg"
           size="lg"
-          disabled={isLoading || isGeneratingImage || isListening || !inputMessage.trim()}
+          disabled={isLoading || isListening || !inputMessage.trim()}
         >
           {isLoading ? (
             <Icon name="Loader2" size={20} className="animate-spin mr-2" />

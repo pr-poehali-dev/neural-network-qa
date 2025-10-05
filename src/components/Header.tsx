@@ -7,9 +7,12 @@ interface HeaderProps {
   chatHistoryLength: number;
   onToggleHistory: () => void;
   onOpenSettings: () => void;
+  onOpenGamification?: () => void;
+  userLevel?: number;
+  userPoints?: number;
 }
 
-export default function Header({ chatHistoryLength, onToggleHistory, onOpenSettings }: HeaderProps) {
+export default function Header({ chatHistoryLength, onToggleHistory, onOpenSettings, onOpenGamification, userLevel, userPoints }: HeaderProps) {
   const { t } = useLanguage();
 
   return (
@@ -28,6 +31,19 @@ export default function Header({ chatHistoryLength, onToggleHistory, onOpenSetti
             <AIStatusIndicator />
           </div>
           <nav className="flex gap-4 items-center">
+            {onOpenGamification && userLevel !== undefined && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={onOpenGamification}
+                className="border-purple-200 dark:border-purple-800 gap-2"
+                title="Ваш прогресс"
+              >
+                <span className="text-lg">🎮</span>
+                <span className="font-bold">Ур.{userLevel}</span>
+                <span className="text-xs text-gray-600 dark:text-gray-400">{userPoints} 💎</span>
+              </Button>
+            )}
             <Button
               variant="outline"
               size="sm"

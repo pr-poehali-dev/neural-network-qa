@@ -23,10 +23,8 @@ interface ChatContainerProps {
   messages: Message[];
   inputMessage: string;
   isLoading: boolean;
-  isGeneratingImage: boolean;
   onInputChange: (value: string) => void;
   onSendMessage: () => void;
-  onGenerateImage: () => void;
   onSaveChat: () => void;
   onExportChat: () => void;
   onClearChat: () => void;
@@ -41,10 +39,8 @@ export default function ChatContainer({
   messages,
   inputMessage,
   isLoading,
-  isGeneratingImage,
   onInputChange,
   onSendMessage,
-  onGenerateImage,
   onSaveChat,
   onExportChat,
   onClearChat,
@@ -111,7 +107,6 @@ export default function ChatContainer({
       <ChatInput
         inputMessage={inputMessage}
         isLoading={isLoading}
-        isGeneratingImage={isGeneratingImage}
         isListening={isListening}
         isDictationMode={isDictationMode}
         dictationText={dictationText}
