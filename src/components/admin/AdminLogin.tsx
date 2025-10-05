@@ -16,7 +16,9 @@ export default function AdminLogin({ onLogin }: AdminLoginProps) {
   const navigate = useNavigate();
 
   const handleLogin = () => {
-    if (password === 'admin123') {
+    const savedPassword = localStorage.getItem('admin_password') || 'admin123';
+    
+    if (password === savedPassword) {
       onLogin();
       localStorage.setItem('admin_auth', 'true');
       toast({

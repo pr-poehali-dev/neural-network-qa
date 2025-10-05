@@ -14,6 +14,7 @@ import VoiceDiagnostics from '@/components/VoiceDiagnostics';
 import FullControlTab from '@/components/admin/FullControlTab';
 import VisualEditorTab from '@/components/admin/VisualEditorTab';
 import DashboardTab from '@/components/admin/DashboardTab';
+import SecurityTab from '@/components/admin/SecurityTab';
 
 const FILE_UPLOAD_URL = 'https://functions.poehali.dev/b58abb29-2429-4b6e-aed0-e5aae54d2240';
 
@@ -62,7 +63,7 @@ export default function Admin() {
   const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
   const [isDragging, setIsDragging] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'site' | 'files' | 'stats' | 'content' | 'buttons' | 'analytics' | 'voice' | 'control' | 'visual'>('dashboard');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'site' | 'files' | 'stats' | 'content' | 'buttons' | 'analytics' | 'voice' | 'control' | 'visual' | 'security'>('dashboard');
   const [siteSettings, setSiteSettings] = useState<SiteSettings>({
     title: 'Богдан AI',
     subtitle: 'Интеллектуальный помощник нового поколения',
@@ -391,6 +392,14 @@ export default function Admin() {
               <Icon name="Layers" className="mr-2" size={18} />
               Визуальный редактор
             </Button>
+            <Button 
+              variant={activeTab === 'security' ? 'default' : 'ghost'}
+              onClick={() => setActiveTab('security')}
+              className={`transition-all whitespace-nowrap ${activeTab === 'security' ? 'bg-gradient-to-r from-indigo-500 to-purple-500 text-white shadow-lg shadow-indigo-500/50' : 'text-purple-200 hover:text-white hover:bg-white/10'}`}
+            >
+              <Icon name="Lock" className="mr-2" size={18} />
+              Безопасность
+            </Button>
           </div>
 
           {activeTab === 'dashboard' && (
@@ -458,6 +467,10 @@ export default function Admin() {
 
           {activeTab === 'visual' && (
             <VisualEditorTab />
+          )}
+
+          {activeTab === 'security' && (
+            <SecurityTab />
           )}
         </main>
       </div>
