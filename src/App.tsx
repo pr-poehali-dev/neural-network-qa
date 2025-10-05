@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
+import TimerNotification from "@/components/TimerNotification";
 import Index from "./pages/Index";
 import About from "./pages/About";
 import Admin from "./pages/Admin";
@@ -20,6 +21,7 @@ const App = () => (
         <TooltipProvider>
           <Toaster />
           <Sonner />
+          <TimerNotification />
           <BrowserRouter>
             <Routes>
               <Route path="/" element={<Index />} />

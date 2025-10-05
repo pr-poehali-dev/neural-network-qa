@@ -18,6 +18,17 @@ interface Message {
   translatedFrom?: string;
 }
 
+const quickReplies = [
+  { emoji: '👍', text: 'Да, точно', category: 'common' },
+  { emoji: '👎', text: 'Нет, не то', category: 'common' },
+  { emoji: '🤔', text: 'Не понял, объясни подробнее', category: 'common' },
+  { emoji: '✅', text: 'Спасибо, понятно', category: 'common' },
+  { emoji: '🔄', text: 'Повтори, пожалуйста', category: 'common' },
+  { emoji: '⏰', text: 'Поставь таймер на 5 минут', category: 'timer' },
+  { emoji: '📝', text: 'Запиши это', category: 'note' },
+  { emoji: '🔍', text: 'Где я могу это найти?', category: 'search' },
+];
+
 interface ChatContainerProps {
   messages: Message[];
   inputMessage: string;
@@ -48,7 +59,37 @@ export default function ChatContainer({
   const [speakingIndex, setSpeakingIndex] = useState<number | null>(null);
   const [isListening, setIsListening] = useState(false);
   const [isTranslating, setIsTranslating] = useState(false);
+  const [showQuickReplies, setShowQuickReplies] = useState(false);
+  const [isDictationMode, setIsDictationMode] = useState(false);
+  const [dictationText, setDictationText] = useState('');
   const { voiceLanguage, translateToLanguage, autoDetectLanguage, voiceSpeed, t } = useLanguage();
+
+  const getSmartSuggestions = (input: string): string[] => {
+    const lowerInput = input.toLowerCase().trim();
+    
+    const suggestionMap: { [key: string]: string[] } = {
+      'как': ['Как это работает?', 'Как мне начать?', 'Как настроить?'],
+      'что': ['Что это значит?', 'Что мне делать?', 'Что ты умеешь?'],
+      'когда': ['Когда лучше начать?', 'Когда это будет готово?'],
+      'где': ['Где это найти?', 'Где можно узнать больше?'],
+      'почему': ['Почему так происходит?', 'Почему это важно?'],
+      'помоги': ['Помоги разобраться', 'Помоги решить проблему'],
+      'расскажи': ['Расскажи подробнее', 'Расскажи про это'],
+      'объясни': ['Объясни простыми словами', 'Объясни пошагово'],
+    };
+
+    for (const [key, suggestions] of Object.entries(suggestionMap)) {
+      if (lowerInput.startsWith(key)) {
+        return suggestions;
+      }
+    }
+
+    if (lowerInput.length > 3) {
+      return ['Продолжить эту тему?', 'Узнать больше деталей?', 'Пример использования?'];
+    }
+
+    return [];
+  };
 
   const speakText = async (text: string, index: number) => {
     if (speakingIndex === index) {
@@ -163,6 +204,74 @@ export default function ChatContainer({
 
     recognition.onend = () => {
       setIsListening(false);
+    };
+
+    recognition.start();
+  };
+
+  const startDictationMode = () => {
+    if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+      alert('Voice recognition is not supported in your browser');
+      return;
+    }
+
+    if (isDictationMode) {
+      setIsDictationMode(false);
+      setIsListening(false);
+      if (dictationText.trim()) {
+        onInputChange(dictationText);
+        setDictationText('');
+      }
+      return;
+    }
+
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    const recognition = new SpeechRecognition();
+    
+    recognition.lang = voiceLanguage;
+    recognition.continuous = true;
+    recognition.interimResults = true;
+
+    setIsDictationMode(true);
+    setIsListening(true);
+    setDictationText('');
+
+    let silenceTimer: NodeJS.Timeout;
+    let lastTranscript = '';
+
+    recognition.onresult = (event: any) => {
+      let interimTranscript = '';
+      let finalTranscript = '';
+
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        const transcript = event.results[i][0].transcript;
+        if (event.results[i].isFinal) {
+          finalTranscript += transcript + ' ';
+        } else {
+          interimTranscript = transcript;
+        }
+      }
+
+      if (finalTranscript) {
+        lastTranscript = finalTranscript;
+        setDictationText(prev => prev + finalTranscript);
+        
+        clearTimeout(silenceTimer);
+        silenceTimer = setTimeout(() => {
+          setDictationText(prev => prev + '. ');
+        }, 1500);
+      }
+    };
+
+    recognition.onerror = () => {
+      setIsDictationMode(false);
+      setIsListening(false);
+    };
+
+    recognition.onend = () => {
+      if (isDictationMode) {
+        recognition.start();
+      }
     };
 
     recognition.start();
@@ -293,31 +402,105 @@ export default function ChatContainer({
       </div>
 
       <div className="space-y-3">
+        {showQuickReplies && messages.length > 0 && (
+          <div className="flex flex-wrap gap-2 animate-fade-in">
+            {quickReplies.map((reply, idx) => (
+              <Button
+                key={idx}
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  onInputChange(reply.text);
+                  setShowQuickReplies(false);
+                }}
+                className="border-purple-200 dark:border-purple-700 hover:border-purple-400 dark:hover:border-purple-500 text-sm"
+              >
+                <span className="mr-1">{reply.emoji}</span>
+                {reply.text}
+              </Button>
+            ))}
+          </div>
+        )}
+        
+        {isDictationMode && (
+          <div className="bg-green-50 dark:bg-green-900/20 border-2 border-green-500 rounded-lg p-3 animate-fade-in">
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+                <span className="text-sm font-semibold text-green-700 dark:text-green-300">🎙️ Режим диктовки активен</span>
+              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={startDictationMode}
+                className="text-green-700 dark:text-green-300"
+              >
+                Стоп
+              </Button>
+            </div>
+            <p className="text-sm text-gray-600 dark:text-gray-400">
+              {dictationText || 'Говорите... Автоматическая пауза через 1.5 сек после речи'}
+            </p>
+          </div>
+        )}
+        
         <div className="flex gap-2">
           <div className="flex-1 relative">
             <Textarea 
-              placeholder={t('chat.placeholder')} 
+              placeholder={isDictationMode ? 'Режим диктовки активен...' : t('chat.placeholder')} 
               value={inputMessage}
-              onChange={(e) => onInputChange(e.target.value)}
+              onChange={(e) => {
+                onInputChange(e.target.value);
+                if (e.target.value.length > 2 && !isDictationMode) {
+                  const suggestions = getSmartSuggestions(e.target.value);
+                  if (suggestions.length > 0 && Math.random() > 0.7) {
+                    setTimeout(() => {
+                      if (document.activeElement === e.target) {
+                        const bubble = document.createElement('div');
+                        bubble.className = 'absolute -top-12 left-0 bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200 px-3 py-1.5 rounded-lg text-sm animate-fade-in shadow-lg cursor-pointer';
+                        bubble.textContent = '💡 ' + suggestions[Math.floor(Math.random() * suggestions.length)];
+                        bubble.onclick = () => {
+                          onInputChange(bubble.textContent!.replace('💡 ', ''));
+                          bubble.remove();
+                        };
+                        e.target.parentElement?.appendChild(bubble);
+                        setTimeout(() => bubble.remove(), 3000);
+                      }
+                    }, 1000);
+                  }
+                }
+              }}
               onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && (e.preventDefault(), onSendMessage())}
               className="resize-none border-purple-200 dark:border-purple-800 dark:bg-gray-800 dark:text-white focus:border-indigo-500 text-base pr-16"
               rows={3}
-              disabled={isLoading || isGeneratingImage || isListening}
+              disabled={isLoading || isGeneratingImage || isListening || isDictationMode}
             />
             <div className="absolute bottom-2 right-2 text-xs text-gray-400 dark:text-gray-500">
               {inputMessage.length} / 1000
             </div>
           </div>
-          <Button
-            onClick={startVoiceInput}
-            variant="outline"
-            size="lg"
-            disabled={isLoading || isGeneratingImage || isListening}
-            className={`border-purple-200 dark:border-purple-800 ${isListening ? 'bg-red-100 dark:bg-red-900 border-red-500' : ''}`}
-            title={t('chat.voiceInput')}
-          >
-            <Icon name={isListening ? "MicOff" : "Mic"} size={20} />
-          </Button>
+          <div className="flex flex-col gap-2">
+            <Button
+              onClick={() => setShowQuickReplies(!showQuickReplies)}
+              variant="outline"
+              size="lg"
+              disabled={isLoading || isGeneratingImage || isDictationMode}
+              className="border-purple-200 dark:border-purple-800"
+              title="Быстрые ответы"
+            >
+              <Icon name="MessageCircle" size={20} />
+            </Button>
+            <Button
+              onClick={startDictationMode}
+              variant="outline"
+              size="lg"
+              disabled={isLoading || isGeneratingImage}
+              className={`border-purple-200 dark:border-purple-800 ${isDictationMode ? 'bg-green-100 dark:bg-green-900 border-green-500 animate-pulse' : ''}`}
+              title="Режим диктовки (непрерывная запись)"
+            >
+              <Icon name={isDictationMode ? "MicOff" : "Mic"} size={20} />
+            </Button>
+          </div>
         </div>
         <div className="flex items-center gap-2">
           <Button 
