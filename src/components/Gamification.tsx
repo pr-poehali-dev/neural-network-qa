@@ -15,13 +15,13 @@ interface GamificationData {
 
 const LEVELS = [
   { level: 1, name: 'Новичок', minPoints: 0, emoji: '🌱', reward: null },
-  { level: 2, name: 'Любознательный', minPoints: 50, emoji: '🔍', reward: 'Открыт доступ к истории чатов' },
-  { level: 3, name: 'Исследователь', minPoints: 150, emoji: '🎒', reward: 'Открыт экспорт чатов' },
-  { level: 4, name: 'Знаток', minPoints: 300, emoji: '📚', reward: 'Промокод EXPERT10 (-10%)' },
-  { level: 5, name: 'Мастер', minPoints: 500, emoji: '⭐', reward: 'VIP статус' },
-  { level: 6, name: 'Эксперт', minPoints: 800, emoji: '🏆', reward: 'Промокод MASTER20 (-20%)' },
-  { level: 7, name: 'Гуру', minPoints: 1200, emoji: '💎', reward: 'Доступ к premium функциям' },
-  { level: 8, name: 'Легенда', minPoints: 2000, emoji: '👑', reward: 'Промокод LEGEND30 (-30%)' },
+  { level: 2, name: 'Любознательный', minPoints: 50, emoji: '🔍', reward: 'Доступ к истории чатов' },
+  { level: 3, name: 'Исследователь', minPoints: 150, emoji: '🎒', reward: 'Экспорт чатов в файл' },
+  { level: 4, name: 'Знаток', minPoints: 300, emoji: '📚', reward: 'Приоритет в очереди ответов' },
+  { level: 5, name: 'Мастер', minPoints: 500, emoji: '⭐', reward: 'Доступ к расширенным подсказкам' },
+  { level: 6, name: 'Эксперт', minPoints: 800, emoji: '🏆', reward: 'Персональные настройки AI' },
+  { level: 7, name: 'Гуру', minPoints: 1200, emoji: '💎', reward: 'Эксклюзивные быстрые кнопки' },
+  { level: 8, name: 'Легенда', minPoints: 2000, emoji: '👑', reward: 'Ранний доступ к новым функциям' },
 ];
 
 const ACHIEVEMENTS = [
