@@ -29,6 +29,7 @@ interface ChatContainerProps {
   onExportChat: () => void;
   onClearChat: () => void;
   onToggleFavorite?: (index: number) => void;
+  onOpenReadingMode?: () => void;
 }
 
 export default function ChatContainer({
@@ -42,7 +43,8 @@ export default function ChatContainer({
   onSaveChat,
   onExportChat,
   onClearChat,
-  onToggleFavorite
+  onToggleFavorite,
+  onOpenReadingMode
 }: ChatContainerProps) {
   const [showQuickReplies, setShowQuickReplies] = useState(false);
   const { voiceLanguage, translateToLanguage, autoDetectLanguage, voiceSpeed } = useLanguage();
@@ -72,6 +74,7 @@ export default function ChatContainer({
         messageCount={messages.length}
         onExportChat={onExportChat}
         onClearChat={onClearChat}
+        onOpenReadingMode={onOpenReadingMode}
       />
 
       <ChatMessageList

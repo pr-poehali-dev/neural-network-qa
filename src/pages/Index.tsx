@@ -9,8 +9,8 @@ import ChatContainer from '@/components/ChatContainer';
 
 import Footer from '@/components/Footer';
 import AIToolsPanel from '@/components/AIToolsPanel';
-import ExportMenu from '@/components/ExportMenu';
-
+import ExportDialog from '@/components/ExportDialog';
+import ReadingModePanel from '@/components/ReadingModePanel';
 import ApiKeyNotice from '@/components/ApiKeyNotice';
 import SettingsPanel from '@/components/SettingsPanel';
 import FileDropZone from '@/components/FileDropZone';
@@ -39,7 +39,7 @@ export default function Index() {
   const [isGeneratingImage, setIsGeneratingImage] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
   const [showExportMenu, setShowExportMenu] = useState(false);
-
+  const [showReadingMode, setShowReadingMode] = useState(false);
   const [showApiNotice, setShowApiNotice] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const { toast } = useToast();
@@ -304,9 +304,16 @@ export default function Index() {
         )}
 
         {showExportMenu && (
-          <ExportMenu 
+          <ExportDialog 
             messages={messages}
             onClose={() => setShowExportMenu(false)}
+          />
+        )}
+
+        {showReadingMode && (
+          <ReadingModePanel
+            messages={messages}
+            onClose={() => setShowReadingMode(false)}
           />
         )}
 
@@ -350,7 +357,7 @@ export default function Index() {
               onSaveChat={saveChat}
               onExportChat={exportChat}
               onClearChat={clearChat}
-
+              onOpenReadingMode={() => setShowReadingMode(true)}
             />
 
 

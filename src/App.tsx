@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import TimerNotification from "@/components/TimerNotification";
+import VoiceCommandsPanel from "@/components/VoiceCommandsPanel";
 import Index from "./pages/Index";
 import About from "./pages/About";
 import Admin from "./pages/Admin";
@@ -22,6 +23,7 @@ const App = () => (
           <Toaster />
           <Sonner />
           <TimerNotification />
+          <VoiceCommandsPanel />
           <BrowserRouter>
             <Routes>
               <Route path="/" element={<Index />} />

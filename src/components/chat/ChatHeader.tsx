@@ -6,12 +6,14 @@ interface ChatHeaderProps {
   messageCount: number;
   onExportChat: () => void;
   onClearChat: () => void;
+  onOpenReadingMode?: () => void;
 }
 
 export default function ChatHeader({
   messageCount,
   onExportChat,
-  onClearChat
+  onClearChat,
+  onOpenReadingMode
 }: ChatHeaderProps) {
   const { t } = useLanguage();
 
@@ -33,6 +35,12 @@ export default function ChatHeader({
       <div className="flex gap-2">
         {messageCount > 0 && (
           <>
+            {onOpenReadingMode && (
+              <Button variant="outline" size="sm" onClick={onOpenReadingMode} className="dark:border-purple-800">
+                <Icon name="BookOpen" className="mr-2" size={16} />
+                Чтение
+              </Button>
+            )}
             <Button variant="outline" size="sm" onClick={onExportChat} className="dark:border-purple-800">
               <Icon name="Download" className="mr-2" size={16} />
               {t('chat.export')}
