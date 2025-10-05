@@ -358,6 +358,7 @@ export default function Index() {
               onExportChat={exportChat}
               onClearChat={clearChat}
               onOpenReadingMode={() => setShowReadingMode(true)}
+              onAddMessage={(msg) => setMessages(prev => [...prev, msg])}
             />
 
 

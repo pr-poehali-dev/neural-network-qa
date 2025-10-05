@@ -6,6 +6,7 @@ import ChatMessageList from './chat/ChatMessageList';
 import ChatInput from './chat/ChatInput';
 import { useChatVoice } from './chat/useChatVoice';
 import { useChatSuggestions } from './chat/useChatSuggestions';
+import { processCommand } from '@/utils/commandProcessor';
 
 export interface Message {
   role: 'user' | 'ai';
@@ -30,6 +31,7 @@ interface ChatContainerProps {
   onClearChat: () => void;
   onToggleFavorite?: (index: number) => void;
   onOpenReadingMode?: () => void;
+  onAddMessage?: (message: Message) => void;
 }
 
 export default function ChatContainer({
@@ -44,7 +46,8 @@ export default function ChatContainer({
   onExportChat,
   onClearChat,
   onToggleFavorite,
-  onOpenReadingMode
+  onOpenReadingMode,
+  onAddMessage
 }: ChatContainerProps) {
   const [showQuickReplies, setShowQuickReplies] = useState(false);
   const { voiceLanguage, translateToLanguage, autoDetectLanguage, voiceSpeed, voiceGender } = useLanguage();
@@ -68,6 +71,18 @@ export default function ChatContainer({
   });
 
   const { getSmartSuggestions } = useChatSuggestions();
+
+  const handleSendMessage = () => {
+    const commandResult = processCommand(inputMessage);
+    
+    if (commandResult.isCommand && commandResult.response && onAddMessage) {
+      onAddMessage({ role: 'user', text: inputMessage });
+      onAddMessage({ role: 'ai', text: commandResult.response });
+      onInputChange('');
+    } else {
+      onSendMessage();
+    }
+  };
 
   return (
     <Card className="p-8 border-2 border-purple-200 dark:border-purple-800 dark:bg-gray-900 flex flex-col animate-slide-up min-h-[600px]">
@@ -95,7 +110,7 @@ export default function ChatContainer({
         dictationText={dictationText}
         showQuickReplies={showQuickReplies}
         onInputChange={onInputChange}
-        onSendMessage={onSendMessage}
+        onSendMessage={handleSendMessage}
         onToggleQuickReplies={() => setShowQuickReplies(!showQuickReplies)}
         onStartDictation={startDictationMode}
         getSmartSuggestions={getSmartSuggestions}
