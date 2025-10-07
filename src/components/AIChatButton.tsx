@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import Icon from '@/components/ui/icon';
 import { useToast } from '@/hooks/use-toast';
@@ -27,6 +27,13 @@ export default function AIChatButton({
   const { t } = useTranslation();
 
   const [currentModel, setCurrentModel] = useState(model);
+  const [position, setPosition] = useState(() => {
+    const saved = localStorage.getItem('chat_button_position');
+    return saved ? JSON.parse(saved) : { bottom: 24, right: 24 };
+  });
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
+  const buttonRef = useRef<HTMLButtonElement>(null);
 
   const state = useAIChatState({ embedded, apiKey });
   
@@ -53,6 +60,48 @@ export default function AIChatButton({
       description: `Теперь используется ${newModel.split('/')[1]?.split(':')[0] || newModel}`,
     });
   };
+
+  useEffect(() => {
+    localStorage.setItem('chat_button_position', JSON.stringify(position));
+  }, [position]);
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    if (!buttonRef.current) return;
+    setIsDragging(true);
+    const rect = buttonRef.current.getBoundingClientRect();
+    setDragOffset({
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top
+    });
+  };
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!isDragging) return;
+      
+      const newRight = window.innerWidth - e.clientX - dragOffset.x + 32;
+      const newBottom = window.innerHeight - e.clientY - dragOffset.y + 32;
+      
+      setPosition({
+        bottom: Math.max(24, Math.min(window.innerHeight - 88, newBottom)),
+        right: Math.max(24, Math.min(window.innerWidth - 88, newRight))
+      });
+    };
+
+    const handleMouseUp = () => {
+      setIsDragging(false);
+    };
+
+    if (isDragging) {
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
+    }
+
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [isDragging, dragOffset]);
 
   useHotkeys([
     {
@@ -154,10 +203,17 @@ export default function AIChatButton({
 
   return (
     <Button
+      ref={buttonRef}
       onClick={() => state.setShowChat(true)}
+      onMouseDown={handleMouseDown}
       size="lg"
-      className={`fixed bottom-6 right-6 z-40 rounded-full w-16 h-16 shadow-2xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 hover:scale-110 transition-transform ${className}`}
-      title="Открыть AI-чат"
+      style={{ 
+        bottom: `${position.bottom}px`, 
+        right: `${position.right}px`,
+        cursor: isDragging ? 'grabbing' : 'grab'
+      }}
+      className={`fixed z-40 rounded-full w-16 h-16 shadow-2xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 hover:scale-110 transition-transform ${isDragging ? 'scale-105' : ''} ${className}`}
+      title="Открыть AI-чат (можно перетащить)"
     >
       <Icon name="Bot" size={28} />
     </Button>

@@ -19,14 +19,18 @@ export default function AIChatHeader({ model, onExport, onClear, onClose, onTogg
   const [showTranslator, setShowTranslator] = useState(false);
   const [showModelSelector, setShowModelSelector] = useState(false);
 
-  const AI_MODELS = [
+  const ALL_AI_MODELS = [
     { id: 'google/gemini-2.0-flash-exp:free', name: 'Gemini 2.0', icon: '⭐', desc: 'Быстрая, видит фото', color: 'from-blue-500 to-cyan-500' },
     { id: 'meta-llama/llama-3.3-70b-instruct:free', name: 'Llama 3.3 70B', icon: '🔥', desc: 'Мощная, только текст', color: 'from-orange-500 to-red-500' },
     { id: 'meta-llama/llama-3.1-8b-instruct:free', name: 'Llama 3.1 8B', icon: '⚡', desc: 'Быстрая, легкая', color: 'from-green-500 to-emerald-500' },
     { id: 'microsoft/phi-3-medium-128k-instruct:free', name: 'Phi-3 Medium', icon: '💼', desc: 'Большой контекст', color: 'from-purple-500 to-pink-500' },
   ];
 
-  const currentModel = AI_MODELS.find(m => m.id === model) || AI_MODELS[0];
+  const savedSettings = localStorage.getItem('site_settings');
+  const disabledModels = savedSettings ? (JSON.parse(savedSettings).disabledModels || []) : [];
+  const AI_MODELS = ALL_AI_MODELS.filter(m => !disabledModels.includes(m.id));
+
+  const currentModel = ALL_AI_MODELS.find(m => m.id === model) || ALL_AI_MODELS[0];
 
   const QUICK_PROMPTS = [
     { emoji: '💡', text: 'Объясни простыми словами', color: 'from-yellow-500 to-orange-500' },

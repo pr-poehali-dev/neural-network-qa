@@ -438,6 +438,42 @@ export default function SiteSettingsTab({ settings, onUpdateSettings }: SiteSett
                 🎁 = бесплатно навсегда | 💰 = почти бесплатно ($0.21 за 1000 сообщений)
               </p>
             </div>
+
+            <div>
+              <Label className="mb-2">Отключенные модели в чате</Label>
+              <div className="space-y-2 p-3 border border-purple-200 rounded-lg bg-gray-50 dark:bg-gray-900">
+                {[
+                  { id: 'google/gemini-2.0-flash-exp:free', name: '⭐ Gemini 2.0 Flash' },
+                  { id: 'meta-llama/llama-3.3-70b-instruct:free', name: '🔥 Llama 3.3 70B' },
+                  { id: 'meta-llama/llama-3.1-8b-instruct:free', name: '⚡ Llama 3.1 8B' },
+                  { id: 'microsoft/phi-3-medium-128k-instruct:free', name: '💼 Phi-3 Medium' },
+                ].map((model) => {
+                  const disabled = settings.disabledModels?.includes(model.id) || false;
+                  return (
+                    <label key={model.id} className="flex items-center gap-2 cursor-pointer hover:bg-white dark:hover:bg-gray-800 p-2 rounded transition-colors">
+                      <input
+                        type="checkbox"
+                        checked={!disabled}
+                        onChange={(e) => {
+                          const disabledModels = settings.disabledModels || [];
+                          const newDisabled = e.target.checked
+                            ? disabledModels.filter(m => m !== model.id)
+                            : [...disabledModels, model.id];
+                          onUpdateSettings({ ...settings, disabledModels: newDisabled });
+                        }}
+                        className="w-4 h-4"
+                      />
+                      <span className={`text-sm ${disabled ? 'text-gray-400 line-through' : 'text-gray-900 dark:text-white'}`}>
+                        {model.name}
+                      </span>
+                    </label>
+                  );
+                })}
+              </div>
+              <p className="text-xs text-gray-500 mt-2">
+                💡 Отключенные модели не будут отображаться в переключателе чата
+              </p>
+            </div>
           </div>
         </div>
 

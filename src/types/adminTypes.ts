@@ -30,6 +30,7 @@ export interface SiteSettings {
   aiModel?: string;
   fallbackAiModel?: string;
   enableAiChat?: boolean;
+  disabledModels?: string[];
 }
 
 export interface UploadedFile {

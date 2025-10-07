@@ -7,12 +7,12 @@ export default function Footer() {
 
   const footerSections = [
     {
-      title: 'Продукт',
+      title: 'Компания',
       links: [
         { label: 'Возможности', href: '/#features' },
-        { label: 'Тарифы', href: '/#pricing' },
         { label: 'Обновления', href: '/#updates' },
-        { label: 'Дорожная карта', href: '/#roadmap' }
+        { label: 'О нас', href: '/about' },
+        { label: 'Связаться с нами', href: '/contact' }
       ]
     },
     {
@@ -20,23 +20,7 @@ export default function Footer() {
       links: [
         { label: 'Политика конфиденциальности', href: '/privacy' },
         { label: 'Условия использования', href: '/terms' },
-        { label: 'Лицензионное соглашение', href: '/license' },
-        { label: 'Обработка данных', href: '/data-processing' }
-      ]
-    },
-    {
-      title: 'Поддержка',
-      links: [
-        { label: 'Центр помощи', href: '/help' },
-        { label: 'Документация', href: '/docs' },
-        { label: 'Связаться с нами', href: '/contact' },
-        { label: 'Статус сервиса', href: '/status' }
-      ]
-    },
-    {
-      title: 'Компания',
-      links: [
-        { label: 'О нас', href: '/about' }
+        { label: 'Лицензионное соглашение', href: '/license' }
       ]
     }
   ];
@@ -53,7 +37,7 @@ export default function Footer() {
       <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PGNpcmNsZSBjeD0iMSIgY3k9IjEiIHI9IjAuNSIgZmlsbD0iIzhhNWNmNiIgZmlsbC1vcGFjaXR5PSIwLjIiLz48L3BhdHRlcm4+PC9kZWZzPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjZ3JpZCkiLz48L3N2Zz4=')] opacity-20"></div>
       
       <div className="relative z-10 container mx-auto px-4 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-8 mb-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
           <div className="lg:col-span-2">
             <div className="flex items-center gap-3 mb-4">
               <Logo size={48} />
@@ -109,18 +93,6 @@ export default function Footer() {
             </p>
             
             <div className="flex flex-wrap gap-4 text-sm text-gray-400">
-              <Link to="/privacy" className="hover:text-white transition-colors">
-                Конфиденциальность
-              </Link>
-              <span>•</span>
-              <Link to="/terms" className="hover:text-white transition-colors">
-                Условия
-              </Link>
-              <span>•</span>
-              <Link to="/cookies" className="hover:text-white transition-colors">
-                Cookies
-              </Link>
-              <span>•</span>
               <Link to="/sitemap" className="hover:text-white transition-colors">
                 Карта сайта
               </Link>
