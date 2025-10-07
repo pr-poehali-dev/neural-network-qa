@@ -35,14 +35,8 @@ export default function Navigation({ onSettingsClick }: NavigationProps) {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
-            <Logo size={40} />
-            <div className="hidden md:block">
-              <h1 className="text-xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
-                Богдан ИИ
-              </h1>
-              <p className="text-xs text-gray-400">AI Assistant</p>
-            </div>
+          <Link to="/" className="hover:opacity-80 transition-opacity">
+            <Logo size={40} showText={true} />
           </Link>
 
           {/* Desktop Menu */}

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import Icon from '@/components/ui/icon';
-import AIChatButton from '@/components/AIChatButton';
+import Logo from '@/components/Logo';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import { useTranslation } from '@/hooks/useTranslation';
@@ -11,63 +11,15 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 export default function Index() {
   const { t } = useTranslation();
   const { toast } = useToast();
-  const [aiChatSettings, setAiChatSettings] = useState<{enabled: boolean; apiKey?: string; model?: string}>({ enabled: false });
   const [showAdminPrompt, setShowAdminPrompt] = useState(false);
   const [showPreviewModal, setShowPreviewModal] = useState(false);
   const [adminPassword, setAdminPassword] = useState('');
-  const [isAdmin, setIsAdmin] = useState(false);
 
   const ADMIN_PASSWORD = 'bogdan2025';
-
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const apiKey = params.get('api');
-    
-    if (apiKey && apiKey.startsWith('sk-or-v1-')) {
-      const settings = {
-        enableAiChat: true,
-        openrouterApiKey: apiKey,
-        aiModel: 'google/gemini-2.0-flash-exp:free'
-      };
-      localStorage.setItem('site_settings', JSON.stringify(settings));
-      localStorage.setItem('openrouter_api_key', apiKey);
-      
-      setAiChatSettings({ enabled: true, apiKey: apiKey, model: 'google/gemini-2.0-flash-exp:free' });
-      window.history.replaceState({}, '', '/');
-    }
-  }, []);
-
-  useEffect(() => {
-    const savedSettings = localStorage.getItem('site_settings');
-    
-    if (savedSettings) {
-      try {
-        const settings = JSON.parse(savedSettings);
-        
-        if (settings.aiModel === 'deepseek/deepseek-r1' || settings.aiModel === 'deepseek/deepseek-r1:free' || settings.aiModel === 'deepseek/deepseek-chat' || settings.aiModel === 'google/gemini-flash-1.5-8b') {
-          settings.aiModel = 'google/gemini-2.0-flash-exp:free';
-          localStorage.setItem('site_settings', JSON.stringify(settings));
-        }
-        
-        if (settings.enableAiChat && settings.openrouterApiKey) {
-          setAiChatSettings({ enabled: settings.enableAiChat, apiKey: settings.openrouterApiKey, model: settings.aiModel || 'google/gemini-2.0-flash-exp:free' });
-          localStorage.setItem('openrouter_api_key', settings.openrouterApiKey);
-        }
-      } catch (e) {
-        console.error('Ошибка парсинга настроек:', e);
-      }
-    }
-  }, []);
-
-  useEffect(() => {
-    const adminSession = localStorage.getItem('admin_session') === 'true';
-    setIsAdmin(adminSession);
-  }, []);
 
   const handleAdminLogin = () => {
     if (adminPassword === ADMIN_PASSWORD) {
       localStorage.setItem('admin_session', 'true');
-      setIsAdmin(true);
       setShowAdminPrompt(false);
       window.location.href = '/admin';
     } else {
@@ -151,8 +103,8 @@ export default function Index() {
         <main className="container mx-auto px-4 py-12 max-w-7xl">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center mb-16">
             <div className="text-center lg:text-left space-y-6">
-              <div className="inline-block p-5 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-2xl shadow-2xl mb-4 border border-white/20 backdrop-blur-sm animate-float">
-                <Icon name="Sparkles" className="w-16 h-16 text-white" />
+              <div className="inline-block mb-4">
+                <Logo size={80} showText={false} />
               </div>
               
               <h1 className="text-5xl md:text-6xl font-black bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent drop-shadow-lg">
@@ -211,16 +163,57 @@ export default function Index() {
               ))}
             </div>
           </div>
+
+          <div className="mb-16">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              <div className="bg-gradient-to-br from-blue-500/10 to-cyan-500/10 backdrop-blur-md rounded-2xl border border-blue-400/20 p-8 text-center">
+                <div className="text-5xl font-bold bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent mb-2">
+                  70+
+                </div>
+                <p className="text-gray-300 font-medium">Команд для работы</p>
+              </div>
+              <div className="bg-gradient-to-br from-purple-500/10 to-pink-500/10 backdrop-blur-md rounded-2xl border border-purple-400/20 p-8 text-center">
+                <div className="text-5xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent mb-2">
+                  24/7
+                </div>
+                <p className="text-gray-300 font-medium">Доступность сервиса</p>
+              </div>
+              <div className="bg-gradient-to-br from-green-500/10 to-emerald-500/10 backdrop-blur-md rounded-2xl border border-green-400/20 p-8 text-center">
+                <div className="text-5xl font-bold bg-gradient-to-r from-green-400 to-emerald-400 bg-clip-text text-transparent mb-2">
+                  100%
+                </div>
+                <p className="text-gray-300 font-medium">Безопасность данных</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-gradient-to-r from-purple-500/10 to-pink-500/10 backdrop-blur-md rounded-2xl border border-white/10 p-8 md:p-12 text-center mb-16">
+            <Icon name="Sparkles" size={48} className="text-purple-400 mx-auto mb-6" />
+            <h2 className="text-3xl font-bold text-white mb-4">Готовы начать?</h2>
+            <p className="text-gray-300 max-w-2xl mx-auto mb-8">
+              Присоединяйтесь к тысячам пользователей, которые уже используют Богдан ИИ 
+              для решения своих задач. Попробуйте все возможности прямо сейчас!
+            </p>
+            <div className="flex flex-wrap gap-4 justify-center">
+              <Button 
+                onClick={() => setShowAdminPrompt(true)}
+                className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold px-8 py-6 text-lg"
+              >
+                <Icon name="Rocket" className="mr-2" size={20} />
+                Начать работу
+              </Button>
+              <Button 
+                variant="outline"
+                onClick={() => window.location.href = '/about'}
+                className="border-white/20 text-white hover:bg-white/10 px-8 py-6 text-lg"
+              >
+                <Icon name="Users" className="mr-2" size={20} />
+                Узнать больше
+              </Button>
+            </div>
+          </div>
         </main>
       </div>
-
-      {aiChatSettings.enabled && aiChatSettings.apiKey && (
-        <AIChatButton 
-          apiKey={aiChatSettings.apiKey} 
-          model={aiChatSettings.model}
-          isAdmin={isAdmin}
-        />
-      )}
 
       <Dialog open={showPreviewModal} onOpenChange={setShowPreviewModal}>
         <DialogContent className="max-w-4xl">

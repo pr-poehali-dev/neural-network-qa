@@ -36,10 +36,7 @@ export default function Footer() {
     {
       title: 'Компания',
       links: [
-        { label: 'О нас', href: '/about' },
-        { label: 'Блог', href: '/blog' },
-        { label: 'Карьера', href: '/careers' },
-        { label: 'Пресс-кит', href: '/press' }
+        { label: 'О нас', href: '/about' }
       ]
     }
   ];
