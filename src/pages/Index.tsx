@@ -7,12 +7,18 @@ import Footer from '@/components/Footer';
 import AIChatButton from '@/components/AIChatButton';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/contexts/AuthContext';
+import AuthModal from '@/components/auth/AuthModal';
+import UserProfile from '@/components/auth/UserProfile';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 
 export default function Index() {
   const { t } = useTranslation();
   const { toast } = useToast();
+  const { isAuthenticated, user } = useAuth();
   const [showAdminPrompt, setShowAdminPrompt] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [showProfile, setShowProfile] = useState(false);
   const [adminPassword, setAdminPassword] = useState('');
   const [userName, setUserName] = useState('');
   const [apiKey, setApiKey] = useState('');
@@ -150,10 +156,40 @@ export default function Index() {
                   </div>
                   <h3 className="text-2xl font-bold text-white">Начните общение с ИИ</h3>
                   <p className="text-gray-300 mb-3">Умный помощник готов ответить на ваши вопросы</p>
-                  <div className="inline-flex items-center gap-2 px-4 py-2 bg-green-500/20 border border-green-400/30 rounded-lg">
-                    <Icon name="CheckCircle" size={16} className="text-green-400" />
-                    <span className="text-sm text-green-300 font-medium">Чат работает</span>
-                  </div>
+                  {isAuthenticated && user ? (
+                    <div className="space-y-3">
+                      <div className="inline-flex items-center gap-2 px-4 py-2 bg-green-500/20 border border-green-400/30 rounded-lg">
+                        <Icon name="CheckCircle" size={16} className="text-green-400" />
+                        <span className="text-sm text-green-300 font-medium">Вы вошли как {user.username}</span>
+                      </div>
+                      {user.subscription_tier === 'free' && (
+                        <div className="bg-yellow-500/10 border border-yellow-400/30 rounded-lg p-3">
+                          <p className="text-xs text-yellow-300">Бесплатный тариф: 10 сообщений/день</p>
+                          <Button 
+                            size="sm" 
+                            onClick={() => setShowProfile(true)}
+                            className="mt-2 w-full bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-white"
+                          >
+                            Перейти на PRO
+                          </Button>
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-500/20 border border-blue-400/30 rounded-lg">
+                        <Icon name="Info" size={16} className="text-blue-400" />
+                        <span className="text-sm text-blue-300 font-medium">Войдите для полного доступа</span>
+                      </div>
+                      <Button 
+                        onClick={() => setShowAuthModal(true)}
+                        className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white"
+                      >
+                        <Icon name="LogIn" size={18} className="mr-2" />
+                        Войти или зарегистрироваться
+                      </Button>
+                    </div>
+                  )
                 </div>
               </div>
             </div>
@@ -210,6 +246,16 @@ export default function Index() {
       </div>
 
       <AIChatButton apiKey={apiKey} model={aiModel} />
+      
+      <AuthModal 
+        isOpen={showAuthModal} 
+        onClose={() => setShowAuthModal(false)} 
+      />
+      
+      <UserProfile 
+        isOpen={showProfile} 
+        onClose={() => setShowProfile(false)} 
+      />
 
       <Footer />
     </div>

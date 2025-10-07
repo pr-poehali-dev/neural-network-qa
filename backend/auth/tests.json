@@ -1,0 +1,50 @@
+{
+  "tests": [
+    {
+      "name": "Register new user",
+      "method": "POST",
+      "body": {
+        "action": "register",
+        "email": "test@example.com",
+        "username": "testuser",
+        "password": "Test123456",
+        "full_name": "Test User"
+      },
+      "expectedStatus": 201,
+      "expectedBody": {
+        "user": {
+          "id": "number",
+          "email": "test@example.com",
+          "username": "testuser"
+        },
+        "tokens": {
+          "access_token": "string",
+          "refresh_token": "string"
+        },
+        "message": "string"
+      },
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Login existing user",
+      "method": "POST",
+      "body": {
+        "action": "login",
+        "login": "testuser",
+        "password": "Test123456"
+      },
+      "expectedStatus": 200,
+      "expectedBody": {
+        "user": {
+          "id": "number",
+          "username": "testuser"
+        },
+        "tokens": {
+          "access_token": "string",
+          "refresh_token": "string"
+        }
+      },
+      "bodyMatcher": "partial"
+    }
+  ]
+}
