@@ -32,6 +32,7 @@ export default function AIChatButton({
   const [showSpecialCommands, setShowSpecialCommands] = useState(false);
   const [totalTokens, setTotalTokens] = useState(0);
   const [uploadedFiles, setUploadedFiles] = useState<{name: string; content: string; type: 'text' | 'image'; dataUrl?: string}[]>([]);
+  const [isFullscreen, setIsFullscreen] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const imageInputRef = useRef<HTMLInputElement>(null);
@@ -313,7 +314,9 @@ export default function AIChatButton({
   if (showChat) {
     const containerClass = embedded 
       ? "w-full h-full bg-white dark:bg-gray-800 flex flex-col"
-      : "fixed bottom-6 right-6 z-50 w-96 h-[600px] bg-white dark:bg-gray-800 shadow-2xl flex flex-col animate-scale-in";
+      : isFullscreen
+        ? "fixed inset-0 z-[100] bg-white dark:bg-gray-800 flex flex-col"
+        : "fixed bottom-6 right-6 z-50 w-96 bg-white dark:bg-gray-800 shadow-2xl flex flex-col animate-scale-in rounded-xl overflow-hidden h-[85vh] min-h-[700px] max-h-[900px]";
 
     return (
       <Card className={containerClass}>
@@ -322,6 +325,8 @@ export default function AIChatButton({
           onExport={exportChat}
           onClear={clearHistory}
           onClose={embedded ? undefined : () => setShowChat(false)}
+          onToggleFullscreen={embedded ? undefined : () => setIsFullscreen(!isFullscreen)}
+          isFullscreen={isFullscreen}
         />
 
         <AIChatStats

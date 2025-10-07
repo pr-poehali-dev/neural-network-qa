@@ -1,5 +1,9 @@
 import { Button } from '@/components/ui/button';
 import Icon from '@/components/ui/icon';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import rehypeRaw from 'rehype-raw';
+import { useState } from 'react';
 
 export interface Message {
   role: 'user' | 'assistant';
@@ -40,29 +44,82 @@ export default function AIChatMessages({
   showQuickPrompts,
   onQuickPrompt
 }: AIChatMessagesProps) {
+  const [showQuickMenu, setShowQuickMenu] = useState(false);
+  const [showTranslator, setShowTranslator] = useState(false);
+
   return (
     <>
       {showQuickPrompts && messages.length === 0 && (
-        <div className="p-4 border-b dark:border-gray-700 bg-gradient-to-br from-slate-900 to-slate-800">
-          <div className="flex items-center gap-2 mb-3">
-            <Icon name="Zap" size={16} className="text-yellow-400" />
-            <p className="text-sm font-bold text-white">Быстрые команды</p>
-          </div>
-          <div className="grid grid-cols-2 gap-2 max-h-64 overflow-y-auto">
-            {QUICK_PROMPTS.map((prompt, idx) => (
-              <button
-                key={idx}
-                onClick={() => onQuickPrompt(prompt.text)}
-                className={`group relative overflow-hidden rounded-xl p-3 text-left transition-all duration-300 hover:scale-105 bg-gradient-to-br ${prompt.color} hover:shadow-lg`}
+        <div className="p-3 border-b dark:border-gray-700 bg-gradient-to-br from-slate-900 to-slate-800">
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-2">
+              <Icon name="Zap" size={16} className="text-yellow-400" />
+              <p className="text-sm font-bold text-white">Быстрые команды</p>
+            </div>
+            <div className="flex gap-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowTranslator(!showTranslator)}
+                className="text-white hover:bg-white/10 h-8 px-2"
+                title="Переводчик"
               >
-                <div className="relative z-10">
-                  <div className="text-2xl mb-1">{prompt.emoji}</div>
-                  <p className="text-xs font-medium text-white leading-tight">{prompt.text}</p>
-                </div>
-                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300"></div>
-              </button>
-            ))}
+                <Icon name="Languages" size={16} />
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowQuickMenu(!showQuickMenu)}
+                className="text-white hover:bg-white/10 h-8 px-2"
+                title={showQuickMenu ? 'Скрыть команды' : 'Показать команды'}
+              >
+                <Icon name={showQuickMenu ? 'X' : 'Menu'} size={16} />
+              </Button>
+            </div>
           </div>
+          
+          {showTranslator && (
+            <div className="mb-3 p-3 bg-blue-900/30 rounded-lg border border-blue-500/30">
+              <p className="text-xs text-blue-200 mb-2 font-semibold">🌍 Переводчик</p>
+              <div className="grid grid-cols-2 gap-2">
+                {[
+                  { text: 'Переведи на английский', flag: '🇬🇧' },
+                  { text: 'Переведи на испанский', flag: '🇪🇸' },
+                  { text: 'Переведи на немецкий', flag: '🇩🇪' },
+                  { text: 'Переведи на французский', flag: '🇫🇷' },
+                  { text: 'Переведи на китайский', flag: '🇨🇳' },
+                  { text: 'Переведи на японский', flag: '🇯🇵' },
+                ].map((lang, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => onQuickPrompt(lang.text)}
+                    className="bg-blue-600/40 hover:bg-blue-600/60 text-white text-xs py-2 px-3 rounded-lg transition-all hover:scale-105 flex items-center gap-2"
+                  >
+                    <span>{lang.flag}</span>
+                    <span className="truncate">{lang.text.replace('Переведи на ', '')}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+          
+          {showQuickMenu && (
+            <div className="grid grid-cols-2 gap-2 max-h-64 overflow-y-auto">
+              {QUICK_PROMPTS.map((prompt, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => onQuickPrompt(prompt.text)}
+                  className={`group relative overflow-hidden rounded-xl p-3 text-left transition-all duration-300 hover:scale-105 bg-gradient-to-br ${prompt.color} hover:shadow-lg`}
+                >
+                  <div className="relative z-10">
+                    <div className="text-2xl mb-1">{prompt.emoji}</div>
+                    <p className="text-xs font-medium text-white leading-tight">{prompt.text}</p>
+                  </div>
+                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300"></div>
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       )}
 
@@ -71,7 +128,6 @@ export default function AIChatMessages({
           <div className="text-center text-gray-500 dark:text-gray-400 mt-4">
             <Icon name="Bot" size={48} className="mx-auto mb-4 opacity-50" />
             <p className="font-medium mb-2 text-lg">Привет! Я Богдан ИИ 👋</p>
-            <p className="text-sm mb-4">Ваш умный помощник с искусственным интеллектом</p>
             <div className="bg-gradient-to-br from-indigo-900/50 to-purple-900/50 backdrop-blur-xl rounded-2xl p-6 text-left text-sm space-y-4 max-w-md mx-auto border border-white/10">
               <div className="flex items-center gap-3 mb-3">
                 <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-500 rounded-xl flex items-center justify-center">
@@ -141,7 +197,14 @@ export default function AIChatMessages({
                       ))}
                     </div>
                   )}
-                  <p className="text-base leading-relaxed whitespace-pre-wrap break-words">{msg.content}</p>
+                  <div className="text-base leading-relaxed prose prose-sm dark:prose-invert max-w-none prose-p:my-2 prose-headings:mt-4 prose-headings:mb-2 prose-ul:my-2 prose-ol:my-2 prose-li:my-1 prose-code:bg-gray-200 dark:prose-code:bg-gray-800 prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-pre:bg-gray-200 dark:prose-pre:bg-gray-800 prose-pre:p-3 prose-pre:rounded-lg">
+                    <ReactMarkdown 
+                      remarkPlugins={[remarkGfm]}
+                      rehypePlugins={[rehypeRaw]}
+                    >
+                      {msg.content}
+                    </ReactMarkdown>
+                  </div>
                   {msg.timestamp && (
                     <p className="text-xs opacity-60 mt-1">
                       {new Date(msg.timestamp).toLocaleTimeString('ru-RU', { 

@@ -6,9 +6,11 @@ interface AIChatHeaderProps {
   onExport: () => void;
   onClear: () => void;
   onClose?: () => void;
+  onToggleFullscreen?: () => void;
+  isFullscreen?: boolean;
 }
 
-export default function AIChatHeader({ model, onExport, onClear, onClose }: AIChatHeaderProps) {
+export default function AIChatHeader({ model, onExport, onClear, onClose, onToggleFullscreen, isFullscreen }: AIChatHeaderProps) {
   return (
     <div className="flex items-center justify-between p-5 border-b border-white/10 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 backdrop-blur-xl">
       <div className="flex items-center gap-3">
@@ -42,6 +44,17 @@ export default function AIChatHeader({ model, onExport, onClear, onClose }: AICh
         >
           <Icon name="Trash2" size={16} />
         </Button>
+        {onToggleFullscreen && (
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={onToggleFullscreen}
+            title={isFullscreen ? 'Выйти из полноэкранного режима' : 'Полноэкранный режим'}
+            className="hover:bg-white/20 text-white"
+          >
+            <Icon name={isFullscreen ? 'Minimize2' : 'Maximize2'} size={16} />
+          </Button>
+        )}
         {onClose && (
           <Button 
             variant="ghost" 
