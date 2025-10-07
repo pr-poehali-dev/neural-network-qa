@@ -106,6 +106,7 @@ export default function AIChatContainer({
         onQuickPrompt={onQuickPrompt}
         onModelChange={onModelChange}
         onTranslateAll={onTranslateAll}
+        isAdmin={isAdmin}
       />
 
       <AIChatStats

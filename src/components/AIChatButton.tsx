@@ -55,10 +55,6 @@ export default function AIChatButton({
 
   const handleModelChange = (newModel: string) => {
     setCurrentModel(newModel);
-    toast({
-      title: `AI модель изменена`,
-      description: `Теперь используется ${newModel.split('/')[1]?.split(':')[0] || newModel}`,
-    });
   };
 
   useEffect(() => {

@@ -16,39 +16,12 @@ export default function Navigation({ onSettingsClick }: NavigationProps) {
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [currentUser, setCurrentUser] = useState<any>(null);
-  const [hasApiKey, setHasApiKey] = useState(false);
 
   useEffect(() => {
     const user = localStorage.getItem('current_user');
     if (user) {
       setCurrentUser(JSON.parse(user));
     }
-    
-    // Проверка API ключа
-    const checkApiKey = () => {
-      const settings = localStorage.getItem('site_settings');
-      const directKey = localStorage.getItem('openrouter_api_key');
-      
-      if (directKey) {
-        setHasApiKey(true);
-        return;
-      }
-      
-      if (settings) {
-        try {
-          const parsed = JSON.parse(settings);
-          setHasApiKey(!!parsed.openrouterApiKey);
-        } catch (e) {
-          setHasApiKey(false);
-        }
-      }
-    };
-    
-    checkApiKey();
-    
-    // Проверяем каждые 2 секунды (на случай изменения в админке)
-    const interval = setInterval(checkApiKey, 2000);
-    return () => clearInterval(interval);
   }, []);
 
   const scrollToFeatures = () => {
@@ -105,19 +78,6 @@ export default function Navigation({ onSettingsClick }: NavigationProps) {
 
           {/* Right Side */}
           <div className="flex items-center gap-2">
-            {/* API Status Indicator */}
-            <div 
-              className={`hidden md:flex items-center gap-2 px-3 py-1.5 rounded-lg border transition-all ${
-                hasApiKey 
-                  ? 'bg-green-500/10 border-green-400/30 text-green-400' 
-                  : 'bg-orange-500/10 border-orange-400/30 text-orange-400'
-              }`}
-              title={hasApiKey ? 'API настроен' : 'API не настроен'}
-            >
-              <div className={`w-2 h-2 rounded-full ${hasApiKey ? 'bg-green-400 animate-pulse' : 'bg-orange-400'}`} />
-              <span className="text-xs font-medium">API</span>
-            </div>
-            
             <ThemeToggle />
             <LanguageSwitcher />
             

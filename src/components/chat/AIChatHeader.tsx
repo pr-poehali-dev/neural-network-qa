@@ -13,9 +13,10 @@ interface AIChatHeaderProps {
   onQuickPrompt?: (text: string) => void;
   onModelChange?: (model: string) => void;
   onTranslateAll?: (language: string) => void;
+  isAdmin?: boolean;
 }
 
-export default function AIChatHeader({ model, onExport, onClear, onClose, onToggleFullscreen, isFullscreen, onQuickPrompt, onModelChange, onTranslateAll }: AIChatHeaderProps) {
+export default function AIChatHeader({ model, onExport, onClear, onClose, onToggleFullscreen, isFullscreen, onQuickPrompt, onModelChange, onTranslateAll, isAdmin }: AIChatHeaderProps) {
   const [showQuickMenu, setShowQuickMenu] = useState(false);
   const [showTranslator, setShowTranslator] = useState(false);
   const [showModelSelector, setShowModelSelector] = useState(false);
@@ -59,18 +60,25 @@ export default function AIChatHeader({ model, onExport, onClear, onClose, onTogg
           </div>
           <div>
             <h3 className="font-bold text-white text-lg">AI Ассистент</h3>
-            <button 
-              onClick={() => {
-                setShowModelSelector(!showModelSelector);
-                setShowQuickMenu(false);
-                setShowTranslator(false);
-              }}
-              className="flex items-center gap-2 hover:bg-white/10 rounded px-2 py-0.5 transition-colors"
-            >
-              <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-              <p className="text-xs text-white/90 font-medium">{currentModel.icon} {currentModel.name}</p>
-              <Icon name="ChevronDown" size={14} className="text-white/70" />
-            </button>
+            {isAdmin && onModelChange ? (
+              <button 
+                onClick={() => {
+                  setShowModelSelector(!showModelSelector);
+                  setShowQuickMenu(false);
+                  setShowTranslator(false);
+                }}
+                className="flex items-center gap-2 hover:bg-white/10 rounded px-2 py-0.5 transition-colors"
+              >
+                <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                <p className="text-xs text-white/90 font-medium">{currentModel.icon} {currentModel.name}</p>
+                <Icon name="ChevronDown" size={14} className="text-white/70" />
+              </button>
+            ) : (
+              <div className="flex items-center gap-2 px-2 py-0.5">
+                <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                <p className="text-xs text-white/90 font-medium">Онлайн</p>
+              </div>
+            )}
           </div>
         </div>
         <div className="flex gap-2">
@@ -219,7 +227,7 @@ export default function AIChatHeader({ model, onExport, onClear, onClose, onTogg
         </div>
       )}
 
-      {showModelSelector && onModelChange && (
+      {showModelSelector && onModelChange && isAdmin && (
         <div className="p-3 bg-gradient-to-br from-indigo-900 to-purple-900 border-b border-white/10">
           <p className="text-xs text-yellow-400 mb-3 font-semibold flex items-center gap-2">
             <Icon name="Cpu" size={14} />

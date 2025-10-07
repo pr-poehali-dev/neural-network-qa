@@ -131,22 +131,22 @@ export default function Index() {
                 <Logo size={80} showText={false} />
               </div>
               
-              <h1 className="text-5xl md:text-6xl font-black bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent drop-shadow-lg">
+              <h1 className="text-5xl md:text-7xl font-black bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent drop-shadow-2xl animate-fade-in-up leading-tight">
                 {t.hero.title}
               </h1>
               
-              <p className="text-xl text-gray-200 font-medium">
+              <p className="text-xl md:text-2xl text-gray-200 font-medium animate-fade-in-up animation-delay-200">
                 {t.hero.subtitle}
               </p>
               
-              <div className="flex flex-wrap gap-3 justify-center lg:justify-start">
-                <span className="px-4 py-2 bg-gradient-to-r from-blue-500/30 to-purple-500/30 border border-blue-400/40 rounded-full text-sm text-white font-medium backdrop-blur-sm">
+              <div className="flex flex-wrap gap-3 justify-center lg:justify-start animate-fade-in-up animation-delay-400">
+                <span className="px-5 py-2.5 bg-gradient-to-r from-blue-500/30 to-purple-500/30 border border-blue-400/40 rounded-full text-sm text-white font-semibold backdrop-blur-sm hover:scale-105 transition-transform cursor-default shadow-lg">
                   ✨ 70+ {t.chat.commands}
                 </span>
-                <span className="px-4 py-2 bg-gradient-to-r from-green-500/30 to-emerald-500/30 border border-green-400/40 rounded-full text-sm text-white font-medium backdrop-blur-sm">
+                <span className="px-5 py-2.5 bg-gradient-to-r from-green-500/30 to-emerald-500/30 border border-green-400/40 rounded-full text-sm text-white font-semibold backdrop-blur-sm hover:scale-105 transition-transform cursor-default shadow-lg">
                   🌍 {t.translator.subtitle}
                 </span>
-                <span className="px-4 py-2 bg-gradient-to-r from-pink-500/30 to-rose-500/30 border border-pink-400/40 rounded-full text-sm text-white font-medium backdrop-blur-sm">
+                <span className="px-5 py-2.5 bg-gradient-to-r from-pink-500/30 to-rose-500/30 border border-pink-400/40 rounded-full text-sm text-white font-semibold backdrop-blur-sm hover:scale-105 transition-transform cursor-default shadow-lg">
                   ⚡ {t.hero.openChat}
                 </span>
               </div>
@@ -160,23 +160,10 @@ export default function Index() {
                   </div>
                   <h3 className="text-2xl font-bold text-white">Начните общение с ИИ</h3>
                   <p className="text-gray-300 mb-3">Умный помощник готов ответить на ваши вопросы</p>
-                  {apiKey ? (
-                    <div className="inline-flex items-center gap-2 px-4 py-2 bg-green-500/20 border border-green-400/30 rounded-lg">
-                      <Icon name="CheckCircle" size={16} className="text-green-400" />
-                      <span className="text-sm text-green-300 font-medium">API настроен — чат работает</span>
-                    </div>
-                  ) : (
-                    <div className="space-y-3">
-                      <div className="inline-flex items-center gap-2 px-4 py-2 bg-orange-500/20 border border-orange-400/30 rounded-lg">
-                        <Icon name="AlertCircle" size={16} className="text-orange-400" />
-                        <span className="text-sm text-orange-300 font-medium">Требуется настройка API</span>
-                      </div>
-                      <div className="text-xs text-gray-400 space-y-1">
-                        <p>1. Нажмите ⚙️ в навигации → пароль: <code className="bg-black/30 px-1 rounded">bogdan2025</code></p>
-                        <p>2. Настройки сайта → вставьте API ключ</p>
-                      </div>
-                    </div>
-                  )}
+                  <div className="inline-flex items-center gap-2 px-4 py-2 bg-green-500/20 border border-green-400/30 rounded-lg">
+                    <Icon name="CheckCircle" size={16} className="text-green-400" />
+                    <span className="text-sm text-green-300 font-medium">Чат работает</span>
+                  </div>
                 </div>
               </div>
             </div>
