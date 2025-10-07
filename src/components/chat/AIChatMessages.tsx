@@ -118,30 +118,30 @@ export default function AIChatMessages({
             className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'} group`}
           >
             <div
-              className={`max-w-[85%] rounded-lg p-3 relative ${
+              className={`max-w-[90%] rounded-xl p-4 relative ${
                 msg.role === 'user'
-                  ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white'
-                  : 'bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white'
+                  ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg'
+                  : 'bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white shadow-md'
               }`}
             >
-              <div className="flex items-start gap-2">
+              <div className="flex items-start gap-3">
                 <Icon 
                   name={msg.role === 'user' ? 'User' : 'Bot'} 
-                  size={16} 
+                  size={18} 
                   className="mt-1 flex-shrink-0"
                 />
                 <div className="flex-1">
                   {msg.files && msg.files.length > 0 && (
-                    <div className="mb-2 flex flex-wrap gap-1">
+                    <div className="mb-3 flex flex-wrap gap-2">
                       {msg.files.map((file, fileIdx) => (
-                        <div key={fileIdx} className="bg-white/20 text-xs px-2 py-0.5 rounded flex items-center gap-1">
-                          <Icon name="FileText" size={10} />
+                        <div key={fileIdx} className="bg-white/20 text-xs px-2 py-1 rounded flex items-center gap-1">
+                          <Icon name="FileText" size={12} />
                           <span>{file.name}</span>
                         </div>
                       ))}
                     </div>
                   )}
-                  <p className="text-sm whitespace-pre-wrap break-words">{msg.content}</p>
+                  <p className="text-base leading-relaxed whitespace-pre-wrap break-words">{msg.content}</p>
                   {msg.timestamp && (
                     <p className="text-xs opacity-60 mt-1">
                       {new Date(msg.timestamp).toLocaleTimeString('ru-RU', { 

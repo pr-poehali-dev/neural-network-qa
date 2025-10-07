@@ -11,6 +11,7 @@ export default function Index() {
   const [showAdminPrompt, setShowAdminPrompt] = useState(false);
   const [adminPassword, setAdminPassword] = useState('');
   const [showFeaturesModal, setShowFeaturesModal] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   const ADMIN_PASSWORD = 'bogdan2025';
 
@@ -58,9 +59,15 @@ export default function Index() {
     }
   }, []);
 
+  useEffect(() => {
+    const adminSession = localStorage.getItem('admin_session') === 'true';
+    setIsAdmin(adminSession);
+  }, []);
+
   const handleAdminLogin = () => {
     if (adminPassword === ADMIN_PASSWORD) {
       localStorage.setItem('admin_session', 'true');
+      setIsAdmin(true);
       setShowAdminPrompt(false);
       window.location.href = '/admin';
     } else {
@@ -68,8 +75,6 @@ export default function Index() {
       setAdminPassword('');
     }
   };
-
-  const isAdmin = localStorage.getItem('admin_session') === 'true';
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 relative overflow-hidden">
@@ -260,7 +265,7 @@ export default function Index() {
 
             <div className="lg:sticky lg:top-4">
               {aiChatSettings.enabled ? (
-                <div className="bg-white/10 dark:bg-gray-900/50 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/20 h-[650px] overflow-hidden">
+                <div className="bg-white/10 dark:bg-gray-900/50 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/20 h-[85vh] min-h-[700px] overflow-hidden">
                   <AIChatButton apiKey={aiChatSettings.apiKey} model={aiChatSettings.model} embedded={true} isAdmin={isAdmin} />
                 </div>
               ) : (
@@ -269,13 +274,20 @@ export default function Index() {
                     <Icon name="Bot" size={48} className="text-white" />
                   </div>
                   <h3 className="text-white font-bold text-xl mb-3">Чат не активирован</h3>
-                  <p className="text-gray-300 mb-6">Добавьте API ключ для начала работы</p>
+                  <p className="text-gray-300 mb-4">Для активации чата добавьте API ключ OpenRouter</p>
+                  <div className="bg-blue-500/10 border border-blue-400/30 rounded-lg p-4 mb-6 text-left">
+                    <p className="text-blue-200 text-sm mb-2">📝 Как активировать:</p>
+                    <ol className="text-gray-300 text-xs space-y-1 list-decimal list-inside">
+                      <li>Откройте URL с параметром: <code className="bg-white/10 px-1 rounded">?api=ваш_ключ</code></li>
+                      <li>Или используйте админ-панель для настройки</li>
+                    </ol>
+                  </div>
                   <Button 
                     onClick={() => setShowAdminPrompt(true)} 
                     className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white shadow-lg hover:shadow-xl transition-all duration-300"
                   >
                     <Icon name="Settings" className="mr-2" size={18} />
-                    Настроить
+                    Открыть настройки
                   </Button>
                 </div>
               )}
