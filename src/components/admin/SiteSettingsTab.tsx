@@ -266,12 +266,12 @@ export default function SiteSettingsTab({ settings, onUpdateSettings }: SiteSett
             <div>
               <Label className="mb-2">Модель AI</Label>
               <select
-                value={settings.aiModel || 'google/gemini-flash-1.5-8b'}
+                value={settings.aiModel || 'google/gemini-2.0-flash-exp:free'}
                 onChange={(e) => onUpdateSettings({ ...settings, aiModel: e.target.value })}
                 className="w-full border border-purple-200 rounded-md p-2 bg-white dark:bg-gray-800 dark:text-white"
               >
-                <optgroup label="🎁 Бесплатные модели">
-                  <option value="google/gemini-flash-1.5-8b">Google Gemini Flash 2.0 (бесплатно, быстро)</option>
+                <optgroup label="🎁 Бесплатные модели (навсегда!)">
+                  <option value="google/gemini-2.0-flash-exp:free">Google Gemini 2.0 Flash (бесплатно, быстро) ⭐</option>
                   <option value="meta-llama/llama-3.1-8b-instruct:free">Meta Llama 3.1 8B (бесплатно)</option>
                   <option value="meta-llama/llama-3.1-70b-instruct:free">Meta Llama 3.1 70B (бесплатно, мощнее)</option>
                   <option value="microsoft/phi-3-medium-128k-instruct:free">Microsoft Phi-3 (бесплатно)</option>

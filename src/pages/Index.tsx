@@ -16,9 +16,12 @@ export default function Index() {
       try {
         const settings = JSON.parse(savedSettings);
         
-        if (settings.aiModel === 'deepseek/deepseek-r1' || settings.aiModel === 'deepseek/deepseek-r1:free' || settings.aiModel === 'deepseek/deepseek-chat') {
-          console.warn('🔧 Автомиграция: переключаю на бесплатную модель Gemini Flash 2.0');
-          settings.aiModel = 'google/gemini-flash-1.5-8b';
+        if (settings.aiModel === 'deepseek/deepseek-r1' || 
+            settings.aiModel === 'deepseek/deepseek-r1:free' || 
+            settings.aiModel === 'deepseek/deepseek-chat' ||
+            settings.aiModel === 'google/gemini-flash-1.5-8b') {
+          console.warn('🔧 Автомиграция: переключаю на бесплатную модель Gemini 2.0 Flash');
+          settings.aiModel = 'google/gemini-2.0-flash-exp:free';
           localStorage.setItem('site_settings', JSON.stringify(settings));
         }
         
@@ -57,7 +60,7 @@ export default function Index() {
     setDiagnostic({ status: 'checking', message: 'Проверяю API ключ...' });
     
     const apiKey = localStorage.getItem('openrouter_api_key');
-    const model = 'google/gemini-flash-1.5-8b';
+    const model = 'google/gemini-2.0-flash-exp:free';
     
     if (!apiKey) {
       setDiagnostic({ 
