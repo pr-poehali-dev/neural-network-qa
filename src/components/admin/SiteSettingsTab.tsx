@@ -251,6 +251,14 @@ export default function SiteSettingsTab({ settings, onUpdateSettings }: SiteSett
                 >
                   openrouter.ai/keys
                 </a>
+                {' '}|{' '}
+                <a 
+                  href="/ai-test" 
+                  target="_blank"
+                  className="text-green-600 hover:underline font-medium"
+                >
+                  🧪 Протестировать AI
+                </a>
               </p>
             </div>
 
