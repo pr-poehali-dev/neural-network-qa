@@ -1,21 +1,25 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import Icon from '@/components/ui/icon';
+import { useTranslation } from '@/hooks/useTranslation';
+import { Language } from '@/i18n/translations';
+import { useToast } from '@/hooks/use-toast';
 
 const LANGUAGES = [
-  { code: 'ru', flag: '🇷🇺', name: 'Русский' },
-  { code: 'en', flag: '🇬🇧', name: 'English' },
-  { code: 'es', flag: '🇪🇸', name: 'Español' },
-  { code: 'de', flag: '🇩🇪', name: 'Deutsch' },
-  { code: 'fr', flag: '🇫🇷', name: 'Français' },
-  { code: 'zh', flag: '🇨🇳', name: '中文' },
+  { code: 'ru' as Language, flag: '🇷🇺', name: 'Русский' },
+  { code: 'en' as Language, flag: '🇬🇧', name: 'English' },
+  { code: 'es' as Language, flag: '🇪🇸', name: 'Español' },
+  { code: 'de' as Language, flag: '🇩🇪', name: 'Deutsch' },
+  { code: 'fr' as Language, flag: '🇫🇷', name: 'Français' },
+  { code: 'zh' as Language, flag: '🇨🇳', name: '中文' },
 ];
 
 export default function LanguageSwitcher() {
-  const [currentLang, setCurrentLang] = useState('ru');
+  const { language, setLanguage } = useTranslation();
+  const { toast } = useToast();
   const [showDropdown, setShowDropdown] = useState(false);
 
-  const selectedLanguage = LANGUAGES.find(l => l.code === currentLang) || LANGUAGES[0];
+  const selectedLanguage = LANGUAGES.find(l => l.code === language) || LANGUAGES[0];
 
   return (
     <div className="relative">
@@ -41,16 +45,20 @@ export default function LanguageSwitcher() {
               <button
                 key={lang.code}
                 onClick={() => {
-                  setCurrentLang(lang.code);
+                  setLanguage(lang.code);
                   setShowDropdown(false);
+                  toast({
+                    title: '✓ Язык изменён',
+                    description: `Теперь используется: ${lang.name}`
+                  });
                 }}
                 className={`w-full px-4 py-3 text-left hover:bg-white/10 transition-colors flex items-center gap-3 ${
-                  currentLang === lang.code ? 'bg-white/10 text-white' : 'text-gray-300'
+                  language === lang.code ? 'bg-white/10 text-white' : 'text-gray-300'
                 }`}
               >
                 <span className="text-xl">{lang.flag}</span>
                 <span className="text-sm font-medium">{lang.name}</span>
-                {currentLang === lang.code && (
+                {language === lang.code && (
                   <Icon name="Check" size={16} className="ml-auto text-green-400" />
                 )}
               </button>

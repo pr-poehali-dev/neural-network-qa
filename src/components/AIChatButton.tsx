@@ -4,6 +4,7 @@ import { Card } from '@/components/ui/card';
 import Icon from '@/components/ui/icon';
 import { useToast } from '@/hooks/use-toast';
 import { useHotkeys } from '@/hooks/useHotkeys';
+import { useTranslation } from '@/hooks/useTranslation';
 import AIChatHeader from '@/components/chat/AIChatHeader';
 import AIChatMessages, { Message } from '@/components/chat/AIChatMessages';
 import AIChatInput from '@/components/chat/AIChatInput';
@@ -38,6 +39,7 @@ export default function AIChatButton({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const imageInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
+  const { t } = useTranslation();
 
   // Горячие клавиши
   useHotkeys([
@@ -47,7 +49,10 @@ export default function AIChatButton({
       callback: () => {
         if (!embedded) {
           setShowChat(!showChat);
-          toast({ title: showChat ? 'Чат закрыт' : 'Чат открыт', description: 'Ctrl+K для переключения' });
+          toast({ 
+            title: showChat ? t.notifications.chatClosed : t.notifications.chatOpened, 
+            description: t.notifications.toggleHotkey 
+          });
         }
       }
     },
@@ -56,7 +61,10 @@ export default function AIChatButton({
       callback: () => {
         if (isFullscreen) {
           setIsFullscreen(false);
-          toast({ title: 'Выход из fullscreen', description: 'F11 для повторного входа' });
+          toast({ 
+            title: t.notifications.exitFullscreen, 
+            description: t.notifications.fullscreenHint 
+          });
         } else if (showChat && !embedded) {
           setShowChat(false);
         }
@@ -67,7 +75,10 @@ export default function AIChatButton({
       callback: () => {
         if (showChat) {
           setIsFullscreen(!isFullscreen);
-          toast({ title: isFullscreen ? 'Обычный режим' : 'Fullscreen режим', description: 'ESC или F11 для выхода' });
+          toast({ 
+            title: isFullscreen ? t.notifications.normalMode : t.notifications.fullscreenMode, 
+            description: t.notifications.escToExit 
+          });
         }
       }
     }
@@ -109,8 +120,8 @@ export default function AIChatButton({
       const file = files[i];
       if (file.size > 5 * 1024 * 1024) {
         toast({
-          title: 'Файл слишком большой',
-          description: `${file.name} превышает 5 МБ`,
+          title: t.errors.fileTooLarge,
+          description: `${file.name} ${t.errors.fileExceeds}`,
           variant: 'destructive'
         });
         continue;
@@ -133,7 +144,7 @@ export default function AIChatButton({
         }
       } catch (error) {
         toast({
-          title: 'Ошибка чтения файла',
+          title: t.errors.fileReadError,
           description: file.name,
           variant: 'destructive'
         });
@@ -143,7 +154,7 @@ export default function AIChatButton({
     if (newFiles.length > 0) {
       setUploadedFiles(prev => [...prev, ...newFiles]);
       toast({
-        title: `Загружено: ${newFiles.length}`,
+        title: `${t.errors.filesUploaded}: ${newFiles.length}`,
         description: newFiles.map(f => f.name).join(', ')
       });
     }
@@ -154,7 +165,7 @@ export default function AIChatButton({
 
   const removeFile = (index: number) => {
     setUploadedFiles(prev => prev.filter((_, i) => i !== index));
-    toast({ title: 'Файл удалён' });
+    toast({ title: t.errors.fileRemoved });
   };
 
   const sendMessage = async (customMessage?: string) => {
@@ -165,9 +176,10 @@ export default function AIChatButton({
     
     if (!storedApiKey) {
       toast({
-        title: 'API ключ не настроен',
-        description: 'Настройте OpenRouter API ключ в админ-панели',
-        variant: 'destructive'
+        title: `❌ ${t.errors.noApiKey}`,
+        description: `💡 ${t.errors.setupApiKey}`,
+        variant: 'destructive',
+        duration: 5000
       });
       return;
     }
@@ -240,7 +252,15 @@ export default function AIChatButton({
         }
         
         if (response.status === 401) {
-          throw new Error('API ключ недействителен. Получите новый на openrouter.ai/keys');
+          throw new Error(t.errors.invalidApiKey);
+        }
+        
+        if (response.status === 402) {
+          throw new Error(t.errors.insufficientCredits);
+        }
+        
+        if (response.status === 404) {
+          throw new Error(t.errors.modelNotFound);
         }
         
         throw new Error(errorMsg);
@@ -260,42 +280,22 @@ export default function AIChatButton({
       setMessages(prev => [...prev, aiResponse]);
       
       toast({
-        title: 'Ответ получен!',
-        description: `Использовано токенов: ${data.usage?.total_tokens || 0}`,
+        title: `✓ ${t.errors.responseReceived}`,
+        description: `${t.errors.tokensUsed}: ${data.usage?.total_tokens || 0}`,
       });
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Не удалось получить ответ';
-      
-      let userFriendlyMessage = errorMessage;
-      let diagnosticTips = '';
-      
-      if (errorMessage.includes('401') || errorMessage.includes('Unauthorized')) {
-        userFriendlyMessage = 'API ключ недействителен';
-        diagnosticTips = 'Проверьте ключ в админ-панели';
-      } else if (errorMessage.includes('402') || errorMessage.includes('credits')) {
-        userFriendlyMessage = 'Недостаточно средств';
-        diagnosticTips = 'Пополните баланс на openrouter.ai';
-      } else if (errorMessage.includes('404')) {
-        userFriendlyMessage = 'Модель не найдена';
-        diagnosticTips = 'Выберите другую модель в настройках';
-      } else if (errorMessage.includes('429')) {
-        userFriendlyMessage = 'Слишком много запросов';
-        diagnosticTips = 'Подождите 30 секунд';
-      } else if (errorMessage.includes('503')) {
-        userFriendlyMessage = 'Модель временно недоступна';
-        diagnosticTips = 'Попробуйте DeepSeek Chat или Llama 3';
-      }
+      const errorMessage = error instanceof Error ? error.message : t.errors.failedToGetResponse;
       
       toast({
-        title: '❌ ' + userFriendlyMessage,
-        description: diagnosticTips || 'Проверьте настройки в админ-панели',
+        title: `❌ ${t.errors.providerError}`,
+        description: `💡 ${t.errors.checkApiKey}`,
         variant: 'destructive',
-        duration: 5000
+        duration: 6000
       });
       
       const errorMsg: Message = {
         role: 'assistant',
-        content: `❌ ${userFriendlyMessage}\n\n💡 ${diagnosticTips || 'Проверьте настройки API ключа в админ-панели'}`,
+        content: `❌ ${t.errors.providerError}\n\n${errorMessage}\n\n💡 ${t.errors.checkApiKey}`,
         timestamp: Date.now()
       };
       setMessages(prev => [...prev, errorMsg]);
@@ -327,12 +327,12 @@ export default function AIChatButton({
     localStorage.removeItem('ai_chat_history');
     setTotalTokens(0);
     setShowQuickPrompts(true);
-    toast({ title: 'История очищена' });
+    toast({ title: t.notifications.historyCleared });
   };
 
   const copyMessage = (content: string) => {
     navigator.clipboard.writeText(content);
-    toast({ title: 'Скопировано в буфер обмена' });
+    toast({ title: t.notifications.messageCopied });
   };
 
   const exportChat = () => {
@@ -343,7 +343,7 @@ export default function AIChatButton({
     a.href = url;
     a.download = `ai-chat-${Date.now()}.txt`;
     a.click();
-    toast({ title: 'Чат экспортирован' });
+    toast({ title: t.notifications.chatExported });
   };
 
   if (showChat) {
@@ -373,7 +373,7 @@ export default function AIChatButton({
         {showSpecialCommands ? (
           <div className="flex-1 overflow-y-auto bg-gradient-to-br from-slate-900 to-slate-800">
             <div className="p-4 border-b border-white/10 flex items-center justify-between">
-              <h3 className="font-bold text-white">Специальные функции</h3>
+              <h3 className="font-bold text-white">{t.chat.specialFunctions}</h3>
               <Button 
                 variant="ghost" 
                 size="sm" 
@@ -405,14 +405,14 @@ export default function AIChatButton({
               className="text-purple-600 dark:text-purple-400 hover:bg-purple-100 dark:hover:bg-purple-900/30"
             >
               <Icon name="Wand2" size={16} className="mr-2" />
-              {showSpecialCommands ? 'Назад к чату' : 'Спец. функции'}
+              {showSpecialCommands ? t.chat.backToChat : t.chat.specialFunctions}
             </Button>
             <div className="flex items-center gap-3">
               <span className="text-[10px] text-gray-400 hidden sm:flex items-center gap-1">
                 <Icon name="Keyboard" size={10} />
-                Ctrl+K
+                {t.chat.hotkey}
               </span>
-              <span className="text-xs text-gray-500">30+ команд</span>
+              <span className="text-xs text-gray-500">30+ {t.chat.commands}</span>
             </div>
           </div>
           

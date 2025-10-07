@@ -3,19 +3,21 @@ import { Button } from '@/components/ui/button';
 import Icon from '@/components/ui/icon';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
 import ThemeToggle from '@/components/ThemeToggle';
+import { useTranslation } from '@/hooks/useTranslation';
 
 interface NavigationProps {
   onSettingsClick: () => void;
 }
 
 export default function Navigation({ onSettingsClick }: NavigationProps) {
+  const { t } = useTranslation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const menuItems = [
-    { icon: 'Home', label: 'Главная', href: '/' },
-    { icon: 'Sparkles', label: 'Возможности', action: 'features' },
-    { icon: 'BookOpen', label: 'Документация', href: '/docs' },
-    { icon: 'MessageSquare', label: 'Поддержка', href: '/support' },
+    { icon: 'Home', label: t.nav.home, href: '/' },
+    { icon: 'Sparkles', label: t.nav.features, action: 'features' },
+    { icon: 'BookOpen', label: t.nav.docs, href: '/docs' },
+    { icon: 'MessageSquare', label: t.nav.support, href: '/support' },
   ];
 
   return (

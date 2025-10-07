@@ -5,8 +5,10 @@ import Footer from '@/components/Footer';
 import ContactButtons from '@/components/ContactButtons';
 import AIChatButton from '@/components/AIChatButton';
 import Navigation from '@/components/Navigation';
+import { useTranslation } from '@/hooks/useTranslation';
 
 export default function Index() {
+  const { t } = useTranslation();
   const [contactInfo, setContactInfo] = useState<{whatsapp?: string; telegram?: string}>({});
   const [aiChatSettings, setAiChatSettings] = useState<{enabled: boolean; apiKey?: string; model?: string}>({ enabled: false });
   const [showAdminPrompt, setShowAdminPrompt] = useState(false);
@@ -104,8 +106,8 @@ export default function Index() {
           <div className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-2xl p-8 max-w-4xl w-full border border-purple-500/30 max-h-[90vh] overflow-y-auto shadow-2xl" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-8">
               <div>
-                <h2 className="text-3xl font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">Возможности Богдан ИИ</h2>
-                <p className="text-gray-400 mt-2">Умный помощник нового поколения</p>
+                <h2 className="text-3xl font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">{t.features.title}</h2>
+                <p className="text-gray-400 mt-2">{t.hero.subtitle}</p>
               </div>
               <Button onClick={() => setShowFeaturesModal(false)} variant="ghost" size="sm" className="text-gray-400 hover:text-white hover:bg-white/10">
                 <Icon name="X" size={24} />
@@ -218,17 +220,17 @@ export default function Index() {
                 </div>
                 
                 <h1 className="text-5xl md:text-6xl font-black mb-4 bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent drop-shadow-lg">
-                  Богдан ИИ
+                  {t.chat.title} {t.nav.features === 'Features' ? 'AI' : 'ИИ'}
                 </h1>
-                <p className="text-xl text-gray-200 mb-4 font-medium">Ваш персональный ИИ-помощник нового поколения</p>
-                <p className="text-sm text-gray-400 mb-8">Анализ изображений • Голосовой ввод • Работа с документами • 70+ функций</p>
+                <p className="text-xl text-gray-200 mb-4 font-medium">{t.hero.subtitle}</p>
+                <p className="text-sm text-gray-400 mb-8">{t.features.files.description} • {t.features.voice.description} • {t.features.files.title} • 70+ {t.chat.commands}</p>
 
                 <Button 
                   onClick={() => setShowFeaturesModal(true)} 
                   className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 text-base px-6 py-6"
                 >
                   <Icon name="Zap" className="mr-2" size={20} />
-                  Узнать возможности
+                  {t.hero.learnMore}
                 </Button>
               </div>
 
