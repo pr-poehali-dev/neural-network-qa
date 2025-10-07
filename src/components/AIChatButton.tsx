@@ -366,7 +366,7 @@ export default function AIChatButton({
               <Icon name="Wand2" size={16} className="mr-2" />
               {showSpecialCommands ? 'Назад к чату' : 'Спец. функции'}
             </Button>
-            <span className="text-xs text-gray-500">15+ готовых команд</span>
+            <span className="text-xs text-gray-500">30+ готовых команд</span>
           </div>
           
           <AIChatInput
