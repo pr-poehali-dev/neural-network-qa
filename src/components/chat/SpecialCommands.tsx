@@ -328,6 +328,140 @@ const SPECIAL_COMMANDS: SpecialCommand[] = [
     prompt: 'Создай 10 практических заданий для изучения: [ТЕМА]. От простого к сложному. Для каждого: задание, подсказка, решение.',
     color: 'from-orange-500 to-red-500',
     category: 'education'
+  },
+  {
+    id: 'mind-map',
+    title: 'Интеллект-карта',
+    description: 'Структурированная схема темы',
+    icon: 'Network',
+    prompt: 'Создай интеллект-карту (mind map) для темы: [ТЕМА]. Центральная идея → основные ветви → подтемы → детали. Используй иерархию и связи.',
+    color: 'from-teal-500 to-cyan-500',
+    category: 'education'
+  },
+  {
+    id: 'flashcards',
+    title: 'Карточки для запоминания',
+    description: '20 карточек вопрос-ответ',
+    icon: 'Layers',
+    prompt: 'Создай 20 карточек для запоминания по теме: [ТЕМА]. Формат: вопрос на одной стороне, ответ на другой. От простых к сложным.',
+    color: 'from-violet-500 to-purple-500',
+    category: 'education'
+  },
+  
+  // Дополнительные текстовые функции
+  {
+    id: 'cold-email',
+    title: 'Холодное письмо',
+    description: 'Первое касание с клиентом',
+    icon: 'MailOpen',
+    prompt: 'Напиши холодное email-письмо для: [ЦЕЛЬ]. Включи: персонализированное приветствие, краткую ценность, конкретный призыв к действию. Максимум 150 слов.',
+    color: 'from-blue-600 to-indigo-600',
+    category: 'text'
+  },
+  {
+    id: 'job-description',
+    title: 'Вакансия',
+    description: 'Описание вакансии для найма',
+    icon: 'Users',
+    prompt: 'Создай описание вакансии для: [ДОЛЖНОСТЬ]. Включи: обязанности, требования, условия, компанию, как откликнуться. Сделай привлекательно для кандидатов.',
+    color: 'from-emerald-600 to-teal-600',
+    category: 'text'
+  },
+  {
+    id: 'case-study',
+    title: 'Кейс-стади',
+    description: 'История успеха клиента',
+    icon: 'Award',
+    prompt: 'Напиши кейс-стади о: [ПРОЕКТ/КЛИЕНТ]. Структура: проблема, решение, результаты (с цифрами), отзыв клиента, выводы.',
+    color: 'from-amber-600 to-orange-600',
+    category: 'text'
+  },
+  
+  // Дополнительные бизнес-функции
+  {
+    id: 'elevator-pitch',
+    title: 'Elevator Pitch',
+    description: 'Презентация за 30 секунд',
+    icon: 'Presentation',
+    prompt: 'Создай elevator pitch (30-секундная презентация) для: [ПРОДУКТ/ИДЕЯ]. Расскажи: что, для кого, какая проблема решается, почему уникально.',
+    color: 'from-purple-600 to-fuchsia-600',
+    category: 'business'
+  },
+  {
+    id: 'value-proposition',
+    title: 'Ценностное предложение',
+    description: 'Value Proposition Canvas',
+    icon: 'Target',
+    prompt: 'Создай ценностное предложение для: [ПРОДУКТ]. Опиши: сегмент клиентов, их задачи, боли, выгоды; твои продукты, решения болей, создатели выгод.',
+    color: 'from-rose-600 to-pink-600',
+    category: 'business'
+  },
+  {
+    id: 'investor-pitch',
+    title: 'Питч для инвесторов',
+    description: 'Презентация проекта инвесторам',
+    icon: 'TrendingUp',
+    prompt: 'Создай питч для инвесторов для: [ПРОЕКТ]. Включи: проблему, решение, рынок, модель монетизации, команду, тракшн, запрос инвестиций, использование средств.',
+    color: 'from-green-700 to-emerald-700',
+    category: 'business'
+  },
+  
+  // Дополнительные креативные функции
+  {
+    id: 'brand-story',
+    title: 'История бренда',
+    description: 'Легенда компании',
+    icon: 'BookOpen',
+    prompt: 'Напиши историю бренда для: [КОМПАНИЯ]. Расскажи: как всё начиналось, какие сложности преодолели, миссия, ценности, куда движетесь.',
+    color: 'from-indigo-600 to-purple-600',
+    category: 'creative'
+  },
+  {
+    id: 'character',
+    title: 'Создать персонажа',
+    description: 'Детальный образ героя',
+    icon: 'User',
+    prompt: 'Создай персонажа для: [ТИП_ИСТОРИИ]. Опиши: имя, возраст, внешность, характер, предыстория, мотивация, конфликты, развитие.',
+    color: 'from-pink-600 to-rose-600',
+    category: 'creative'
+  },
+  {
+    id: 'podcast-script',
+    title: 'Сценарий подкаста',
+    description: 'Выпуск подкаста на тему',
+    icon: 'Radio',
+    prompt: 'Напиши сценарий подкаста на тему: [ТЕМА]. Длительность: [МИНУТЫ]. Включи: интро, основные блоки, вопросы гостю (если есть), аутро, призыв к действию.',
+    color: 'from-cyan-600 to-blue-600',
+    category: 'creative'
+  },
+  
+  // Дополнительные аналитические функции
+  {
+    id: 'user-persona',
+    title: 'Портрет клиента',
+    description: 'Детальная персона',
+    icon: 'UserCircle',
+    prompt: 'Создай портрет целевого клиента (user persona) для: [ПРОДУКТ]. Включи: демографию, цели, боли, поведение, источники информации, возражения.',
+    color: 'from-blue-700 to-indigo-700',
+    category: 'analysis'
+  },
+  {
+    id: 'gap-analysis',
+    title: 'Анализ разрывов',
+    description: 'Текущее vs Желаемое состояние',
+    icon: 'GitBranch',
+    prompt: 'Проведи gap-анализ для: [КОМПАНИЯ/ПРОЕКТ]. Опиши: текущее состояние, желаемое состояние, разрывы, причины разрывов, план устранения.',
+    color: 'from-orange-700 to-red-700',
+    category: 'analysis'
+  },
+  {
+    id: 'risk-analysis',
+    title: 'Анализ рисков',
+    description: 'Выявление и оценка рисков',
+    icon: 'AlertTriangle',
+    prompt: 'Проведи анализ рисков для: [ПРОЕКТ]. Для каждого риска: описание, вероятность, влияние, меры предотвращения, план реагирования.',
+    color: 'from-red-600 to-rose-600',
+    category: 'analysis'
   }
 ];
 
@@ -366,22 +500,21 @@ export default function SpecialCommands({ onSelectCommand }: SpecialCommandsProp
               <span className="text-xs text-gray-400">({commands.length})</span>
             </div>
             
-            <div className="grid grid-cols-1 gap-2">
+            <div className="grid grid-cols-2 gap-2">
               {commands.map(cmd => (
                 <button
                   key={cmd.id}
                   onClick={() => onSelectCommand(cmd.prompt)}
-                  className={`group relative overflow-hidden rounded-lg p-3 text-left transition-all duration-300 hover:scale-[1.02] bg-gradient-to-r ${cmd.color} hover:shadow-lg`}
+                  className={`group relative overflow-hidden rounded-lg p-2.5 text-left transition-all duration-300 hover:scale-[1.02] bg-gradient-to-r ${cmd.color} hover:shadow-lg`}
                 >
-                  <div className="relative z-10 flex items-start gap-3">
-                    <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center flex-shrink-0">
-                      <Icon name={cmd.icon as any} size={20} className="text-white" />
+                  <div className="relative z-10 flex items-start gap-2">
+                    <div className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <Icon name={cmd.icon as any} size={16} className="text-white" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h5 className="font-semibold text-white text-sm mb-1">{cmd.title}</h5>
-                      <p className="text-xs text-white/80 leading-relaxed">{cmd.description}</p>
+                      <h5 className="font-semibold text-white text-xs mb-0.5">{cmd.title}</h5>
+                      <p className="text-[10px] text-white/80 leading-snug line-clamp-1">{cmd.description}</p>
                     </div>
-                    <Icon name="ChevronRight" size={16} className="text-white/60 group-hover:text-white transition-colors flex-shrink-0" />
                   </div>
                   <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300"></div>
                 </button>

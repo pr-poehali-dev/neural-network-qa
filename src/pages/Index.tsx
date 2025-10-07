@@ -183,12 +183,12 @@ export default function Index() {
                   { emoji: '🎤', title: 'Голос', desc: 'Речь → текст', gradient: 'from-violet-500 to-purple-500' },
                   { emoji: '🌍', title: 'Переводы', desc: '100+ языков', gradient: 'from-red-500 to-orange-500' }
                 ].map((item, idx) => (
-                  <div key={idx} className="group bg-white/5 backdrop-blur-sm rounded-xl p-4 border border-white/10 hover:border-purple-500/50 transition-all duration-300 hover:scale-105 hover:bg-white/10">
-                    <div className={`inline-flex w-12 h-12 items-center justify-center rounded-xl bg-gradient-to-br ${item.gradient} mb-3 text-2xl shadow-lg group-hover:scale-110 transition-transform duration-300`}>
+                  <div key={idx} className="group bg-gradient-to-br from-white/5 to-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/10 hover:border-purple-400/60 transition-all duration-300 hover:scale-105 hover:shadow-xl hover:shadow-purple-500/20 cursor-pointer">
+                    <div className={`inline-flex w-12 h-12 items-center justify-center rounded-xl bg-gradient-to-br ${item.gradient} mb-3 text-2xl shadow-lg group-hover:scale-110 group-hover:rotate-3 transition-all duration-300`}>
                       {item.emoji}
                     </div>
-                    <h3 className="font-bold text-white mb-1">{item.title}</h3>
-                    <p className="text-xs text-gray-400 leading-relaxed">{item.desc}</p>
+                    <h3 className="font-bold text-white mb-1 group-hover:text-purple-300 transition-colors">{item.title}</h3>
+                    <p className="text-xs text-gray-400 leading-relaxed group-hover:text-gray-300 transition-colors">{item.desc}</p>
                   </div>
                 ))}
               </div>
@@ -200,10 +200,10 @@ export default function Index() {
                 </div>
                 <p className="text-gray-300 mb-4">Просто начните диалог или выберите готовую функцию из меню «Спец. функции»</p>
                 <div className="flex flex-wrap gap-2">
-                  <span className="px-3 py-1 bg-white/10 rounded-full text-xs text-white">50+ функций</span>
-                  <span className="px-3 py-1 bg-white/10 rounded-full text-xs text-white">Бесплатно</span>
-                  <span className="px-3 py-1 bg-white/10 rounded-full text-xs text-white">Без регистрации</span>
-                  <span className="px-3 py-1 bg-white/10 rounded-full text-xs text-white">Быстрые ответы</span>
+                  <span className="px-3 py-1 bg-gradient-to-r from-blue-500/30 to-purple-500/30 border border-blue-400/40 rounded-full text-xs text-white font-medium backdrop-blur-sm">✨ 70+ функций</span>
+                  <span className="px-3 py-1 bg-gradient-to-r from-green-500/30 to-emerald-500/30 border border-green-400/40 rounded-full text-xs text-white font-medium backdrop-blur-sm">🎉 Бесплатно</span>
+                  <span className="px-3 py-1 bg-gradient-to-r from-pink-500/30 to-rose-500/30 border border-pink-400/40 rounded-full text-xs text-white font-medium backdrop-blur-sm">🚀 Без регистрации</span>
+                  <span className="px-3 py-1 bg-gradient-to-r from-amber-500/30 to-orange-500/30 border border-amber-400/40 rounded-full text-xs text-white font-medium backdrop-blur-sm">⚡ Быстрые ответы</span>
                 </div>
               </div>
             </div>
@@ -224,7 +224,7 @@ export default function Index() {
                   Богдан ИИ
                 </h1>
                 <p className="text-xl text-gray-200 mb-4 font-medium">Ваш персональный ИИ-помощник нового поколения</p>
-                <p className="text-sm text-gray-400 mb-8">Анализ изображений • Голосовой ввод • Работа с документами • 50+ функций</p>
+                <p className="text-sm text-gray-400 mb-8">Анализ изображений • Голосовой ввод • Работа с документами • 70+ функций</p>
 
                 <Button 
                   onClick={() => setShowFeaturesModal(true)} 

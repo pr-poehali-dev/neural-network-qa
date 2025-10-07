@@ -102,7 +102,7 @@ export default function AIChatInput({
             <input
               ref={fileInputRef}
               type="file"
-              accept=".txt,.pdf,.doc,.docx,.md"
+              accept=".txt,.pdf,.doc,.docx,.md,.csv,.json,.xml,.html,.css,.js,.ts,.tsx,.jsx,.py,.java,.cpp,.c,.h,.sql,.yaml,.yml"
               multiple
               onChange={(e) => onFileUpload(e, 'text')}
               className="hidden"
@@ -123,7 +123,8 @@ export default function AIChatInput({
         <input
           ref={imageInputRef}
           type="file"
-          accept="image/*"
+          accept="image/*,.png,.jpg,.jpeg,.gif,.webp,.svg,.bmp,.ico"
+          multiple
           onChange={(e) => onFileUpload(e, 'image')}
           className="hidden"
         />
