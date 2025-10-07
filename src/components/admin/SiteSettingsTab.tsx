@@ -43,6 +43,78 @@ export default function SiteSettingsTab({ settings, onUpdateSettings }: SiteSett
     toast({ title: 'Настройки сайта сохранены' });
   };
 
+  const testApiKey = async (keyNumber: 1 | 2) => {
+    const apiKey = keyNumber === 1 ? settings.openrouterApiKey : settings.openrouterApiKey2;
+    
+    if (!apiKey) {
+      toast({
+        title: `❌ API ключ #${keyNumber} не заполнен`,
+        description: 'Введите ключ перед тестированием',
+        variant: 'destructive'
+      });
+      return;
+    }
+
+    const testModel = settings.aiModel || 'google/gemini-2.0-flash-exp:free';
+    
+    toast({
+      title: `🔍 Тестирование API ключа #${keyNumber}...`,
+      description: `Проверяю подключение к модели ${testModel}`
+    });
+
+    try {
+      const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${apiKey}`,
+          'Content-Type': 'application/json',
+          'HTTP-Referer': window.location.origin,
+          'X-Title': 'AI Chat Test'
+        },
+        body: JSON.stringify({
+          model: testModel,
+          messages: [{ role: 'user', content: 'Привет! Это тестовое сообщение.' }],
+          max_tokens: 50
+        })
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        const errorMsg = error.error?.message || `HTTP ${response.status}`;
+        
+        if (response.status === 401) {
+          throw new Error('❌ Неверный API ключ');
+        } else if (response.status === 402) {
+          throw new Error('❌ Недостаточно кредитов на балансе');
+        } else if (response.status === 404) {
+          throw new Error('❌ Модель не найдена');
+        } else if (response.status === 429) {
+          throw new Error('⚠️ Превышен лимит запросов (попробуйте позже)');
+        } else {
+          throw new Error(errorMsg);
+        }
+      }
+
+      const data = await response.json();
+      const responseText = data.choices?.[0]?.message?.content || 'Нет ответа';
+      const tokensUsed = data.usage?.total_tokens || 0;
+
+      toast({
+        title: `✅ API ключ #${keyNumber} работает!`,
+        description: `Ответ: "${responseText.substring(0, 50)}..." | Токены: ${tokensUsed}`,
+        duration: 8000
+      });
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Неизвестная ошибка';
+      toast({
+        title: `❌ Ошибка API ключа #${keyNumber}`,
+        description: errorMessage,
+        variant: 'destructive',
+        duration: 10000
+      });
+    }
+  };
+
   return (
     <Card className="p-8 border-2 border-purple-200">
       <h2 className="text-2xl font-bold text-gray-900 mb-6">Настройки сайта</h2>
@@ -233,7 +305,19 @@ export default function SiteSettingsTab({ settings, onUpdateSettings }: SiteSett
             </div>
 
             <div>
-              <Label className="mb-2">OpenRouter API Key</Label>
+              <div className="flex items-center justify-between mb-2">
+                <Label>OpenRouter API Key #1 (основной)</Label>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => testApiKey(1)}
+                  className="text-xs"
+                  disabled={!settings.openrouterApiKey}
+                >
+                  <Icon name="Zap" size={14} className="mr-1" />
+                  Тест
+                </Button>
+              </div>
               <Input
                 type="password"
                 value={settings.openrouterApiKey || ''}
@@ -252,15 +336,39 @@ export default function SiteSettingsTab({ settings, onUpdateSettings }: SiteSett
                   <li>Выберите бесплатную модель ниже ⬇️</li>
                 </ol>
               </div>
-              <p className="text-xs text-gray-500 mt-2">
-                <a 
-                  href="/ai-test" 
-                  target="_blank"
-                  className="text-green-600 hover:underline font-medium"
+            </div>
+
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <Label>OpenRouter API Key #2 (резервный, опционально)</Label>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => testApiKey(2)}
+                  className="text-xs"
+                  disabled={!settings.openrouterApiKey2}
                 >
-                  🧪 Протестировать AI после настройки
-                </a>
-              </p>
+                  <Icon name="Zap" size={14} className="mr-1" />
+                  Тест
+                </Button>
+              </div>
+              <Input
+                type="password"
+                value={settings.openrouterApiKey2 || ''}
+                onChange={(e) => onUpdateSettings({ ...settings, openrouterApiKey2: e.target.value })}
+                className="border-purple-200"
+                placeholder="sk-or-v1-..."
+              />
+              <div className="mt-2 p-3 bg-orange-50 border border-orange-200 rounded-md">
+                <p className="text-xs font-medium text-orange-900 mb-1">
+                  🔄 Резервный ключ для надёжности:
+                </p>
+                <ul className="text-xs text-orange-800 space-y-1 ml-4 list-disc">
+                  <li>При ошибке 429 на первом ключе автоматически используется второй</li>
+                  <li>Создайте второй аккаунт на openrouter.ai для удвоения лимитов</li>
+                  <li>Необязательно - работает и с одним ключом</li>
+                </ul>
+              </div>
             </div>
 
             <div>

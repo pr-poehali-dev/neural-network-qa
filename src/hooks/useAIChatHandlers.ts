@@ -143,7 +143,10 @@ export function useAIChatHandlers({
     const messageToSend = customMessage || input;
     if (!messageToSend.trim() && uploadedFiles.length === 0) return;
 
-    const storedApiKey = apiKey || localStorage.getItem('openrouter_api_key');
+    const savedSettings = localStorage.getItem('site_settings');
+    const settings = savedSettings ? JSON.parse(savedSettings) : {};
+    const storedApiKey = apiKey || settings.openrouterApiKey || localStorage.getItem('openrouter_api_key');
+    const storedApiKey2 = settings.openrouterApiKey2;
     
     if (!storedApiKey) {
       const errorMsg: Message = {
@@ -268,9 +271,39 @@ export function useAIChatHandlers({
       const errorMessage = error instanceof Error ? error.message : t.errors.failedToGetResponse;
       
       if (errorMessage === 'RATE_LIMIT_429') {
+        if (storedApiKey2) {
+          try {
+            toast({
+              title: `🔄 Переключение на API ключ #2...`,
+              description: `Основной ключ исчерпал лимит`,
+            });
+
+            const userMessage: Message = { 
+              role: 'user', 
+              content: messageToSend,
+              timestamp: Date.now()
+            };
+
+            const fallbackResponse = await sendMessageViaFallback(userMessage, storedApiKey2);
+            setMessages(prev => [...prev, fallbackResponse]);
+            
+            toast({
+              title: `✅ Ответ получен через API ключ #2`,
+              description: `Резервный ключ сработал успешно`,
+            });
+            
+            setIsLoading(false);
+            return;
+          } catch (key2Error) {
+            toast({
+              title: `⚠️ API ключ #2 тоже недоступен`,
+              description: `Пробую резервную модель...`,
+            });
+          }
+        }
+
         try {
-          const savedSettings = localStorage.getItem('site_settings');
-          const fallbackModel = savedSettings ? JSON.parse(savedSettings).fallbackAiModel : 'meta-llama/llama-3.3-70b-instruct:free';
+          const fallbackModel = settings.fallbackAiModel || 'meta-llama/llama-3.3-70b-instruct:free';
           
           toast({
             title: `🔄 Переключение на резервную модель...`,
@@ -306,7 +339,7 @@ export function useAIChatHandlers({
             
             const errorMsg: Message = {
               role: 'assistant',
-              content: `❌ **Превышен лимит запросов (429)**\n\n🔄 **Попытка переключения на резервную модель провалилась**\n\n---\n\n📝 **Решения:**\n\n**Вариант 1: Настроить резервную модель (рекомендуется)**\n1. Откройте **⚙️ Настройки** → **Настройки сайта**\n2. Найдите **"Резервная модель AI"**\n3. Выберите другую модель (например, Llama 3.3 70B)\n4. При ошибке 429 чат автоматически переключится\n\n**Вариант 2: Подождать**\n- Подождите 1-2 минуты\n- Попробуйте снова\n\n**Вариант 3: Пополнить баланс**\n- Пополните $5 на [openrouter.ai](https://openrouter.ai)\n- Платные запросы без лимитов`,
+              content: `❌ **Превышен лимит запросов (429)**\n\n🔄 **Все резервные варианты недоступны**\n\n---\n\n📝 **Решения:**\n\n**Вариант 1: Добавить второй API ключ (рекомендуется)**\n1. Откройте **⚙️ Настройки** → **Настройки сайта**\n2. Создайте второй аккаунт на [openrouter.ai](https://openrouter.ai)\n3. Вставьте второй ключ в **"OpenRouter API Key #2"**\n4. При ошибке 429 чат автоматически переключится на второй ключ\n\n**Вариант 2: Настроить резервную модель**\n1. Выберите другую модель в **"Резервная модель AI"**\n2. При ошибке 429 чат попробует другую модель\n\n**Вариант 3: Подождать**\n- Подождите 1-2 минуты\n- Попробуйте снова\n\n**Вариант 4: Пополнить баланс**\n- Пополните $5 на [openrouter.ai](https://openrouter.ai)\n- Платные запросы без лимитов`,
               timestamp: Date.now()
             };
             setMessages(prev => [...prev, errorMsg]);
