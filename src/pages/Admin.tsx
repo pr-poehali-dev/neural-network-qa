@@ -15,6 +15,7 @@ import FullControlTab from '@/components/admin/FullControlTab';
 import VisualEditorTab from '@/components/admin/VisualEditorTab';
 import DashboardTab from '@/components/admin/DashboardTab';
 import SecurityTab from '@/components/admin/SecurityTab';
+import LanguagesTab from '@/components/admin/LanguagesTab';
 
 const FILE_UPLOAD_URL = 'https://functions.poehali.dev/b58abb29-2429-4b6e-aed0-e5aae54d2240';
 
@@ -70,7 +71,7 @@ export default function Admin() {
   const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
   const [isDragging, setIsDragging] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'site' | 'files' | 'stats' | 'content' | 'buttons' | 'analytics' | 'voice' | 'control' | 'visual' | 'security'>('dashboard');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'site' | 'files' | 'stats' | 'content' | 'buttons' | 'analytics' | 'voice' | 'control' | 'visual' | 'security' | 'languages'>('dashboard');
   const [siteSettings, setSiteSettings] = useState<SiteSettings>({
     title: 'Богдан AI',
     subtitle: 'Интеллектуальный помощник нового поколения',
@@ -410,6 +411,14 @@ export default function Admin() {
               <Icon name="Lock" className="mr-2" size={18} />
               Безопасность
             </Button>
+            <Button 
+              variant={activeTab === 'languages' ? 'default' : 'ghost'}
+              onClick={() => setActiveTab('languages')}
+              className={`transition-all whitespace-nowrap ${activeTab === 'languages' ? 'bg-gradient-to-r from-blue-500 to-cyan-500 text-white shadow-lg shadow-blue-500/50' : 'text-purple-200 hover:text-white hover:bg-white/10'}`}
+            >
+              <Icon name="Globe" className="mr-2" size={18} />
+              Языки
+            </Button>
           </div>
 
           {activeTab === 'dashboard' && (
@@ -481,6 +490,10 @@ export default function Admin() {
 
           {activeTab === 'security' && (
             <SecurityTab />
+          )}
+
+          {activeTab === 'languages' && (
+            <LanguagesTab />
           )}
         </main>
       </div>
