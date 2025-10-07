@@ -5,9 +5,9 @@ import Icon from '@/components/ui/icon';
 export default function About() {
   const team = [
     {
-      name: 'Богдан Пашков',
+      name: 'Богдан Копаев',
       role: 'Создатель и вдохновитель проекта',
-      image: 'https://cdn.poehali.dev/files/f544efcc-ed58-4c61-857e-6eb90a748068.png',
+      image: 'https://cdn.poehali.dev/files/87ea466b-a4a1-4746-bc8a-c980f029ba08.png',
       description: 'Основатель проекта "Богдан ИИ". Агент отдела дополнительного обслуживания аэропорта Пулково.',
       social: {
         linkedin: '#',
@@ -18,7 +18,7 @@ export default function About() {
     {
       name: 'Андрей Пашков',
       role: 'Заместитель создателя',
-      image: 'https://cdn.poehali.dev/files/87ea466b-a4a1-4746-bc8a-c980f029ba08.png',
+      image: 'https://cdn.poehali.dev/files/f544efcc-ed58-4c61-857e-6eb90a748068.png',
       description: 'Сооснователь и технический директор. Агент отдела дополнительного обслуживания аэропорта Пулково.',
       social: {
         linkedin: '#',

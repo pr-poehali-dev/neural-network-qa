@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import Icon from '@/components/ui/icon';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
@@ -15,6 +15,14 @@ export default function Navigation({ onSettingsClick }: NavigationProps) {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [currentUser, setCurrentUser] = useState<any>(null);
+
+  useEffect(() => {
+    const user = localStorage.getItem('current_user');
+    if (user) {
+      setCurrentUser(JSON.parse(user));
+    }
+  }, []);
 
   const scrollToFeatures = () => {
     const featuresSection = document.getElementById('features');
@@ -72,6 +80,29 @@ export default function Navigation({ onSettingsClick }: NavigationProps) {
           <div className="flex items-center gap-2">
             <ThemeToggle />
             <LanguageSwitcher />
+            
+            {currentUser ? (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => navigate('/profile')}
+                className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white border-0 gap-2"
+              >
+                <Icon name="User" size={16} />
+                <span className="hidden sm:inline">{currentUser.name}</span>
+              </Button>
+            ) : (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => navigate('/auth')}
+                className="bg-white/10 hover:bg-white/20 text-white backdrop-blur-md border border-white/20 gap-2"
+              >
+                <Icon name="LogIn" size={16} />
+                <span className="hidden sm:inline">Вход</span>
+              </Button>
+            )}
+            
             <Button
               variant="ghost"
               size="sm"

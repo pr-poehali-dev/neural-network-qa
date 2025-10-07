@@ -4,6 +4,7 @@ import Icon from '@/components/ui/icon';
 import Logo from '@/components/Logo';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
+import AIChatButton from '@/components/AIChatButton';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useToast } from '@/hooks/use-toast';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
@@ -12,33 +13,31 @@ export default function Index() {
   const { t } = useTranslation();
   const { toast } = useToast();
   const [showAdminPrompt, setShowAdminPrompt] = useState(false);
-  const [showChat, setShowChat] = useState(false);
   const [adminPassword, setAdminPassword] = useState('');
   const [userName, setUserName] = useState('');
-  const [showNamePrompt, setShowNamePrompt] = useState(false);
+  const [apiKey, setApiKey] = useState('');
+  const [aiModel, setAiModel] = useState('google/gemini-2.0-flash-exp:free');
 
   useEffect(() => {
     const savedName = localStorage.getItem('user_name');
     if (savedName) {
       setUserName(savedName);
     }
+    
+    const settings = localStorage.getItem('site_settings');
+    if (settings) {
+      const parsed = JSON.parse(settings);
+      if (parsed.openrouterApiKey) {
+        setApiKey(parsed.openrouterApiKey);
+        localStorage.setItem('openrouter_api_key', parsed.openrouterApiKey);
+      }
+      if (parsed.aiModel) {
+        setAiModel(parsed.aiModel);
+      }
+    }
   }, []);
 
-  const handleStartChat = () => {
-    const savedName = localStorage.getItem('user_name');
-    if (!savedName) {
-      setShowNamePrompt(true);
-    } else {
-      setShowChat(true);
-    }
-  };
 
-  const handleSaveName = (name: string) => {
-    localStorage.setItem('user_name', name);
-    setUserName(name);
-    setShowNamePrompt(false);
-    setShowChat(true);
-  };
 
   const ADMIN_PASSWORD = 'bogdan2025';
 
@@ -161,13 +160,9 @@ export default function Index() {
                   </div>
                   <h3 className="text-2xl font-bold text-white">Начните общение с ИИ</h3>
                   <p className="text-gray-300">Умный помощник готов ответить на ваши вопросы</p>
-                  <Button
-                    onClick={handleStartChat}
-                    className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-semibold py-6 text-lg"
-                  >
-                    <Icon name="Sparkles" className="mr-2" size={20} />
-                    Открыть чат
-                  </Button>
+                  <p className="text-sm text-purple-300">
+                    {apiKey ? '✅ API ключ настроен' : '⚠️ Требуется настройка API в админ-панели'}
+                  </p>
                 </div>
               </div>
             </div>
@@ -225,11 +220,11 @@ export default function Index() {
             </p>
             <div className="flex flex-wrap gap-4 justify-center">
               <Button 
-                onClick={handleStartChat}
+                onClick={() => window.location.href = '/auth'}
                 className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold px-8 py-6 text-lg"
               >
-                <Icon name="MessageSquare" className="mr-2" size={20} />
-                Начать работу
+                <Icon name="User" className="mr-2" size={20} />
+                Войти / Регистрация
               </Button>
               <Button 
                 variant="outline"
@@ -244,81 +239,7 @@ export default function Index() {
         </main>
       </div>
 
-      {showNamePrompt && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl p-8 max-w-md w-full border border-purple-500/30 shadow-2xl">
-            <div className="text-center mb-6">
-              <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full mb-4">
-                <Icon name="User" size={32} className="text-white" />
-              </div>
-              <h3 className="text-2xl font-bold text-white mb-2">Добро пожаловать!</h3>
-              <p className="text-gray-300">Как к вам обращаться?</p>
-            </div>
-            <input 
-              type="text" 
-              placeholder="Введите ваше имя" 
-              className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:border-purple-400 outline-none mb-4"
-              onKeyPress={(e) => {
-                if (e.key === 'Enter' && (e.target as HTMLInputElement).value.trim()) {
-                  handleSaveName((e.target as HTMLInputElement).value.trim());
-                }
-              }}
-              autoFocus
-            />
-            <Button 
-              onClick={(e) => {
-                const input = e.currentTarget.parentElement?.querySelector('input');
-                if (input?.value.trim()) {
-                  handleSaveName(input.value.trim());
-                }
-              }}
-              className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-semibold py-3"
-            >
-              Продолжить
-            </Button>
-          </div>
-        </div>
-      )}
-
-      {showChat && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl max-w-4xl w-full h-[80vh] border border-purple-500/30 shadow-2xl flex flex-col">
-            <div className="flex items-center justify-between p-4 border-b border-white/10">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center">
-                  <Icon name="Bot" size={20} className="text-white" />
-                </div>
-                <div>
-                  <h3 className="text-white font-semibold">Богдан ИИ</h3>
-                  <p className="text-xs text-gray-400">Здравствуйте, {userName}!</p>
-                </div>
-              </div>
-              <Button variant="ghost" size="sm" onClick={() => setShowChat(false)}>
-                <Icon name="X" size={20} className="text-gray-400" />
-              </Button>
-            </div>
-            <div className="flex-1 overflow-y-auto p-6">
-              <div className="text-center text-gray-400 py-12">
-                <Icon name="MessageSquare" size={64} className="mx-auto mb-4 text-purple-400" />
-                <p className="mb-2">Чат готов к работе</p>
-                <p className="text-sm">Для полного функционала настройте API-ключ в админ-панели</p>
-              </div>
-            </div>
-            <div className="p-4 border-t border-white/10">
-              <div className="flex gap-2">
-                <input 
-                  type="text" 
-                  placeholder="Напишите сообщение..." 
-                  className="flex-1 px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:border-purple-400 outline-none"
-                />
-                <Button className="bg-gradient-to-r from-indigo-600 to-purple-600">
-                  <Icon name="Send" size={20} />
-                </Button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      <AIChatButton apiKey={apiKey} model={aiModel} />
 
       <Footer />
     </div>
