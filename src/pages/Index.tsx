@@ -16,9 +16,9 @@ export default function Index() {
       try {
         const settings = JSON.parse(savedSettings);
         
-        if (settings.aiModel === 'deepseek/deepseek-r1' || settings.aiModel === 'deepseek/deepseek-r1:free') {
-          console.warn('🔧 Автомиграция: меняю недоступную модель R1 → Chat');
-          settings.aiModel = 'deepseek/deepseek-chat';
+        if (settings.aiModel === 'deepseek/deepseek-r1' || settings.aiModel === 'deepseek/deepseek-r1:free' || settings.aiModel === 'deepseek/deepseek-chat') {
+          console.warn('🔧 Автомиграция: переключаю на бесплатную модель Gemini Flash 2.0');
+          settings.aiModel = 'google/gemini-flash-1.5-8b';
           localStorage.setItem('site_settings', JSON.stringify(settings));
         }
         
@@ -57,7 +57,7 @@ export default function Index() {
     setDiagnostic({ status: 'checking', message: 'Проверяю API ключ...' });
     
     const apiKey = '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';
-    const model = 'deepseek/deepseek-chat';
+    const model = 'google/gemini-flash-1.5-8b';
     
     try {
       const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
