@@ -265,16 +265,32 @@ export default function SiteSettingsTab({ settings, onUpdateSettings }: SiteSett
             <div>
               <Label className="mb-2">Модель AI</Label>
               <select
-                value={settings.aiModel || 'openai/gpt-3.5-turbo'}
+                value={settings.aiModel || 'deepseek/deepseek-chat'}
                 onChange={(e) => onUpdateSettings({ ...settings, aiModel: e.target.value })}
-                className="w-full border border-purple-200 rounded-md p-2 bg-white"
+                className="w-full border border-purple-200 rounded-md p-2 bg-white dark:bg-gray-800 dark:text-white"
               >
-                <option value="openai/gpt-3.5-turbo">GPT-3.5 Turbo (быстро, дешево)</option>
-                <option value="openai/gpt-4">GPT-4 (умнее, дороже)</option>
-                <option value="anthropic/claude-3-haiku">Claude 3 Haiku (быстро)</option>
-                <option value="anthropic/claude-3-sonnet">Claude 3 Sonnet (сбалансировано)</option>
-                <option value="meta-llama/llama-3-70b-instruct">Llama 3 70B (бесплатно)</option>
-                <option value="google/gemini-pro">Gemini Pro</option>
+                <optgroup label="🔥 DeepSeek (рекомендуется)">
+                  <option value="deepseek/deepseek-chat">DeepSeek Chat (очень дешево)</option>
+                  <option value="deepseek/deepseek-coder">DeepSeek Coder (для кода)</option>
+                </optgroup>
+                <optgroup label="OpenAI">
+                  <option value="openai/gpt-3.5-turbo">GPT-3.5 Turbo</option>
+                  <option value="openai/gpt-4">GPT-4</option>
+                  <option value="openai/gpt-4-turbo">GPT-4 Turbo</option>
+                </optgroup>
+                <optgroup label="Anthropic">
+                  <option value="anthropic/claude-3-haiku">Claude 3 Haiku</option>
+                  <option value="anthropic/claude-3-sonnet">Claude 3 Sonnet</option>
+                  <option value="anthropic/claude-3-opus">Claude 3 Opus</option>
+                </optgroup>
+                <optgroup label="Meta">
+                  <option value="meta-llama/llama-3-70b-instruct">Llama 3 70B (бесплатно)</option>
+                  <option value="meta-llama/llama-3-8b-instruct">Llama 3 8B (быстро)</option>
+                </optgroup>
+                <optgroup label="Google">
+                  <option value="google/gemini-pro">Gemini Pro</option>
+                  <option value="google/gemini-pro-1.5">Gemini Pro 1.5</option>
+                </optgroup>
               </select>
               <p className="text-xs text-gray-500 mt-1">
                 Выберите модель по балансу цена/качество

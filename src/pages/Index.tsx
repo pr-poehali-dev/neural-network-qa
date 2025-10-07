@@ -25,7 +25,7 @@ export default function Index() {
           setAiChatSettings({
             enabled: settings.enableAiChat,
             apiKey: settings.openrouterApiKey,
-            model: settings.aiModel || 'openai/gpt-3.5-turbo'
+            model: settings.aiModel || 'deepseek/deepseek-chat'
           });
           localStorage.setItem('openrouter_api_key', settings.openrouterApiKey);
         }

@@ -8,7 +8,7 @@ import { useToast } from '@/hooks/use-toast';
 
 export default function AITest() {
   const [apiKey, setApiKey] = useState(localStorage.getItem('openrouter_api_key') || '');
-  const [model, setModel] = useState('openai/gpt-3.5-turbo');
+  const [model, setModel] = useState('deepseek/deepseek-chat');
   const [message, setMessage] = useState('');
   const [response, setResponse] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -129,12 +129,25 @@ export default function AITest() {
                 onChange={(e) => setModel(e.target.value)}
                 className="w-full border border-gray-300 rounded-md p-2 bg-white dark:bg-gray-800 dark:border-gray-600 dark:text-white"
               >
-                <option value="openai/gpt-3.5-turbo">GPT-3.5 Turbo (быстро, дешево)</option>
-                <option value="openai/gpt-4">GPT-4 (умнее, дороже)</option>
-                <option value="anthropic/claude-3-haiku">Claude 3 Haiku</option>
-                <option value="anthropic/claude-3-sonnet">Claude 3 Sonnet</option>
-                <option value="meta-llama/llama-3-70b-instruct">Llama 3 70B</option>
-                <option value="google/gemini-pro">Gemini Pro</option>
+                <optgroup label="🔥 DeepSeek (рекомендуется)">
+                  <option value="deepseek/deepseek-chat">DeepSeek Chat (очень дешево)</option>
+                  <option value="deepseek/deepseek-coder">DeepSeek Coder (для кода)</option>
+                </optgroup>
+                <optgroup label="OpenAI">
+                  <option value="openai/gpt-3.5-turbo">GPT-3.5 Turbo</option>
+                  <option value="openai/gpt-4">GPT-4</option>
+                  <option value="openai/gpt-4-turbo">GPT-4 Turbo</option>
+                </optgroup>
+                <optgroup label="Anthropic">
+                  <option value="anthropic/claude-3-haiku">Claude 3 Haiku</option>
+                  <option value="anthropic/claude-3-sonnet">Claude 3 Sonnet</option>
+                </optgroup>
+                <optgroup label="Meta">
+                  <option value="meta-llama/llama-3-70b-instruct">Llama 3 70B (бесплатно)</option>
+                </optgroup>
+                <optgroup label="Google">
+                  <option value="google/gemini-pro">Gemini Pro</option>
+                </optgroup>
               </select>
             </div>
 

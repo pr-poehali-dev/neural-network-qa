@@ -27,7 +27,7 @@ const QUICK_PROMPTS = [
 export default function AIChatButton({ 
   className = '',
   apiKey,
-  model = 'openai/gpt-3.5-turbo'
+  model = 'deepseek/deepseek-chat'
 }: AIChatButtonProps) {
   const [showChat, setShowChat] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
