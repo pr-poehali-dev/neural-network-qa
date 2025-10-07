@@ -116,27 +116,50 @@ export default function AIChatHeader({ model, onExport, onClear, onClose, onTogg
       </div>
       
       {showTranslator && (
-        <div className="p-3 bg-blue-900/30 border-b border-blue-500/30">
-          <p className="text-xs text-blue-200 mb-2 font-semibold">🌍 Переводчик</p>
+        <div className="p-3 bg-blue-900/30 border-b border-blue-500/30 max-h-96 overflow-y-auto">
+          <p className="text-xs text-blue-200 mb-3 font-semibold flex items-center gap-2">
+            <Icon name="Languages" size={14} />
+            🌍 Переводчик (100+ языков)
+          </p>
           <div className="grid grid-cols-3 gap-2">
             {[
-              { text: 'Переведи на английский', flag: '🇬🇧' },
-              { text: 'Переведи на испанский', flag: '🇪🇸' },
-              { text: 'Переведи на немецкий', flag: '🇩🇪' },
-              { text: 'Переведи на французский', flag: '🇫🇷' },
-              { text: 'Переведи на китайский', flag: '🇨🇳' },
-              { text: 'Переведи на японский', flag: '🇯🇵' },
+              { text: 'Переведи на английский', flag: '🇬🇧', name: 'English' },
+              { text: 'Переведи на испанский', flag: '🇪🇸', name: 'Español' },
+              { text: 'Переведи на немецкий', flag: '🇩🇪', name: 'Deutsch' },
+              { text: 'Переведи на французский', flag: '🇫🇷', name: 'Français' },
+              { text: 'Переведи на китайский', flag: '🇨🇳', name: '中文' },
+              { text: 'Переведи на японский', flag: '🇯🇵', name: '日本語' },
+              { text: 'Переведи на корейский', flag: '🇰🇷', name: '한국어' },
+              { text: 'Переведи на итальянский', flag: '🇮🇹', name: 'Italiano' },
+              { text: 'Переведи на португальский', flag: '🇵🇹', name: 'Português' },
+              { text: 'Переведи на арабский', flag: '🇸🇦', name: 'العربية' },
+              { text: 'Переведи на турецкий', flag: '🇹🇷', name: 'Türkçe' },
+              { text: 'Переведи на польский', flag: '🇵🇱', name: 'Polski' },
+              { text: 'Переведи на украинский', flag: '🇺🇦', name: 'Українська' },
+              { text: 'Переведи на чешский', flag: '🇨🇿', name: 'Čeština' },
+              { text: 'Переведи на греческий', flag: '🇬🇷', name: 'Ελληνικά' },
+              { text: 'Переведи на хинди', flag: '🇮🇳', name: 'हिन्दी' },
+              { text: 'Переведи на тайский', flag: '🇹🇭', name: 'ไทย' },
+              { text: 'Переведи на вьетнамский', flag: '🇻🇳', name: 'Tiếng Việt' },
+              { text: 'Переведи на голландский', flag: '🇳🇱', name: 'Nederlands' },
+              { text: 'Переведи на шведский', flag: '🇸🇪', name: 'Svenska' },
+              { text: 'Переведи на финский', flag: '🇫🇮', name: 'Suomi' },
+              { text: 'Переведи на норвежский', flag: '🇳🇴', name: 'Norsk' },
+              { text: 'Переведи на датский', flag: '🇩🇰', name: 'Dansk' },
+              { text: 'Переведи на румынский', flag: '🇷🇴', name: 'Română' },
             ].map((lang, idx) => (
               <button
                 key={idx}
                 onClick={() => handlePromptClick(lang.text)}
-                className="bg-blue-600/40 hover:bg-blue-600/60 text-white text-xs py-2 px-3 rounded-lg transition-all hover:scale-105 flex items-center gap-2 justify-center"
+                className="bg-blue-600/40 hover:bg-blue-600/60 text-white text-xs py-2 px-2 rounded-lg transition-all hover:scale-105 flex items-center gap-1 justify-center"
+                title={lang.name}
               >
-                <span>{lang.flag}</span>
-                <span className="truncate">{lang.text.replace('Переведи на ', '')}</span>
+                <span className="text-base">{lang.flag}</span>
+                <span className="truncate text-[10px]">{lang.name}</span>
               </button>
             ))}
           </div>
+          <p className="text-[10px] text-blue-300 mt-2 text-center">+ еще 76 языков по запросу</p>
         </div>
       )}
       

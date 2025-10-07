@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import Icon from '@/components/ui/icon';
 import { useToast } from '@/hooks/use-toast';
+import { useHotkeys } from '@/hooks/useHotkeys';
 import AIChatHeader from '@/components/chat/AIChatHeader';
 import AIChatMessages, { Message } from '@/components/chat/AIChatMessages';
 import AIChatInput from '@/components/chat/AIChatInput';
@@ -37,6 +38,40 @@ export default function AIChatButton({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const imageInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
+
+  // Горячие клавиши
+  useHotkeys([
+    {
+      key: 'k',
+      ctrl: true,
+      callback: () => {
+        if (!embedded) {
+          setShowChat(!showChat);
+          toast({ title: showChat ? 'Чат закрыт' : 'Чат открыт', description: 'Ctrl+K для переключения' });
+        }
+      }
+    },
+    {
+      key: 'Escape',
+      callback: () => {
+        if (isFullscreen) {
+          setIsFullscreen(false);
+          toast({ title: 'Выход из fullscreen', description: 'F11 для повторного входа' });
+        } else if (showChat && !embedded) {
+          setShowChat(false);
+        }
+      }
+    },
+    {
+      key: 'F11',
+      callback: () => {
+        if (showChat) {
+          setIsFullscreen(!isFullscreen);
+          toast({ title: isFullscreen ? 'Обычный режим' : 'Fullscreen режим', description: 'ESC или F11 для выхода' });
+        }
+      }
+    }
+  ]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -372,7 +407,13 @@ export default function AIChatButton({
               <Icon name="Wand2" size={16} className="mr-2" />
               {showSpecialCommands ? 'Назад к чату' : 'Спец. функции'}
             </Button>
-            <span className="text-xs text-gray-500">30+ готовых команд</span>
+            <div className="flex items-center gap-3">
+              <span className="text-[10px] text-gray-400 hidden sm:flex items-center gap-1">
+                <Icon name="Keyboard" size={10} />
+                Ctrl+K
+              </span>
+              <span className="text-xs text-gray-500">30+ команд</span>
+            </div>
           </div>
           
           <AIChatInput

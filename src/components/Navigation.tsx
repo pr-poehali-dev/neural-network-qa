@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import Icon from '@/components/ui/icon';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
+import ThemeToggle from '@/components/ThemeToggle';
 
 interface NavigationProps {
   onSettingsClick: () => void;
@@ -51,6 +52,7 @@ export default function Navigation({ onSettingsClick }: NavigationProps) {
 
           {/* Right Side */}
           <div className="flex items-center gap-2">
+            <ThemeToggle />
             <LanguageSwitcher />
             <Button
               variant="ghost"

@@ -105,7 +105,7 @@ export default function Index() {
             <div className="flex items-center justify-between mb-8">
               <div>
                 <h2 className="text-3xl font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">Возможности Богдан ИИ</h2>
-                <p className="text-gray-400 mt-2">Powered by Google Gemini 2.0 Flash</p>
+                <p className="text-gray-400 mt-2">Умный помощник нового поколения</p>
               </div>
               <Button onClick={() => setShowFeaturesModal(false)} variant="ghost" size="sm" className="text-gray-400 hover:text-white hover:bg-white/10">
                 <Icon name="X" size={24} />
