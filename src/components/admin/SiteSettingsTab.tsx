@@ -270,9 +270,9 @@ export default function SiteSettingsTab({ settings, onUpdateSettings }: SiteSett
                 className="w-full border border-purple-200 rounded-md p-2 bg-white dark:bg-gray-800 dark:text-white"
               >
                 <optgroup label="🔥 DeepSeek (рекомендуется)">
-                  <option value="deepseek/deepseek-r1:free">DeepSeek R1 (бесплатно, мощная)</option>
-                  <option value="deepseek/deepseek-chat">DeepSeek Chat (очень дешево)</option>
+                  <option value="deepseek/deepseek-chat">DeepSeek Chat (очень дешево, быстро)</option>
                   <option value="deepseek/deepseek-coder">DeepSeek Coder (для кода)</option>
+                  <option value="deepseek/deepseek-r1:free">DeepSeek R1 Free (эксперимент)</option>
                 </optgroup>
                 <optgroup label="OpenAI">
                   <option value="openai/gpt-3.5-turbo">GPT-3.5 Turbo</option>

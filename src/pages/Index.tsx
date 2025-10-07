@@ -50,7 +50,7 @@ export default function Index() {
     setDiagnostic({ status: 'checking', message: 'Проверяю API ключ...' });
     
     const apiKey = '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';
-    const model = 'deepseek/deepseek-r1:free';
+    const model = 'deepseek/deepseek-chat';
     
     try {
       const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
@@ -252,7 +252,7 @@ export default function Index() {
                     ) : diagnostic.status === 'success' ? (
                       '✅ Чат включён! Обновите страницу'
                     ) : (
-                      '🚀 Включить AI чат с проверкой (DeepSeek R1)'
+                      '🚀 Включить AI чат с проверкой (DeepSeek Chat)'
                     )}
                   </button>
                 </div>
