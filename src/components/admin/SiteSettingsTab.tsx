@@ -265,14 +265,19 @@ export default function SiteSettingsTab({ settings, onUpdateSettings }: SiteSett
             <div>
               <Label className="mb-2">Модель AI</Label>
               <select
-                value={settings.aiModel || 'deepseek/deepseek-chat'}
+                value={settings.aiModel || 'google/gemini-flash-1.5-8b'}
                 onChange={(e) => onUpdateSettings({ ...settings, aiModel: e.target.value })}
                 className="w-full border border-purple-200 rounded-md p-2 bg-white dark:bg-gray-800 dark:text-white"
               >
-                <optgroup label="🔥 DeepSeek (рекомендуется)">
-                  <option value="deepseek/deepseek-chat">DeepSeek Chat (очень дешево, быстро)</option>
+                <optgroup label="🎁 Бесплатные модели">
+                  <option value="google/gemini-flash-1.5-8b">Google Gemini Flash 2.0 (бесплатно, быстро)</option>
+                  <option value="meta-llama/llama-3.1-8b-instruct:free">Meta Llama 3.1 8B (бесплатно)</option>
+                  <option value="meta-llama/llama-3.1-70b-instruct:free">Meta Llama 3.1 70B (бесплатно, мощнее)</option>
+                  <option value="microsoft/phi-3-medium-128k-instruct:free">Microsoft Phi-3 (бесплатно)</option>
+                </optgroup>
+                <optgroup label="💰 Очень дешёвые ($0.14/1M)">
+                  <option value="deepseek/deepseek-chat">DeepSeek Chat (дешевле всех)</option>
                   <option value="deepseek/deepseek-coder">DeepSeek Coder (для кода)</option>
-                  <option value="deepseek/deepseek-r1:free">DeepSeek R1 Free (эксперимент)</option>
                 </optgroup>
                 <optgroup label="OpenAI">
                   <option value="openai/gpt-3.5-turbo">GPT-3.5 Turbo</option>
@@ -284,17 +289,13 @@ export default function SiteSettingsTab({ settings, onUpdateSettings }: SiteSett
                   <option value="anthropic/claude-3-sonnet">Claude 3 Sonnet</option>
                   <option value="anthropic/claude-3-opus">Claude 3 Opus</option>
                 </optgroup>
-                <optgroup label="Meta">
-                  <option value="meta-llama/llama-3-70b-instruct">Llama 3 70B (бесплатно)</option>
-                  <option value="meta-llama/llama-3-8b-instruct">Llama 3 8B (быстро)</option>
-                </optgroup>
                 <optgroup label="Google">
                   <option value="google/gemini-pro">Gemini Pro</option>
                   <option value="google/gemini-pro-1.5">Gemini Pro 1.5</option>
                 </optgroup>
               </select>
               <p className="text-xs text-gray-500 mt-1">
-                Выберите модель по балансу цена/качество
+                🎁 = бесплатно навсегда | 💰 = почти бесплатно ($0.21 за 1000 сообщений)
               </p>
             </div>
           </div>
