@@ -39,6 +39,13 @@ interface SiteSettings {
   enableVoice: boolean;
   maxFileSize: string;
   allowedTypes: string;
+  whatsappNumber?: string;
+  telegramUsername?: string;
+  telegramBotId?: string;
+  telegramAdminChatId?: string;
+  openrouterApiKey?: string;
+  aiModel?: string;
+  enableAiChat?: boolean;
 }
 
 interface UploadedFile {

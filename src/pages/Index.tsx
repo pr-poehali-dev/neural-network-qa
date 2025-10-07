@@ -20,6 +20,7 @@ import Gamification from '@/components/Gamification';
 import WelcomeForm from '@/components/WelcomeForm';
 import UserProfile from '@/components/UserProfile';
 import NoAITools from '@/components/NoAITools';
+import AIChatButton from '@/components/AIChatButton';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useGamification } from '@/hooks/useGamification';
 
@@ -59,6 +60,7 @@ export default function Index() {
   const [showTools, setShowTools] = useState(false);
   const [userName, setUserName] = useState('');
   const [userAvatar, setUserAvatar] = useState('👤');
+  const [aiChatSettings, setAiChatSettings] = useState<{enabled: boolean; apiKey?: string; model?: string}>({ enabled: false });
   const gamification = useGamification();
   const { toast } = useToast();
   const { t } = useLanguage();
@@ -182,6 +184,14 @@ export default function Index() {
           if (settings.telegramAdminChatId) {
             localStorage.setItem('telegram_admin_chat_id', settings.telegramAdminChatId);
           }
+        }
+        if (settings.enableAiChat && settings.openrouterApiKey) {
+          setAiChatSettings({
+            enabled: settings.enableAiChat,
+            apiKey: settings.openrouterApiKey,
+            model: settings.aiModel || 'openai/gpt-3.5-turbo'
+          });
+          localStorage.setItem('openrouter_api_key', settings.openrouterApiKey);
         }
       } catch (e) {
         console.error('Error parsing settings:', e);
@@ -467,6 +477,12 @@ export default function Index() {
               whatsapp={contactInfo.whatsapp}
               telegram={contactInfo.telegram}
             />
+            {aiChatSettings.enabled && (
+              <AIChatButton 
+                apiKey={aiChatSettings.apiKey}
+                model={aiChatSettings.model}
+              />
+            )}
             <Footer />
           </>
         )}

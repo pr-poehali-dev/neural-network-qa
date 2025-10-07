@@ -23,6 +23,9 @@ interface SiteSettings {
   telegramUsername?: string;
   telegramBotId?: string;
   telegramAdminChatId?: string;
+  openrouterApiKey?: string;
+  aiModel?: string;
+  enableAiChat?: boolean;
 }
 
 interface SiteSettingsTabProps {
@@ -208,6 +211,67 @@ export default function SiteSettingsTab({ settings, onUpdateSettings }: SiteSett
               placeholder="123456789"
             />
             <p className="text-xs text-gray-500 mt-1">Напишите /start боту, чтобы узнать ID</p>
+          </div>
+        </div>
+
+        <div className="border-t border-purple-200 pt-6 mt-6">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+            <Icon name="Bot" size={20} className="text-purple-600" />
+            Настройки AI чат-бота
+          </h3>
+          
+          <div className="space-y-4">
+            <div className="flex items-center justify-between p-4 border border-purple-200 rounded-lg">
+              <div>
+                <Label>Включить AI чат</Label>
+                <p className="text-xs text-gray-500 mt-1">Плавающая кнопка AI-ассистента</p>
+              </div>
+              <Switch
+                checked={settings.enableAiChat || false}
+                onCheckedChange={(checked) => onUpdateSettings({ ...settings, enableAiChat: checked })}
+              />
+            </div>
+
+            <div>
+              <Label className="mb-2">OpenRouter API Key</Label>
+              <Input
+                type="password"
+                value={settings.openrouterApiKey || ''}
+                onChange={(e) => onUpdateSettings({ ...settings, openrouterApiKey: e.target.value })}
+                className="border-purple-200"
+                placeholder="sk-or-v1-..."
+              />
+              <p className="text-xs text-gray-500 mt-1">
+                Получите ключ на{' '}
+                <a 
+                  href="https://openrouter.ai/keys" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-purple-600 hover:underline"
+                >
+                  openrouter.ai/keys
+                </a>
+              </p>
+            </div>
+
+            <div>
+              <Label className="mb-2">Модель AI</Label>
+              <select
+                value={settings.aiModel || 'openai/gpt-3.5-turbo'}
+                onChange={(e) => onUpdateSettings({ ...settings, aiModel: e.target.value })}
+                className="w-full border border-purple-200 rounded-md p-2 bg-white"
+              >
+                <option value="openai/gpt-3.5-turbo">GPT-3.5 Turbo (быстро, дешево)</option>
+                <option value="openai/gpt-4">GPT-4 (умнее, дороже)</option>
+                <option value="anthropic/claude-3-haiku">Claude 3 Haiku (быстро)</option>
+                <option value="anthropic/claude-3-sonnet">Claude 3 Sonnet (сбалансировано)</option>
+                <option value="meta-llama/llama-3-70b-instruct">Llama 3 70B (бесплатно)</option>
+                <option value="google/gemini-pro">Gemini Pro</option>
+              </select>
+              <p className="text-xs text-gray-500 mt-1">
+                Выберите модель по балансу цена/качество
+              </p>
+            </div>
           </div>
         </div>
 
