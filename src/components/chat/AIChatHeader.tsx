@@ -23,6 +23,7 @@ export default function AIChatHeader({ model, onExport, onClear, onClose, onTogg
 
   const ALL_AI_MODELS = [
     { id: 'google/gemini-2.0-flash-exp:free', name: 'Gemini 2.0', icon: '⭐', desc: 'Быстрая, видит фото', color: 'from-blue-500 to-cyan-500' },
+    { id: 'sberbank/gigachat:latest', name: 'GigaChat', icon: '🇷🇺', desc: 'Российская модель от Сбера', color: 'from-green-600 to-emerald-600' },
     { id: 'meta-llama/llama-3.3-70b-instruct:free', name: 'Llama 3.3 70B', icon: '🔥', desc: 'Мощная, только текст', color: 'from-orange-500 to-red-500' },
     { id: 'meta-llama/llama-3.1-8b-instruct:free', name: 'Llama 3.1 8B', icon: '⚡', desc: 'Быстрая, легкая', color: 'from-green-500 to-emerald-500' },
     { id: 'microsoft/phi-3-medium-128k-instruct:free', name: 'Phi-3 Medium', icon: '💼', desc: 'Большой контекст', color: 'from-purple-500 to-pink-500' },

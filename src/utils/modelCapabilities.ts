@@ -36,6 +36,24 @@ export const MODEL_CAPABILITIES: Record<string, ModelCapabilities> = {
       speed: 'fast',
     },
   },
+  'sberbank/gigachat:latest': {
+    id: 'sberbank/gigachat:latest',
+    name: 'GigaChat',
+    icon: '🇷🇺',
+    description: 'Российская модель от Сбербанка с глубоким пониманием русского языка',
+    features: {
+      text: true,
+      images: false,
+      files: true,
+      voice: false,
+      code: true,
+      translation: true,
+    },
+    limits: {
+      contextWindow: '8K токенов',
+      speed: 'medium',
+    },
+  },
   'meta-llama/llama-3.3-70b-instruct:free': {
     id: 'meta-llama/llama-3.3-70b-instruct:free',
     name: 'Llama 3.3 70B',
