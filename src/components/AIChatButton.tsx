@@ -1,31 +1,18 @@
 import { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
 import Icon from '@/components/ui/icon';
 import { useToast } from '@/hooks/use-toast';
-
-interface Message {
-  role: 'user' | 'assistant';
-  content: string;
-  timestamp?: number;
-  files?: {name: string; content: string}[];
-}
+import AIChatHeader from '@/components/chat/AIChatHeader';
+import AIChatMessages, { Message } from '@/components/chat/AIChatMessages';
+import AIChatInput from '@/components/chat/AIChatInput';
+import AIChatStats from '@/components/chat/AIChatStats';
 
 interface AIChatButtonProps {
   className?: string;
   apiKey?: string;
   model?: string;
 }
-
-const QUICK_PROMPTS = [
-  { emoji: '💡', text: 'Объясни простыми словами' },
-  { emoji: '📝', text: 'Напиши текст про' },
-  { emoji: '🔍', text: 'Проанализируй документ' },
-  { emoji: '✨', text: 'Улучши и исправь' },
-  { emoji: '📊', text: 'Сделай краткое резюме' },
-  { emoji: '🌍', text: 'Переведи на' },
-];
 
 export default function AIChatButton({ 
   className = '',
@@ -282,231 +269,38 @@ export default function AIChatButton({
   if (showChat) {
     return (
       <Card className="fixed bottom-6 right-6 z-50 w-96 h-[600px] bg-white dark:bg-gray-800 shadow-2xl flex flex-col animate-scale-in">
-        {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b dark:border-gray-700 bg-gradient-to-r from-indigo-600 to-purple-600">
-          <div className="flex items-center gap-2">
-            <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
-            <div>
-              <h3 className="font-semibold text-white">Богдан ИИ</h3>
-              <p className="text-xs text-white/80">Онлайн • {model.split('/')[1] || 'AI'}</p>
-            </div>
-          </div>
-          <div className="flex gap-1">
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              onClick={exportChat}
-              title="Экспорт чата"
-              className="hover:bg-white/20 text-white"
-            >
-              <Icon name="Download" size={16} />
-            </Button>
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              onClick={clearHistory}
-              title="Очистить чат"
-              className="hover:bg-white/20 text-white"
-            >
-              <Icon name="Trash2" size={16} />
-            </Button>
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              onClick={() => setShowChat(false)}
-              className="hover:bg-white/20 text-white"
-            >
-              <Icon name="X" size={18} />
-            </Button>
-          </div>
-        </div>
+        <AIChatHeader
+          model={model}
+          onExport={exportChat}
+          onClear={clearHistory}
+          onClose={() => setShowChat(false)}
+        />
 
-        {/* Stats */}
-        {totalTokens > 0 && (
-          <div className="px-4 py-2 bg-blue-50 dark:bg-gray-900 border-b dark:border-gray-700">
-            <div className="flex items-center justify-between text-xs text-gray-600 dark:text-gray-400">
-              <span className="flex items-center gap-1">
-                <Icon name="Zap" size={12} />
-                Токенов: {totalTokens}
-              </span>
-              <span className="flex items-center gap-1">
-                <Icon name="MessageSquare" size={12} />
-                Сообщений: {messages.length}
-              </span>
-            </div>
-          </div>
-        )}
+        <AIChatStats
+          totalTokens={totalTokens}
+          messageCount={messages.length}
+        />
 
-        {/* Quick Prompts */}
-        {showQuickPrompts && messages.length === 0 && (
-          <div className="p-4 border-b dark:border-gray-700 bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-gray-900 dark:to-gray-800">
-            <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Быстрые команды:</p>
-            <div className="grid grid-cols-2 gap-2">
-              {QUICK_PROMPTS.map((prompt, idx) => (
-                <Button
-                  key={idx}
-                  variant="outline"
-                  size="sm"
-                  onClick={() => handleQuickPrompt(prompt.text)}
-                  className="justify-start text-xs hover:bg-white dark:hover:bg-gray-700"
-                >
-                  <span className="mr-1">{prompt.emoji}</span>
-                  {prompt.text}
-                </Button>
-              ))}
-            </div>
-          </div>
-        )}
+        <AIChatMessages
+          messages={messages}
+          isLoading={isLoading}
+          messagesEndRef={messagesEndRef}
+          onCopyMessage={copyMessage}
+          showQuickPrompts={showQuickPrompts}
+          onQuickPrompt={handleQuickPrompt}
+        />
 
-        {/* Messages */}
-        <div className="flex-1 overflow-y-auto p-4 space-y-4">
-          {messages.length === 0 && (
-            <div className="text-center text-gray-500 dark:text-gray-400 mt-4">
-              <Icon name="Bot" size={48} className="mx-auto mb-4 opacity-50" />
-              <p className="font-medium mb-2 text-lg">Привет! Я Богдан ИИ 👋</p>
-              <p className="text-sm mb-4">Ваш умный помощник с искусственным интеллектом</p>
-              <div className="bg-indigo-50 dark:bg-indigo-900/20 rounded-lg p-4 text-left text-xs space-y-2 max-w-xs mx-auto">
-                <p className="font-medium text-indigo-900 dark:text-indigo-100">Я могу помочь вам:</p>
-                <ul className="space-y-1 text-gray-700 dark:text-gray-300">
-                  <li>💬 Отвечать на вопросы</li>
-                  <li>📝 Создавать тексты</li>
-                  <li>📄 Анализировать документы</li>
-                  <li>🌍 Переводить тексты</li>
-                  <li>💡 Генерировать идеи</li>
-                </ul>
-                <p className="text-indigo-700 dark:text-indigo-300 font-medium pt-2 border-t border-indigo-200 dark:border-indigo-800">
-                  📎 Прикрепите файл кнопкой внизу!
-                </p>
-              </div>
-            </div>
-          )}
-          
-          {messages.map((msg, idx) => (
-            <div
-              key={idx}
-              className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'} group`}
-            >
-              <div
-                className={`max-w-[85%] rounded-lg p-3 relative ${
-                  msg.role === 'user'
-                    ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white'
-                    : 'bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white'
-                }`}
-              >
-                <div className="flex items-start gap-2">
-                  <Icon 
-                    name={msg.role === 'user' ? 'User' : 'Bot'} 
-                    size={16} 
-                    className="mt-1 flex-shrink-0"
-                  />
-                  <div className="flex-1">
-                    {msg.files && msg.files.length > 0 && (
-                      <div className="mb-2 flex flex-wrap gap-1">
-                        {msg.files.map((file, fileIdx) => (
-                          <div key={fileIdx} className="bg-white/20 text-xs px-2 py-0.5 rounded flex items-center gap-1">
-                            <Icon name="FileText" size={10} />
-                            <span>{file.name}</span>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                    <p className="text-sm whitespace-pre-wrap break-words">{msg.content}</p>
-                    {msg.timestamp && (
-                      <p className="text-xs opacity-60 mt-1">
-                        {new Date(msg.timestamp).toLocaleTimeString('ru-RU', { 
-                          hour: '2-digit', 
-                          minute: '2-digit' 
-                        })}
-                      </p>
-                    )}
-                  </div>
-                </div>
-                
-                {msg.role === 'assistant' && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => copyMessage(msg.content)}
-                    className="absolute -right-10 top-2 opacity-0 group-hover:opacity-100 transition-opacity"
-                    title="Копировать"
-                  >
-                    <Icon name="Copy" size={14} />
-                  </Button>
-                )}
-              </div>
-            </div>
-          ))}
-          
-          {isLoading && (
-            <div className="flex justify-start">
-              <div className="bg-gray-100 dark:bg-gray-700 rounded-lg p-3 flex items-center gap-2">
-                <Icon name="Loader2" className="animate-spin text-indigo-600" size={20} />
-                <span className="text-sm text-gray-600 dark:text-gray-400">AI печатает...</span>
-              </div>
-            </div>
-          )}
-          
-          <div ref={messagesEndRef} />
-        </div>
-
-        {/* Input */}
-        <div className="p-4 border-t dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
-          {uploadedFiles.length > 0 && (
-            <div className="mb-2 flex flex-wrap gap-2">
-              {uploadedFiles.map((file, idx) => (
-                <div key={idx} className="bg-indigo-100 dark:bg-indigo-900/30 text-indigo-900 dark:text-indigo-100 text-xs px-2 py-1 rounded-full flex items-center gap-1">
-                  <Icon name="FileText" size={12} />
-                  <span className="max-w-[120px] truncate">{file.name}</span>
-                  <button
-                    onClick={() => removeFile(idx)}
-                    className="hover:bg-indigo-200 dark:hover:bg-indigo-800 rounded-full p-0.5"
-                  >
-                    <Icon name="X" size={12} />
-                  </button>
-                </div>
-              ))}
-            </div>
-          )}
-          <div className="flex gap-2">
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept=".txt,.pdf,.doc,.docx,.md"
-              multiple
-              onChange={handleFileUpload}
-              className="hidden"
-            />
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => fileInputRef.current?.click()}
-              disabled={isLoading}
-              className="dark:bg-gray-800 dark:border-gray-600"
-              title="Загрузить документ"
-            >
-              <Icon name="Paperclip" size={18} />
-            </Button>
-            <Input
-              placeholder="Напишите сообщение..."
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyPress={handleKeyPress}
-              disabled={isLoading}
-              className="dark:bg-gray-800 dark:text-white border-gray-300 dark:border-gray-600"
-            />
-            <Button 
-              onClick={() => sendMessage()}
-              disabled={isLoading || (!input.trim() && uploadedFiles.length === 0)}
-              className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700"
-            >
-              {isLoading ? (
-                <Icon name="Loader2" className="animate-spin" size={18} />
-              ) : (
-                <Icon name="Send" size={18} />
-              )}
-            </Button>
-          </div>
-        </div>
+        <AIChatInput
+          input={input}
+          isLoading={isLoading}
+          uploadedFiles={uploadedFiles}
+          fileInputRef={fileInputRef}
+          onInputChange={setInput}
+          onKeyPress={handleKeyPress}
+          onSend={() => sendMessage()}
+          onFileUpload={handleFileUpload}
+          onRemoveFile={removeFile}
+        />
       </Card>
     );
   }
