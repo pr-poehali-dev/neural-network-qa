@@ -4,6 +4,7 @@ import Icon from '@/components/ui/icon';
 import Footer from '@/components/Footer';
 import ContactButtons from '@/components/ContactButtons';
 import AIChatButton from '@/components/AIChatButton';
+import Navigation from '@/components/Navigation';
 
 export default function Index() {
   const [contactInfo, setContactInfo] = useState<{whatsapp?: string; telegram?: string}>({});
@@ -78,21 +79,12 @@ export default function Index() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 relative overflow-hidden">
+      <Navigation onSettingsClick={() => setShowAdminPrompt(true)} />
+      
       <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAxMCAwIEwgMCAwIDAgMTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzgxODNmNCIgc3Ryb2tlLW9wYWNpdHk9IjAuMSIgc3Ryb2tlLXdpZHRoPSIxIi8+PC9wYXR0ZXJuPjwvZGVmcz48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJ1cmwoI2dyaWQpIi8+PC9zdmc+')] opacity-30"></div>
       <div className="absolute top-20 left-10 w-72 h-72 bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"></div>
       <div className="absolute top-40 right-10 w-72 h-72 bg-indigo-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000"></div>
       <div className="absolute -bottom-8 left-20 w-72 h-72 bg-pink-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000"></div>
-      
-      <div className="fixed top-4 right-4 z-50">
-        <Button 
-          onClick={() => setShowAdminPrompt(true)} 
-          size="sm" 
-          variant="ghost" 
-          className="bg-white/10 hover:bg-white/20 text-white backdrop-blur-md border border-white/20 transition-all duration-300 hover:scale-110"
-        >
-          <Icon name="Settings" size={16} />
-        </Button>
-      </div>
 
       {showAdminPrompt && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
@@ -216,7 +208,7 @@ export default function Index() {
         </div>
       )}
       
-      <div className="relative z-10">
+      <div className="relative z-10 pt-16">
         <main className="container mx-auto px-4 py-8 max-w-7xl">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
             <div className="space-y-6">

@@ -327,6 +327,7 @@ export default function AIChatButton({
           onClose={embedded ? undefined : () => setShowChat(false)}
           onToggleFullscreen={() => setIsFullscreen(!isFullscreen)}
           isFullscreen={isFullscreen}
+          onQuickPrompt={handleQuickPrompt}
         />
 
         <AIChatStats
