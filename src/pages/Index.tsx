@@ -49,7 +49,7 @@ export default function Index() {
     const settings = {
       enableAiChat: true,
       openrouterApiKey: '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',
-      aiModel: 'deepseek/deepseek-r1'
+      aiModel: 'deepseek/deepseek-r1:free'
     };
     localStorage.setItem('site_settings', JSON.stringify(settings));
     console.log('💾 Сохранил настройки:', settings);
