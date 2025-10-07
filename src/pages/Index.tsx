@@ -132,34 +132,53 @@ export default function Index() {
                   { emoji: '📱', title: 'Соцсети', desc: '10 постов за раз', gradient: 'from-pink-500 to-rose-500' },
                   { emoji: '🛍️', title: 'Описание товара', desc: 'Для интернет-магазина', gradient: 'from-emerald-500 to-teal-500' },
                   { emoji: '❓', title: 'FAQ', desc: '15 вопросов-ответов', gradient: 'from-blue-400 to-cyan-400' },
+                  { emoji: '📰', title: 'Пресс-релиз', desc: 'Для СМИ и медиа', gradient: 'from-slate-600 to-gray-600' },
+                  { emoji: '📢', title: 'Объявление', desc: 'Для площадки или группы', gradient: 'from-sky-500 to-blue-500' },
+                  { emoji: '💌', title: 'Письмо клиенту', desc: 'Поддержка и забота', gradient: 'from-rose-500 to-pink-500' },
+                  { emoji: '📄', title: 'Договор', desc: 'Шаблон соглашения', gradient: 'from-gray-600 to-slate-600' },
                   { emoji: '💼', title: 'Бизнес-план', desc: 'Полный план проекта', gradient: 'from-gray-700 to-gray-900' },
                   { emoji: '📊', title: 'SWOT-анализ', desc: 'Анализ бизнеса', gradient: 'from-orange-500 to-red-500' },
                   { emoji: '🎯', title: 'Презентация', desc: 'Структура слайдов', gradient: 'from-teal-500 to-cyan-500' },
                   { emoji: '📈', title: 'Маркетинг-план', desc: 'Стратегия продвижения', gradient: 'from-green-600 to-emerald-600' },
                   { emoji: '👥', title: 'Анализ конкурентов', desc: 'Кто главные игроки', gradient: 'from-red-600 to-orange-600' },
                   { emoji: '📞', title: 'Скрипт продаж', desc: 'Диалог с клиентом', gradient: 'from-purple-600 to-pink-600' },
+                  { emoji: '💰', title: 'Финмодель', desc: 'Финансовый прогноз', gradient: 'from-emerald-600 to-teal-600' },
+                  { emoji: '🎁', title: 'Акция', desc: 'Промо-предложение', gradient: 'from-fuchsia-500 to-pink-500' },
+                  { emoji: '📣', title: 'Рекламный текст', desc: 'Продающий креатив', gradient: 'from-orange-600 to-red-600' },
                   { emoji: '🐍', title: 'Python код', desc: 'Готовые скрипты', gradient: 'from-blue-600 to-indigo-600' },
+                  { emoji: '⚛️', title: 'React компонент', desc: 'UI элемент', gradient: 'from-cyan-600 to-blue-600' },
                   { emoji: '🗄️', title: 'SQL запросы', desc: 'База данных', gradient: 'from-teal-600 to-cyan-600' },
                   { emoji: '🔍', title: 'RegEx', desc: 'Регулярные выражения', gradient: 'from-green-600 to-emerald-600' },
                   { emoji: '🌐', title: 'HTML+CSS', desc: 'Готовая веб-страница', gradient: 'from-orange-600 to-red-600' },
                   { emoji: '🔌', title: 'API интеграция', desc: 'Работа с API', gradient: 'from-cyan-600 to-blue-600' },
                   { emoji: '✅', title: 'Unit-тесты', desc: 'Тестирование кода', gradient: 'from-lime-600 to-green-600' },
+                  { emoji: '🐛', title: 'Отладка кода', desc: 'Найти и исправить баг', gradient: 'from-red-600 to-rose-600' },
+                  { emoji: '⚡', title: 'Оптимизация', desc: 'Ускорить код', gradient: 'from-yellow-600 to-orange-600' },
+                  { emoji: '📦', title: 'Docker файл', desc: 'Контейнеризация', gradient: 'from-blue-700 to-indigo-700' },
                   { emoji: '📖', title: 'Истории', desc: 'Рассказы и сценарии', gradient: 'from-yellow-500 to-orange-500' },
                   { emoji: '💡', title: 'Нейминг', desc: '20 названий', gradient: 'from-pink-500 to-purple-500' },
                   { emoji: '🎨', title: 'Слоганы', desc: 'УТП и слоганы', gradient: 'from-cyan-500 to-blue-500' },
                   { emoji: '🎬', title: 'Сценарий видео', desc: 'YouTube, TikTok', gradient: 'from-red-500 to-rose-500' },
                   { emoji: '❔', title: 'Создать квиз', desc: '10 вопросов', gradient: 'from-violet-500 to-fuchsia-500' },
                   { emoji: '✍️', title: 'Стихи', desc: 'Красивые стихотворения', gradient: 'from-sky-500 to-blue-500' },
+                  { emoji: '🎵', title: 'Текст песни', desc: 'Рифмованные куплеты', gradient: 'from-purple-600 to-pink-600' },
+                  { emoji: '🎭', title: 'Шутки', desc: '10 весёлых шуток', gradient: 'from-amber-500 to-yellow-500' },
+                  { emoji: '🎪', title: 'Игра', desc: 'Текстовый квест', gradient: 'from-rose-500 to-red-500' },
                   { emoji: '📄', title: 'Краткое резюме', desc: 'Суть текста', gradient: 'from-violet-500 to-purple-500' },
                   { emoji: '⚖️', title: 'Плюсы и минусы', desc: 'Объективная оценка', gradient: 'from-amber-500 to-orange-500' },
                   { emoji: '🛡️', title: 'Проверка фактов', desc: 'Анализ информации', gradient: 'from-red-500 to-pink-500' },
                   { emoji: '✨', title: 'Улучшить текст', desc: 'Исправления и стиль', gradient: 'from-indigo-500 to-blue-500' },
                   { emoji: '🔄', title: 'Сравнить', desc: 'Выбор лучшего', gradient: 'from-fuchsia-500 to-pink-500' },
                   { emoji: '🗺️', title: 'Дорожная карта', desc: 'План на 12 месяцев', gradient: 'from-amber-500 to-orange-500' },
+                  { emoji: '🔮', title: 'Прогноз', desc: 'Что будет через год', gradient: 'from-violet-600 to-purple-600' },
+                  { emoji: '🎲', title: 'Идеи', desc: '20 креативных идей', gradient: 'from-pink-600 to-rose-600' },
+                  { emoji: '🧩', title: 'Решение проблемы', desc: 'Пошаговый план', gradient: 'from-green-600 to-emerald-600' },
                   { emoji: '👶', title: 'Объясни просто', desc: 'Как для ребёнка', gradient: 'from-green-400 to-emerald-400' },
                   { emoji: '🎓', title: 'План обучения', desc: 'Как изучить с нуля', gradient: 'from-blue-500 to-indigo-500' },
                   { emoji: '📋', title: 'Шпаргалка', desc: 'Краткая справка', gradient: 'from-purple-500 to-pink-500' },
                   { emoji: '📝', title: 'Практика', desc: '10 заданий', gradient: 'from-orange-500 to-red-500' },
+                  { emoji: '🎯', title: 'Цели SMART', desc: 'Постановка целей', gradient: 'from-teal-600 to-cyan-600' },
+                  { emoji: '📚', title: 'Конспект', desc: 'Краткий пересказ', gradient: 'from-indigo-600 to-blue-600' },
                   { emoji: '🖼️', title: 'Анализ фото', desc: 'Описание изображений', gradient: 'from-green-500 to-emerald-500' },
                   { emoji: '🎤', title: 'Голос', desc: 'Речь → текст', gradient: 'from-violet-500 to-purple-500' },
                   { emoji: '🌍', title: 'Переводы', desc: '100+ языков', gradient: 'from-red-500 to-orange-500' }
@@ -181,7 +200,7 @@ export default function Index() {
                 </div>
                 <p className="text-gray-300 mb-4">Просто начните диалог или выберите готовую функцию из меню «Спец. функции»</p>
                 <div className="flex flex-wrap gap-2">
-                  <span className="px-3 py-1 bg-white/10 rounded-full text-xs text-white">Gemini 2.0 Flash</span>
+                  <span className="px-3 py-1 bg-white/10 rounded-full text-xs text-white">50+ функций</span>
                   <span className="px-3 py-1 bg-white/10 rounded-full text-xs text-white">Бесплатно</span>
                   <span className="px-3 py-1 bg-white/10 rounded-full text-xs text-white">Без регистрации</span>
                   <span className="px-3 py-1 bg-white/10 rounded-full text-xs text-white">Быстрые ответы</span>
@@ -205,7 +224,7 @@ export default function Index() {
                   Богдан ИИ
                 </h1>
                 <p className="text-xl text-gray-200 mb-4 font-medium">Ваш персональный ИИ-помощник нового поколения</p>
-                <p className="text-sm text-gray-400 mb-8">Анализ изображений • Голосовой ввод • Работа с документами • Gemini 2.0 Flash</p>
+                <p className="text-sm text-gray-400 mb-8">Анализ изображений • Голосовой ввод • Работа с документами • 50+ функций</p>
 
                 <Button 
                   onClick={() => setShowFeaturesModal(true)} 
