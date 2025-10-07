@@ -92,6 +92,40 @@ export function useAIChatHandlers({
     toast({ title: t.errors.fileRemoved });
   };
 
+  const sendMessageViaGemini = async (userMessage: Message): Promise<Message> => {
+    const savedSettings = localStorage.getItem('site_settings');
+    const geminiApiKey = savedSettings ? JSON.parse(savedSettings).geminiApiKey : null;
+
+    if (!geminiApiKey) {
+      throw new Error('GEMINI_NOT_CONFIGURED');
+    }
+
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${geminiApiKey}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        contents: [...messages, userMessage].map(m => ({
+          role: m.role === 'user' ? 'user' : 'model',
+          parts: [{ text: m.content }]
+        }))
+      })
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error?.message || 'Gemini API error');
+    }
+
+    const data = await response.json();
+    return {
+      role: 'assistant',
+      content: data.candidates[0].content.parts[0].text,
+      timestamp: Date.now()
+    };
+  };
+
   const sendMessage = async (customMessage?: string) => {
     const messageToSend = customMessage || input;
     if (!messageToSend.trim() && uploadedFiles.length === 0) return;
@@ -194,7 +228,7 @@ export function useAIChatHandlers({
         }
         
         if (response.status === 429) {
-          throw new Error('Превышен лимит запросов. Попробуйте через 1 минуту или выберите другую модель.');
+          throw new Error('RATE_LIMIT_429');
         }
         
         throw new Error(errorMsg);
@@ -220,6 +254,68 @@ export function useAIChatHandlers({
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : t.errors.failedToGetResponse;
       
+      if (errorMessage === 'RATE_LIMIT_429') {
+        try {
+          toast({
+            title: `🔄 Переключение на Gemini...`,
+            description: `OpenRouter перегружен, пробую Google Gemini API`,
+          });
+
+          const userMessage: Message = { 
+            role: 'user', 
+            content: messageToSend,
+            timestamp: Date.now()
+          };
+
+          const geminiResponse = await sendMessageViaGemini(userMessage);
+          setMessages(prev => [...prev, geminiResponse]);
+          
+          toast({
+            title: `✅ Ответ получен через Gemini`,
+            description: `OpenRouter недоступен, использовался резервный API`,
+          });
+          
+          setIsLoading(false);
+          return;
+        } catch (geminiError) {
+          const geminiErrorMsg = geminiError instanceof Error ? geminiError.message : 'Unknown error';
+          
+          if (geminiErrorMsg === 'GEMINI_NOT_CONFIGURED') {
+            toast({
+              title: `❌ Gemini API не настроен`,
+              description: `Добавьте Gemini API ключ в настройках для автопереключения`,
+              variant: 'destructive',
+              duration: 10000
+            });
+            
+            const errorMsg: Message = {
+              role: 'assistant',
+              content: `❌ **Превышен лимит запросов OpenRouter (429)**\n\n🔄 **Попытка переключения на Gemini провалилась**\n\nGemini API ключ не настроен.\n\n---\n\n📝 **Решения:**\n\n**Вариант 1: Добавить Gemini API ключ (рекомендуется)**\n1. Откройте [Google AI Studio](https://aistudio.google.com/apikey)\n2. Создайте API ключ\n3. Вставьте в **⚙️ Настройки** → **Google Gemini API Key**\n4. При ошибке 429 чат автоматически переключится на Gemini\n\n**Вариант 2: Подождать**\n- Подождите 1-2 минуты\n- Попробуйте снова\n\n**Вариант 3: Пополнить баланс**\n- Пополните $5 на [openrouter.ai](https://openrouter.ai)\n- Платные запросы без лимитов`,
+              timestamp: Date.now()
+            };
+            setMessages(prev => [...prev, errorMsg]);
+            setIsLoading(false);
+            return;
+          }
+          
+          toast({
+            title: `❌ Ошибка Gemini API`,
+            description: geminiErrorMsg,
+            variant: 'destructive',
+            duration: 8000
+          });
+          
+          const errorMsg: Message = {
+            role: 'assistant',
+            content: `❌ **OpenRouter перегружен (429)**\n❌ **Gemini тоже не сработал**\n\n**Ошибка Gemini:** ${geminiErrorMsg}\n\n---\n\n📝 **Решение:**\n1. Проверьте Gemini API ключ в настройках\n2. Или подождите 1-2 минуты\n3. Или пополните баланс на openrouter.ai`,
+            timestamp: Date.now()
+          };
+          setMessages(prev => [...prev, errorMsg]);
+          setIsLoading(false);
+          return;
+        }
+      }
+      
       let helpText = '';
       if (errorMessage.includes('401') || errorMessage.includes('Invalid')) {
         helpText = '\n\n**Решение:** Проверьте API ключ в админ-панели (⚙️ → Настройки сайта)';
@@ -227,8 +323,6 @@ export function useAIChatHandlers({
         helpText = '\n\n**Решение:** Пополните баланс на openrouter.ai или выберите бесплатную модель';
       } else if (errorMessage.includes('404') || errorMessage.includes('model')) {
         helpText = '\n\n**Решение:** Измените модель в админ-панели (⚙️ → Настройки сайта → Модель AI)';
-      } else if (errorMessage.includes('429') || errorMessage.includes('rate limit')) {
-        helpText = '\n\n**Решение:** Превышен лимит запросов. Подождите 1 минуту или выберите другую модель';
       } else {
         helpText = '\n\n**Решение:** Проверьте интернет-соединение и API ключ';
       }
