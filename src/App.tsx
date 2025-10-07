@@ -9,6 +9,11 @@ import { LanguageProvider } from "@/hooks/useTranslation";
 import Index from "./pages/Index";
 import Admin from "./pages/Admin";
 import AITest from "./pages/AITest";
+import Docs from "./pages/Docs";
+import Privacy from "./pages/Privacy";
+import Terms from "./pages/Terms";
+import License from "./pages/License";
+import Support from "./pages/Support";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -25,6 +30,11 @@ const App = () => (
               <Route path="/" element={<Index />} />
               <Route path="/admin" element={<Admin />} />
               <Route path="/ai-test" element={<AITest />} />
+              <Route path="/docs" element={<Docs />} />
+              <Route path="/privacy" element={<Privacy />} />
+              <Route path="/terms" element={<Terms />} />
+              <Route path="/license" element={<License />} />
+              <Route path="/support" element={<Support />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>

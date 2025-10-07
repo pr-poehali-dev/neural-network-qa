@@ -3,14 +3,17 @@ import { Button } from '@/components/ui/button';
 import Icon from '@/components/ui/icon';
 import AIChatButton from '@/components/AIChatButton';
 import Navigation from '@/components/Navigation';
+import Footer from '@/components/Footer';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useToast } from '@/hooks/use-toast';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 
 export default function Index() {
   const { t } = useTranslation();
   const { toast } = useToast();
   const [aiChatSettings, setAiChatSettings] = useState<{enabled: boolean; apiKey?: string; model?: string}>({ enabled: false });
   const [showAdminPrompt, setShowAdminPrompt] = useState(false);
+  const [showPreviewModal, setShowPreviewModal] = useState(false);
   const [adminPassword, setAdminPassword] = useState('');
   const [isAdmin, setIsAdmin] = useState(false);
 
@@ -174,15 +177,22 @@ export default function Index() {
             </div>
 
             <div className="lg:block">
-              <div className="bg-gradient-to-br from-white/5 to-white/10 backdrop-blur-md rounded-2xl border border-white/20 p-4 shadow-2xl">
-                <div className="aspect-video bg-gradient-to-br from-slate-800 to-slate-900 rounded-lg flex items-center justify-center">
-                  <Icon name="MessageSquare" size={80} className="text-purple-400 opacity-50" />
+              <div 
+                className="bg-gradient-to-br from-white/5 to-white/10 backdrop-blur-md rounded-2xl border border-white/20 p-4 shadow-2xl cursor-pointer hover:scale-105 transition-transform"
+                onClick={() => setShowPreviewModal(true)}
+              >
+                <div className="aspect-video bg-gradient-to-br from-slate-800 to-slate-900 rounded-lg flex items-center justify-center relative overflow-hidden">
+                  <div className="absolute inset-0 bg-gradient-to-br from-blue-500/20 to-purple-500/20"></div>
+                  <div className="relative z-10 text-center">
+                    <Icon name="MessageSquare" size={80} className="text-purple-400 opacity-70 mb-4" />
+                    <p className="text-white/60 text-sm">Нажмите для просмотра</p>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
 
-          <div className="mb-16">
+          <div id="features" className="mb-16">
             <h2 className="text-3xl font-bold text-center text-white mb-4">{t.features.title}</h2>
             <p className="text-gray-400 text-center mb-8">{t.features.subtitle}</p>
             
@@ -211,6 +221,26 @@ export default function Index() {
           isAdmin={isAdmin}
         />
       )}
+
+      <Dialog open={showPreviewModal} onOpenChange={setShowPreviewModal}>
+        <DialogContent className="max-w-4xl">
+          <DialogHeader>
+            <DialogTitle>Демонстрация работы ИИ-чата</DialogTitle>
+            <DialogDescription>
+              Интерактивный помощник с поддержкой голоса, файлов и 70+ команд
+            </DialogDescription>
+          </DialogHeader>
+          <div className="aspect-video bg-gradient-to-br from-slate-800 to-slate-900 rounded-lg flex items-center justify-center">
+            <div className="text-center space-y-4">
+              <Icon name="Bot" size={64} className="text-purple-400 mx-auto" />
+              <p className="text-white">Чат будет доступен после настройки API-ключа</p>
+              <p className="text-gray-400 text-sm">Откройте настройки для подключения</p>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <Footer />
     </div>
   );
 }

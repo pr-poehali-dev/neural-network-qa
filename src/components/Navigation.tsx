@@ -3,7 +3,9 @@ import { Button } from '@/components/ui/button';
 import Icon from '@/components/ui/icon';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
 import ThemeToggle from '@/components/ThemeToggle';
+import Logo from '@/components/Logo';
 import { useTranslation } from '@/hooks/useTranslation';
+import { Link, useNavigate } from 'react-router-dom';
 
 interface NavigationProps {
   onSettingsClick: () => void;
@@ -11,11 +13,19 @@ interface NavigationProps {
 
 export default function Navigation({ onSettingsClick }: NavigationProps) {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  const scrollToFeatures = () => {
+    const featuresSection = document.getElementById('features');
+    if (featuresSection) {
+      featuresSection.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
 
   const menuItems = [
     { icon: 'Home', label: t.nav.home, href: '/' },
-    { icon: 'Sparkles', label: t.nav.features, action: 'features' },
+    { icon: 'Sparkles', label: t.nav.features, action: scrollToFeatures },
     { icon: 'BookOpen', label: t.nav.docs, href: '/docs' },
     { icon: 'MessageSquare', label: t.nav.support, href: '/support' },
   ];
@@ -25,30 +35,42 @@ export default function Navigation({ onSettingsClick }: NavigationProps) {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
-              <Icon name="Sparkles" size={20} className="text-white" />
-            </div>
+          <Link to="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
+            <Logo size={40} />
             <div className="hidden md:block">
               <h1 className="text-xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
                 Богдан ИИ
               </h1>
               <p className="text-xs text-gray-400">AI Assistant</p>
             </div>
-          </div>
+          </Link>
 
           {/* Desktop Menu */}
           <div className="hidden md:flex items-center gap-1">
             {menuItems.map((item, idx) => (
-              <Button
-                key={idx}
-                variant="ghost"
-                size="sm"
-                className="text-gray-300 hover:text-white hover:bg-white/10 gap-2"
-              >
-                <Icon name={item.icon as any} size={16} />
-                {item.label}
-              </Button>
+              item.href ? (
+                <Link key={idx} to={item.href}>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="text-gray-300 hover:text-white hover:bg-white/10 gap-2"
+                  >
+                    <Icon name={item.icon as any} size={16} />
+                    {item.label}
+                  </Button>
+                </Link>
+              ) : (
+                <Button
+                  key={idx}
+                  variant="ghost"
+                  size="sm"
+                  onClick={item.action as any}
+                  className="text-gray-300 hover:text-white hover:bg-white/10 gap-2"
+                >
+                  <Icon name={item.icon as any} size={16} />
+                  {item.label}
+                </Button>
+              )
             ))}
           </div>
 
@@ -82,15 +104,30 @@ export default function Navigation({ onSettingsClick }: NavigationProps) {
           <div className="md:hidden py-4 border-t border-white/10 animate-in slide-in-from-top duration-300">
             <div className="flex flex-col gap-2">
               {menuItems.map((item, idx) => (
-                <Button
-                  key={idx}
-                  variant="ghost"
-                  className="justify-start text-gray-300 hover:text-white hover:bg-white/10 gap-3"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  <Icon name={item.icon as any} size={18} />
-                  {item.label}
-                </Button>
+                item.href ? (
+                  <Link key={idx} to={item.href} onClick={() => setMobileMenuOpen(false)}>
+                    <Button
+                      variant="ghost"
+                      className="w-full justify-start text-gray-300 hover:text-white hover:bg-white/10 gap-3"
+                    >
+                      <Icon name={item.icon as any} size={18} />
+                      {item.label}
+                    </Button>
+                  </Link>
+                ) : (
+                  <Button
+                    key={idx}
+                    variant="ghost"
+                    className="justify-start text-gray-300 hover:text-white hover:bg-white/10 gap-3"
+                    onClick={() => {
+                      (item.action as any)();
+                      setMobileMenuOpen(false);
+                    }}
+                  >
+                    <Icon name={item.icon as any} size={18} />
+                    {item.label}
+                  </Button>
+                )
               ))}
             </div>
           </div>

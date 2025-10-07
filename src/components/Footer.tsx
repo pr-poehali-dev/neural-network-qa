@@ -1,28 +1,134 @@
 import Icon from '@/components/ui/icon';
 import { Link } from 'react-router-dom';
+import Logo from '@/components/Logo';
 
 export default function Footer() {
+  const currentYear = new Date().getFullYear();
+
+  const footerSections = [
+    {
+      title: 'Продукт',
+      links: [
+        { label: 'Возможности', href: '/#features' },
+        { label: 'Тарифы', href: '/#pricing' },
+        { label: 'Обновления', href: '/#updates' },
+        { label: 'Дорожная карта', href: '/#roadmap' }
+      ]
+    },
+    {
+      title: 'Документы',
+      links: [
+        { label: 'Политика конфиденциальности', href: '/privacy' },
+        { label: 'Условия использования', href: '/terms' },
+        { label: 'Лицензионное соглашение', href: '/license' },
+        { label: 'Обработка данных', href: '/data-processing' }
+      ]
+    },
+    {
+      title: 'Поддержка',
+      links: [
+        { label: 'Центр помощи', href: '/help' },
+        { label: 'Документация', href: '/docs' },
+        { label: 'Связаться с нами', href: '/contact' },
+        { label: 'Статус сервиса', href: '/status' }
+      ]
+    },
+    {
+      title: 'Компания',
+      links: [
+        { label: 'О нас', href: '/about' },
+        { label: 'Блог', href: '/blog' },
+        { label: 'Карьера', href: '/careers' },
+        { label: 'Пресс-кит', href: '/press' }
+      ]
+    }
+  ];
+
+  const socialLinks = [
+    { icon: 'Github', href: '#', label: 'GitHub' },
+    { icon: 'Twitter', href: '#', label: 'Twitter' },
+    { icon: 'Linkedin', href: '#', label: 'LinkedIn' },
+    { icon: 'Mail', href: '#', label: 'Email' }
+  ];
+
   return (
-    <footer className="border-t border-purple-200 dark:border-purple-800 mt-20 py-12 bg-white/50 dark:bg-gray-900/50 backdrop-blur-sm">
-      <div className="container mx-auto px-6">
-        <div className="flex flex-col md:flex-row justify-between items-center gap-6">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-600 to-purple-600 flex items-center justify-center">
-              <Icon name="Brain" className="text-white" size={20} />
+    <footer className="relative bg-gradient-to-br from-slate-900 via-purple-950 to-slate-900 border-t border-white/10">
+      <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PGNpcmNsZSBjeD0iMSIgY3k9IjEiIHI9IjAuNSIgZmlsbD0iIzhhNWNmNiIgZmlsbC1vcGFjaXR5PSIwLjIiLz48L3BhdHRlcm4+PC9kZWZzPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjZ3JpZCkiLz48L3N2Zz4=')] opacity-20"></div>
+      
+      <div className="relative z-10 container mx-auto px-4 py-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-8 mb-12">
+          <div className="lg:col-span-2">
+            <div className="flex items-center gap-3 mb-4">
+              <Logo size={48} />
+              <div>
+                <h3 className="text-xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+                  Богдан ИИ
+                </h3>
+                <p className="text-xs text-gray-400">Умный помощник нового поколения</p>
+              </div>
             </div>
-            <div>
-              <p className="font-bold text-gray-900 dark:text-white">Богдан ИИ</p>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Виртуальный помощник на основе ваших данных</p>
+            <p className="text-gray-400 text-sm mb-6 max-w-sm">
+              Современная платформа на базе искусственного интеллекта для общения, перевода, 
+              обработки файлов и автоматизации задач.
+            </p>
+            
+            <div className="flex gap-3">
+              {socialLinks.map((social, idx) => (
+                <a
+                  key={idx}
+                  href={social.href}
+                  aria-label={social.label}
+                  className="w-10 h-10 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg flex items-center justify-center transition-all hover:scale-110 hover:border-purple-400"
+                >
+                  <Icon name={social.icon as any} size={18} className="text-gray-400 hover:text-white" />
+                </a>
+              ))}
             </div>
           </div>
-          <div className="flex gap-8">
-            <Link to="/" className="text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">Главная</Link>
-            <Link to="/about" className="text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">О сервисе</Link>
-            <Link to="/admin" className="text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">Админ</Link>
-          </div>
+
+          {footerSections.map((section, idx) => (
+            <div key={idx}>
+              <h4 className="font-semibold text-white mb-4">{section.title}</h4>
+              <ul className="space-y-2">
+                {section.links.map((link, linkIdx) => (
+                  <li key={linkIdx}>
+                    <Link
+                      to={link.href}
+                      className="text-sm text-gray-400 hover:text-white transition-colors inline-flex items-center gap-1 group"
+                    >
+                      <span className="group-hover:translate-x-1 transition-transform">{link.label}</span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
         </div>
-        <div className="text-center text-gray-500 dark:text-gray-500 text-sm mt-8 pt-8 border-t border-purple-100 dark:border-purple-900">
-          © 2024 Богдан ИИ. Все права защищены.
+
+        <div className="pt-8 border-t border-white/10">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+            <p className="text-sm text-gray-400">
+              © {currentYear} Богдан ИИ. Все права защищены.
+            </p>
+            
+            <div className="flex flex-wrap gap-4 text-sm text-gray-400">
+              <Link to="/privacy" className="hover:text-white transition-colors">
+                Конфиденциальность
+              </Link>
+              <span>•</span>
+              <Link to="/terms" className="hover:text-white transition-colors">
+                Условия
+              </Link>
+              <span>•</span>
+              <Link to="/cookies" className="hover:text-white transition-colors">
+                Cookies
+              </Link>
+              <span>•</span>
+              <Link to="/sitemap" className="hover:text-white transition-colors">
+                Карта сайта
+              </Link>
+            </div>
+          </div>
         </div>
       </div>
     </footer>
