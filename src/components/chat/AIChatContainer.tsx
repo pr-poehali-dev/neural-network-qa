@@ -38,6 +38,7 @@ interface AIChatContainerProps {
   onRemoveFile: (index: number) => void;
   onSpecialCommand: (prompt: string) => void;
   onToggleSpecialCommands: () => void;
+  onModelChange?: (model: string) => void;
 }
 
 export default function AIChatContainer({
@@ -68,7 +69,8 @@ export default function AIChatContainer({
   onFileUpload,
   onRemoveFile,
   onSpecialCommand,
-  onToggleSpecialCommands
+  onToggleSpecialCommands,
+  onModelChange
 }: AIChatContainerProps) {
   const { t } = useTranslation();
 
@@ -88,6 +90,7 @@ export default function AIChatContainer({
         onToggleFullscreen={onToggleFullscreen}
         isFullscreen={isFullscreen}
         onQuickPrompt={onQuickPrompt}
+        onModelChange={onModelChange}
       />
 
       <AIChatStats
@@ -169,6 +172,7 @@ export default function AIChatContainer({
           onFileUpload={onFileUpload}
           onRemoveFile={onRemoveFile}
           isAdmin={isAdmin}
+          currentModel={model}
         />
       </div>
     </Card>

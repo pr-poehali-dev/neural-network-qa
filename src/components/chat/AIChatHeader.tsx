@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/button';
 import Icon from '@/components/ui/icon';
 import { useState } from 'react';
+import { getModelCapabilities } from '@/utils/modelCapabilities';
 
 interface AIChatHeaderProps {
   model: string;
@@ -10,11 +11,22 @@ interface AIChatHeaderProps {
   onToggleFullscreen?: () => void;
   isFullscreen?: boolean;
   onQuickPrompt?: (text: string) => void;
+  onModelChange?: (model: string) => void;
 }
 
-export default function AIChatHeader({ model, onExport, onClear, onClose, onToggleFullscreen, isFullscreen, onQuickPrompt }: AIChatHeaderProps) {
+export default function AIChatHeader({ model, onExport, onClear, onClose, onToggleFullscreen, isFullscreen, onQuickPrompt, onModelChange }: AIChatHeaderProps) {
   const [showQuickMenu, setShowQuickMenu] = useState(false);
   const [showTranslator, setShowTranslator] = useState(false);
+  const [showModelSelector, setShowModelSelector] = useState(false);
+
+  const AI_MODELS = [
+    { id: 'google/gemini-2.0-flash-exp:free', name: 'Gemini 2.0', icon: '⭐', desc: 'Быстрая, видит фото', color: 'from-blue-500 to-cyan-500' },
+    { id: 'meta-llama/llama-3.3-70b-instruct:free', name: 'Llama 3.3 70B', icon: '🔥', desc: 'Мощная, только текст', color: 'from-orange-500 to-red-500' },
+    { id: 'meta-llama/llama-3.1-8b-instruct:free', name: 'Llama 3.1 8B', icon: '⚡', desc: 'Быстрая, легкая', color: 'from-green-500 to-emerald-500' },
+    { id: 'microsoft/phi-3-medium-128k-instruct:free', name: 'Phi-3 Medium', icon: '💼', desc: 'Большой контекст', color: 'from-purple-500 to-pink-500' },
+  ];
+
+  const currentModel = AI_MODELS.find(m => m.id === model) || AI_MODELS[0];
 
   const QUICK_PROMPTS = [
     { emoji: '💡', text: 'Объясни простыми словами', color: 'from-yellow-500 to-orange-500' },
@@ -41,11 +53,19 @@ export default function AIChatHeader({ model, onExport, onClear, onClose, onTogg
             <Icon name="Sparkles" size={20} className="text-white" />
           </div>
           <div>
-            <h3 className="font-bold text-white text-lg">Богдан отвечает</h3>
-            <div className="flex items-center gap-2">
+            <h3 className="font-bold text-white text-lg">AI Ассистент</h3>
+            <button 
+              onClick={() => {
+                setShowModelSelector(!showModelSelector);
+                setShowQuickMenu(false);
+                setShowTranslator(false);
+              }}
+              className="flex items-center gap-2 hover:bg-white/10 rounded px-2 py-0.5 transition-colors"
+            >
               <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-              <p className="text-xs text-white/90 font-medium">Онлайн</p>
-            </div>
+              <p className="text-xs text-white/90 font-medium">{currentModel.icon} {currentModel.name}</p>
+              <Icon name="ChevronDown" size={14} className="text-white/70" />
+            </button>
           </div>
         </div>
         <div className="flex gap-2">
@@ -184,6 +204,60 @@ export default function AIChatHeader({ model, onExport, onClear, onClose, onTogg
               </button>
             ))}
           </div>
+        </div>
+      )}
+
+      {showModelSelector && onModelChange && (
+        <div className="p-3 bg-gradient-to-br from-indigo-900 to-purple-900 border-b border-white/10">
+          <p className="text-xs text-yellow-400 mb-3 font-semibold flex items-center gap-2">
+            <Icon name="Cpu" size={14} />
+            Выберите AI модель
+          </p>
+          <div className="grid grid-cols-1 gap-2">
+            {AI_MODELS.map((aiModel) => {
+              const capabilities = getModelCapabilities(aiModel.id);
+              return (
+                <button
+                  key={aiModel.id}
+                  onClick={() => {
+                    if (onModelChange) {
+                      onModelChange(aiModel.id);
+                      setShowModelSelector(false);
+                    }
+                  }}
+                  className={`group relative overflow-hidden rounded-xl p-3 text-left transition-all duration-300 hover:scale-102 bg-gradient-to-br ${aiModel.color} hover:shadow-lg ${model === aiModel.id ? 'ring-2 ring-white/50' : ''}`}
+                >
+                  <div className="relative z-10">
+                    <div className="flex items-center justify-between mb-1">
+                      <div className="flex items-center gap-2">
+                        <span className="text-xl">{aiModel.icon}</span>
+                        <p className="text-sm font-bold text-white">{aiModel.name}</p>
+                      </div>
+                      {model === aiModel.id && (
+                        <Icon name="Check" size={20} className="text-white" />
+                      )}
+                    </div>
+                    <p className="text-xs text-white/80 mb-2">{aiModel.desc}</p>
+                    <div className="flex flex-wrap gap-1">
+                      {capabilities.features.images && (
+                        <span className="text-[10px] bg-white/20 text-white px-2 py-0.5 rounded">📷 Фото</span>
+                      )}
+                      {capabilities.features.files && (
+                        <span className="text-[10px] bg-white/20 text-white px-2 py-0.5 rounded">📎 Файлы</span>
+                      )}
+                      {capabilities.features.code && (
+                        <span className="text-[10px] bg-white/20 text-white px-2 py-0.5 rounded">💻 Код</span>
+                      )}
+                      <span className="text-[10px] bg-white/20 text-white px-2 py-0.5 rounded">
+                        {capabilities.limits.speed === 'fast' ? '⚡ Быстро' : capabilities.limits.speed === 'medium' ? '🚀 Средне' : '🐢 Медленно'}
+                      </span>
+                    </div>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+          <p className="text-[10px] text-white/60 mt-2 text-center">Все модели бесплатные</p>
         </div>
       )}
     </>

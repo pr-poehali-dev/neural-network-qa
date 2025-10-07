@@ -175,9 +175,35 @@ export function useAdminState() {
     }, 500);
   };
 
-  const handleDeleteFile = (idx: number) => {
-    setUploadedFiles(prev => prev.filter((_, i) => i !== idx));
-    toast({ title: "Файл удален" });
+  const handleDeleteFile = async (idx: number) => {
+    const file = uploadedFiles[idx];
+    
+    if (!file.id) {
+      setUploadedFiles(prev => prev.filter((_, i) => i !== idx));
+      toast({ title: "Файл удален" });
+      return;
+    }
+    
+    try {
+      const response = await fetch(FILE_UPLOAD_URL, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          fileId: file.id,
+          sessionId: getSessionId()
+        })
+      });
+      
+      if (response.ok) {
+        setUploadedFiles(prev => prev.filter((_, i) => i !== idx));
+        toast({ title: "Файл удален" });
+      } else {
+        toast({ title: 'Ошибка удаления файла', variant: 'destructive' });
+      }
+    } catch (error) {
+      console.error('Error deleting file:', error);
+      toast({ title: 'Ошибка удаления файла', variant: 'destructive' });
+    }
   };
 
   const handleUpdateDescription = async (idx: number, description: string) => {

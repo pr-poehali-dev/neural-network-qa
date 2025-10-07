@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import Icon from '@/components/ui/icon';
 import { useToast } from '@/hooks/use-toast';
@@ -25,11 +26,13 @@ export default function AIChatButton({
   const { toast } = useToast();
   const { t } = useTranslation();
 
+  const [currentModel, setCurrentModel] = useState(model);
+
   const state = useAIChatState({ embedded, apiKey });
   
   const handlers = useAIChatHandlers({
     apiKey,
-    model,
+    model: currentModel,
     messages: state.messages,
     setMessages: state.setMessages,
     input: state.input,
@@ -42,6 +45,14 @@ export default function AIChatButton({
     fileInputRef: state.fileInputRef,
     imageInputRef: state.imageInputRef
   });
+
+  const handleModelChange = (newModel: string) => {
+    setCurrentModel(newModel);
+    toast({
+      title: `AI модель изменена`,
+      description: `Теперь используется ${newModel.split('/')[1]?.split(':')[0] || newModel}`,
+    });
+  };
 
   useHotkeys([
     {
@@ -109,7 +120,7 @@ export default function AIChatButton({
         embedded={embedded}
         isFullscreen={state.isFullscreen}
         apiKey={apiKey}
-        model={model}
+        model={currentModel}
         messages={state.messages}
         isLoading={state.isLoading}
         showQuickPrompts={state.showQuickPrompts}
@@ -134,6 +145,7 @@ export default function AIChatButton({
         onRemoveFile={handlers.removeFile}
         onSpecialCommand={handleSpecialCommand}
         onToggleSpecialCommands={() => state.setShowSpecialCommands(!state.showSpecialCommands)}
+        onModelChange={handleModelChange}
       />
     );
   }

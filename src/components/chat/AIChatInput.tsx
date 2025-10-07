@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import Icon from '@/components/ui/icon';
 import { useToast } from '@/hooks/use-toast';
+import { supportsImages } from '@/utils/modelCapabilities';
 
 interface AIChatInputProps {
   input: string;
@@ -16,6 +17,7 @@ interface AIChatInputProps {
   onFileUpload: (e: React.ChangeEvent<HTMLInputElement>, type: 'text' | 'image') => void;
   onRemoveFile: (index: number) => void;
   isAdmin?: boolean;
+  currentModel?: string;
 }
 
 export default function AIChatInput({
@@ -29,10 +31,13 @@ export default function AIChatInput({
   onSend,
   onFileUpload,
   onRemoveFile,
-  isAdmin = false
+  isAdmin = false,
+  currentModel = 'google/gemini-2.0-flash-exp:free'
 }: AIChatInputProps) {
   const [isListening, setIsListening] = useState(false);
   const { toast } = useToast();
+  
+  const canUseImages = supportsImages(currentModel);
 
   const startVoiceInput = () => {
     if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
@@ -120,24 +125,28 @@ export default function AIChatInput({
           </>
         )}
         
-        <input
-          ref={imageInputRef}
-          type="file"
-          accept="image/*,.png,.jpg,.jpeg,.gif,.webp,.svg,.bmp,.ico"
-          multiple
-          onChange={(e) => onFileUpload(e, 'image')}
-          className="hidden"
-        />
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => imageInputRef.current?.click()}
-          disabled={isLoading}
-          className="dark:bg-gray-800 dark:border-gray-600"
-          title="Загрузить изображение"
-        >
-          <Icon name="Image" size={18} />
-        </Button>
+        {canUseImages && (
+          <>
+            <input
+              ref={imageInputRef}
+              type="file"
+              accept="image/*,.png,.jpg,.jpeg,.gif,.webp,.svg,.bmp,.ico"
+              multiple
+              onChange={(e) => onFileUpload(e, 'image')}
+              className="hidden"
+            />
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => imageInputRef.current?.click()}
+              disabled={isLoading}
+              className="dark:bg-gray-800 dark:border-gray-600"
+              title="Загрузить изображение"
+            >
+              <Icon name="Image" size={18} />
+            </Button>
+          </>
+        )}
 
         <Button
           variant="outline"

@@ -262,11 +262,6 @@ export function useAIChatHandlers({
       }
 
       setMessages(prev => [...prev, aiResponse]);
-      
-      toast({
-        title: `✓ ${t.errors.responseReceived}`,
-        description: `${t.errors.tokensUsed}: ${data.usage?.total_tokens || 0}`,
-      });
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : t.errors.failedToGetResponse;
       
