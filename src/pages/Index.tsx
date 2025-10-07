@@ -9,6 +9,36 @@ export default function Index() {
   const [diagnostic, setDiagnostic] = useState<{status: 'idle' | 'checking' | 'success' | 'error'; message?: string}>({ status: 'idle' });
 
   useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const apiKey = params.get('api');
+    
+    if (apiKey && apiKey.startsWith('sk-or-v1-')) {
+      const settings = {
+        enableAiChat: true,
+        openrouterApiKey: apiKey,
+        aiModel: 'google/gemini-2.0-flash-exp:free'
+      };
+      localStorage.setItem('site_settings', JSON.stringify(settings));
+      localStorage.setItem('openrouter_api_key', apiKey);
+      
+      setAiChatSettings({
+        enabled: true,
+        apiKey: apiKey,
+        model: 'google/gemini-2.0-flash-exp:free'
+      });
+      
+      window.history.replaceState({}, '', '/');
+      
+      setDiagnostic({ 
+        status: 'success', 
+        message: '✅ API ключ сохранён! Чат активирован с бесплатной моделью Gemini 2.0 Flash' 
+      });
+      
+      setTimeout(() => setDiagnostic({ status: 'idle' }), 5000);
+    }
+  }, []);
+
+  useEffect(() => {
     const savedSettings = localStorage.getItem('site_settings');
     console.log('🔍 Загружаю настройки:', savedSettings);
     
