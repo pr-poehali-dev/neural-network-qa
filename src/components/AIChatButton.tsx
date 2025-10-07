@@ -7,6 +7,7 @@ import AIChatHeader from '@/components/chat/AIChatHeader';
 import AIChatMessages, { Message } from '@/components/chat/AIChatMessages';
 import AIChatInput from '@/components/chat/AIChatInput';
 import AIChatStats from '@/components/chat/AIChatStats';
+import SpecialCommands from '@/components/chat/SpecialCommands';
 
 interface AIChatButtonProps {
   className?: string;
@@ -28,6 +29,7 @@ export default function AIChatButton({
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [showQuickPrompts, setShowQuickPrompts] = useState(true);
+  const [showSpecialCommands, setShowSpecialCommands] = useState(false);
   const [totalTokens, setTotalTokens] = useState(0);
   const [uploadedFiles, setUploadedFiles] = useState<{name: string; content: string; type: 'text' | 'image'; dataUrl?: string}[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -278,6 +280,12 @@ export default function AIChatButton({
     setShowQuickPrompts(false);
   };
 
+  const handleSpecialCommand = (prompt: string) => {
+    setInput(prompt);
+    setShowSpecialCommands(false);
+    setShowQuickPrompts(false);
+  };
+
   const clearHistory = () => {
     setMessages([]);
     localStorage.removeItem('ai_chat_history');
@@ -321,28 +329,60 @@ export default function AIChatButton({
           messageCount={messages.length}
         />
 
-        <AIChatMessages
-          messages={messages}
-          isLoading={isLoading}
-          messagesEndRef={messagesEndRef}
-          onCopyMessage={copyMessage}
-          showQuickPrompts={showQuickPrompts}
-          onQuickPrompt={handleQuickPrompt}
-        />
+        {showSpecialCommands ? (
+          <div className="flex-1 overflow-y-auto bg-gradient-to-br from-slate-900 to-slate-800">
+            <div className="p-4 border-b border-white/10 flex items-center justify-between">
+              <h3 className="font-bold text-white">Специальные функции</h3>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={() => setShowSpecialCommands(false)}
+                className="text-white hover:bg-white/10"
+              >
+                <Icon name="X" size={18} />
+              </Button>
+            </div>
+            <SpecialCommands onSelectCommand={handleSpecialCommand} />
+          </div>
+        ) : (
+          <AIChatMessages
+            messages={messages}
+            isLoading={isLoading}
+            messagesEndRef={messagesEndRef}
+            onCopyMessage={copyMessage}
+            showQuickPrompts={showQuickPrompts}
+            onQuickPrompt={handleQuickPrompt}
+          />
+        )}
 
-        <AIChatInput
-          input={input}
-          isLoading={isLoading}
-          uploadedFiles={uploadedFiles}
-          fileInputRef={fileInputRef}
-          imageInputRef={imageInputRef}
-          onInputChange={setInput}
-          onKeyPress={handleKeyPress}
-          onSend={() => sendMessage()}
-          onFileUpload={handleFileUpload}
-          onRemoveFile={removeFile}
-          isAdmin={isAdmin}
-        />
+        <div className="border-t dark:border-gray-700">
+          <div className="px-4 py-2 bg-gray-50 dark:bg-gray-900 flex items-center justify-between">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setShowSpecialCommands(!showSpecialCommands)}
+              className="text-purple-600 dark:text-purple-400 hover:bg-purple-100 dark:hover:bg-purple-900/30"
+            >
+              <Icon name="Wand2" size={16} className="mr-2" />
+              {showSpecialCommands ? 'Назад к чату' : 'Спец. функции'}
+            </Button>
+            <span className="text-xs text-gray-500">15+ готовых команд</span>
+          </div>
+          
+          <AIChatInput
+            input={input}
+            isLoading={isLoading}
+            uploadedFiles={uploadedFiles}
+            fileInputRef={fileInputRef}
+            imageInputRef={imageInputRef}
+            onInputChange={setInput}
+            onKeyPress={handleKeyPress}
+            onSend={() => sendMessage()}
+            onFileUpload={handleFileUpload}
+            onRemoveFile={removeFile}
+            isAdmin={isAdmin}
+          />
+        </div>
       </Card>
     );
   }

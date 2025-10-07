@@ -115,25 +115,56 @@ export default function Index() {
               </Button>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-              {[
-                { emoji: '💬', title: 'Общение', desc: 'Задавайте вопросы, получайте умные ответы на любые темы', gradient: 'from-blue-500 to-cyan-500' },
-                { emoji: '📝', title: 'Создание текстов', desc: 'Статьи, письма, посты для соцсетей, коммерческие предложения', gradient: 'from-purple-500 to-pink-500' },
-                { emoji: '📄', title: 'Анализ документов', desc: 'Загрузите файл — AI прочитает и ответит на вопросы', gradient: 'from-orange-500 to-red-500' },
-                { emoji: '🖼️', title: 'Анализ изображений', desc: 'Распознавание объектов, описание фото, извлечение текста', gradient: 'from-green-500 to-emerald-500' },
-                { emoji: '🎤', title: 'Голосовой ввод', desc: 'Говорите — AI распознает речь и ответит текстом', gradient: 'from-indigo-500 to-purple-500' },
-                { emoji: '🌍', title: 'Переводы', desc: 'Автоопределение языка, перевод на 100+ языков', gradient: 'from-teal-500 to-cyan-500' },
-                { emoji: '📊', title: 'Резюме и анализ', desc: 'Краткое изложение длинных текстов, выводы, рекомендации', gradient: 'from-yellow-500 to-orange-500' },
-                { emoji: '🎨', title: 'Креатив', desc: 'Истории, стихи, сценарии, названия для проектов', gradient: 'from-pink-500 to-rose-500' }
-              ].map((item, idx) => (
-                <div key={idx} className="group bg-white/5 backdrop-blur-sm rounded-xl p-6 border border-white/10 hover:border-purple-500/50 transition-all duration-300 hover:scale-105 hover:bg-white/10">
-                  <div className={`inline-flex w-16 h-16 items-center justify-center rounded-2xl bg-gradient-to-br ${item.gradient} mb-4 text-3xl shadow-lg group-hover:scale-110 transition-transform duration-300`}>
-                    {item.emoji}
-                  </div>
-                  <h3 className="font-bold text-white text-lg mb-2">{item.title}</h3>
-                  <p className="text-sm text-gray-400 leading-relaxed">{item.desc}</p>
+            <div className="space-y-6">
+              <div className="bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-xl p-4 border border-purple-400/30">
+                <div className="flex items-center gap-3 mb-2">
+                  <Icon name="Zap" className="text-yellow-400" size={24} />
+                  <h3 className="font-bold text-white text-lg">15+ специальных функций</h3>
                 </div>
-              ))}
+                <p className="text-gray-300 text-sm">Готовые шаблоны для бизнеса, кода, креатива и анализа</p>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {[
+                  { emoji: '💬', title: 'Диалоги', desc: 'Ответы на любые вопросы', gradient: 'from-blue-500 to-cyan-500' },
+                  { emoji: '📝', title: 'Статьи', desc: 'SEO-тексты для блога', gradient: 'from-purple-500 to-pink-500' },
+                  { emoji: '✉️', title: 'Email', desc: 'Деловые письма', gradient: 'from-indigo-500 to-purple-500' },
+                  { emoji: '📱', title: 'Соцсети', desc: '10 постов за раз', gradient: 'from-pink-500 to-rose-500' },
+                  { emoji: '💼', title: 'Бизнес-план', desc: 'Полный план проекта', gradient: 'from-gray-700 to-gray-900' },
+                  { emoji: '📊', title: 'SWOT-анализ', desc: 'Анализ бизнеса', gradient: 'from-orange-500 to-red-500' },
+                  { emoji: '🎯', title: 'Презентация', desc: 'Структура слайдов', gradient: 'from-teal-500 to-cyan-500' },
+                  { emoji: '🐍', title: 'Python код', desc: 'Готовые скрипты', gradient: 'from-blue-600 to-indigo-600' },
+                  { emoji: '🗄️', title: 'SQL запросы', desc: 'База данных', gradient: 'from-green-600 to-emerald-600' },
+                  { emoji: '📖', title: 'Истории', desc: 'Рассказы и сценарии', gradient: 'from-yellow-500 to-orange-500' },
+                  { emoji: '💡', title: 'Нейминг', desc: '20 названий', gradient: 'from-pink-500 to-purple-500' },
+                  { emoji: '🎨', title: 'Слоганы', desc: 'УТП и слоганы', gradient: 'from-cyan-500 to-blue-500' },
+                  { emoji: '🖼️', title: 'Анализ фото', desc: 'Описание изображений', gradient: 'from-green-500 to-emerald-500' },
+                  { emoji: '🎤', title: 'Голос', desc: 'Речь → текст', gradient: 'from-violet-500 to-purple-500' },
+                  { emoji: '🌍', title: 'Переводы', desc: '100+ языков', gradient: 'from-red-500 to-orange-500' }
+                ].map((item, idx) => (
+                  <div key={idx} className="group bg-white/5 backdrop-blur-sm rounded-xl p-4 border border-white/10 hover:border-purple-500/50 transition-all duration-300 hover:scale-105 hover:bg-white/10">
+                    <div className={`inline-flex w-12 h-12 items-center justify-center rounded-xl bg-gradient-to-br ${item.gradient} mb-3 text-2xl shadow-lg group-hover:scale-110 transition-transform duration-300`}>
+                      {item.emoji}
+                    </div>
+                    <h3 className="font-bold text-white mb-1">{item.title}</h3>
+                    <p className="text-xs text-gray-400 leading-relaxed">{item.desc}</p>
+                  </div>
+                ))}
+              </div>
+
+              <div className="bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-xl p-6 border border-blue-400/30">
+                <div className="flex items-center gap-3 mb-3">
+                  <Icon name="Rocket" className="text-blue-400" size={28} />
+                  <h3 className="font-bold text-white text-xl">Начните прямо сейчас!</h3>
+                </div>
+                <p className="text-gray-300 mb-4">Просто начните диалог или выберите готовую функцию из меню «Спец. функции»</p>
+                <div className="flex flex-wrap gap-2">
+                  <span className="px-3 py-1 bg-white/10 rounded-full text-xs text-white">Gemini 2.0 Flash</span>
+                  <span className="px-3 py-1 bg-white/10 rounded-full text-xs text-white">Бесплатно</span>
+                  <span className="px-3 py-1 bg-white/10 rounded-full text-xs text-white">Без регистрации</span>
+                  <span className="px-3 py-1 bg-white/10 rounded-full text-xs text-white">Быстрые ответы</span>
+                </div>
+              </div>
             </div>
           </div>
         </div>

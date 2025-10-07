@@ -18,12 +18,18 @@ interface AIChatMessagesProps {
 }
 
 const QUICK_PROMPTS = [
-  { emoji: '💡', text: 'Объясни простыми словами' },
-  { emoji: '📝', text: 'Напиши текст про' },
-  { emoji: '🔍', text: 'Проанализируй документ' },
-  { emoji: '✨', text: 'Улучши и исправь' },
-  { emoji: '📊', text: 'Сделай краткое резюме' },
-  { emoji: '🌍', text: 'Переведи на' },
+  { emoji: '💡', text: 'Объясни простыми словами', color: 'from-yellow-500 to-orange-500' },
+  { emoji: '📝', text: 'Напиши статью про', color: 'from-blue-500 to-cyan-500' },
+  { emoji: '✍️', text: 'Напиши письмо для', color: 'from-purple-500 to-pink-500' },
+  { emoji: '📊', text: 'Составь таблицу', color: 'from-green-500 to-emerald-500' },
+  { emoji: '🔍', text: 'Проанализируй текст', color: 'from-indigo-500 to-purple-500' },
+  { emoji: '✨', text: 'Улучши и исправь', color: 'from-teal-500 to-cyan-500' },
+  { emoji: '🌍', text: 'Переведи на английский', color: 'from-red-500 to-orange-500' },
+  { emoji: '💼', text: 'Создай бизнес-план', color: 'from-gray-600 to-gray-800' },
+  { emoji: '🎨', text: 'Придумай креативное название', color: 'from-pink-500 to-rose-500' },
+  { emoji: '📋', text: 'Сделай список задач', color: 'from-violet-500 to-purple-500' },
+  { emoji: '🤖', text: 'Напиши код на Python', color: 'from-blue-600 to-indigo-600' },
+  { emoji: '📧', text: 'Составь email рассылку', color: 'from-orange-500 to-red-500' },
 ];
 
 export default function AIChatMessages({ 
@@ -37,20 +43,24 @@ export default function AIChatMessages({
   return (
     <>
       {showQuickPrompts && messages.length === 0 && (
-        <div className="p-4 border-b dark:border-gray-700 bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-gray-900 dark:to-gray-800">
-          <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Быстрые команды:</p>
-          <div className="grid grid-cols-2 gap-2">
+        <div className="p-4 border-b dark:border-gray-700 bg-gradient-to-br from-slate-900 to-slate-800">
+          <div className="flex items-center gap-2 mb-3">
+            <Icon name="Zap" size={16} className="text-yellow-400" />
+            <p className="text-sm font-bold text-white">Быстрые команды</p>
+          </div>
+          <div className="grid grid-cols-2 gap-2 max-h-64 overflow-y-auto">
             {QUICK_PROMPTS.map((prompt, idx) => (
-              <Button
+              <button
                 key={idx}
-                variant="outline"
-                size="sm"
                 onClick={() => onQuickPrompt(prompt.text)}
-                className="justify-start text-xs hover:bg-white dark:hover:bg-gray-700"
+                className={`group relative overflow-hidden rounded-xl p-3 text-left transition-all duration-300 hover:scale-105 bg-gradient-to-br ${prompt.color} hover:shadow-lg`}
               >
-                <span className="mr-1">{prompt.emoji}</span>
-                {prompt.text}
-              </Button>
+                <div className="relative z-10">
+                  <div className="text-2xl mb-1">{prompt.emoji}</div>
+                  <p className="text-xs font-medium text-white leading-tight">{prompt.text}</p>
+                </div>
+                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300"></div>
+              </button>
             ))}
           </div>
         </div>
@@ -62,18 +72,42 @@ export default function AIChatMessages({
             <Icon name="Bot" size={48} className="mx-auto mb-4 opacity-50" />
             <p className="font-medium mb-2 text-lg">Привет! Я Богдан ИИ 👋</p>
             <p className="text-sm mb-4">Ваш умный помощник с искусственным интеллектом</p>
-            <div className="bg-indigo-50 dark:bg-indigo-900/20 rounded-lg p-4 text-left text-xs space-y-2 max-w-xs mx-auto">
-              <p className="font-medium text-indigo-900 dark:text-indigo-100">Я могу помочь вам:</p>
-              <ul className="space-y-1 text-gray-700 dark:text-gray-300">
-                <li>💬 Отвечать на вопросы</li>
-                <li>📝 Создавать тексты</li>
-                <li>📄 Анализировать документы</li>
-                <li>🌍 Переводить тексты</li>
-                <li>💡 Генерировать идеи</li>
-              </ul>
-              <p className="text-indigo-700 dark:text-indigo-300 font-medium pt-2 border-t border-indigo-200 dark:border-indigo-800">
-                📎 Прикрепите файл кнопкой внизу!
-              </p>
+            <div className="bg-gradient-to-br from-indigo-900/50 to-purple-900/50 backdrop-blur-xl rounded-2xl p-6 text-left text-sm space-y-4 max-w-md mx-auto border border-white/10">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-500 rounded-xl flex items-center justify-center">
+                  <Icon name="Sparkles" size={24} className="text-white" />
+                </div>
+                <div>
+                  <p className="font-bold text-white text-base">Что я умею:</p>
+                  <p className="text-xs text-gray-300">Powered by Gemini 2.0 Flash</p>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                {[
+                  { icon: 'MessageSquare', text: 'Диалоги' },
+                  { icon: 'FileText', text: 'Тексты' },
+                  { icon: 'Code', text: 'Код' },
+                  { icon: 'Image', text: 'Фото' },
+                  { icon: 'Globe', text: 'Переводы' },
+                  { icon: 'Briefcase', text: 'Бизнес' },
+                  { icon: 'GraduationCap', text: 'Обучение' },
+                  { icon: 'Sparkles', text: 'Креатив' },
+                ].map((item, idx) => (
+                  <div key={idx} className="flex items-center gap-2 text-white/90 bg-white/5 rounded-lg p-2">
+                    <Icon name={item.icon as any} size={14} />
+                    <span className="text-xs font-medium">{item.text}</span>
+                  </div>
+                ))}
+              </div>
+              <div className="bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-lg p-3 border border-blue-400/30">
+                <p className="text-white font-semibold text-xs mb-1 flex items-center gap-2">
+                  <Icon name="Lightbulb" size={14} />
+                  Совет:
+                </p>
+                <p className="text-gray-300 text-xs leading-relaxed">
+                  Используйте кнопки внизу для загрузки 📸 изображений и 🎤 голосового ввода!
+                </p>
+              </div>
             </div>
           </div>
         )}
