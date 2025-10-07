@@ -9,42 +9,40 @@ export default function Logo({ size = 40, showText = false }: LogoProps) {
       <div className="relative" style={{ width: size, height: size }}>
         <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
           <defs>
-            <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#3b82f6" />
-              <stop offset="50%" stopColor="#8b5cf6" />
+            <linearGradient id="modernGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#6366f1" />
+              <stop offset="50%" stopColor="#a855f7" />
               <stop offset="100%" stopColor="#ec4899" />
             </linearGradient>
           </defs>
           
-          <rect width="100" height="100" rx="20" fill="url(#logoGradient)" />
+          <circle cx="50" cy="50" r="42" fill="url(#modernGradient)" opacity="0.15"/>
           
-          <circle cx="30" cy="30" r="6" fill="white" opacity="0.9" />
-          <circle cx="50" cy="30" r="6" fill="white" opacity="0.9" />
-          <circle cx="70" cy="30" r="6" fill="white" opacity="0.9" />
+          <path 
+            d="M 30 40 L 50 25 L 70 40 L 70 60 L 50 75 L 30 60 Z" 
+            stroke="url(#modernGradient)" 
+            strokeWidth="3" 
+            fill="none"
+          />
           
-          <circle cx="30" cy="50" r="6" fill="white" opacity="0.9" />
-          <circle cx="50" cy="50" r="8" fill="white" />
-          <circle cx="70" cy="50" r="6" fill="white" opacity="0.9" />
+          <circle cx="50" cy="50" r="10" fill="url(#modernGradient)"/>
           
-          <circle cx="30" cy="70" r="6" fill="white" opacity="0.9" />
-          <circle cx="50" cy="70" r="6" fill="white" opacity="0.9" />
-          <circle cx="70" cy="70" r="6" fill="white" opacity="0.9" />
+          <path d="M 50 50 L 50 25" stroke="url(#modernGradient)" strokeWidth="2.5" opacity="0.7"/>
+          <path d="M 50 50 L 70 40" stroke="url(#modernGradient)" strokeWidth="2.5" opacity="0.7"/>
+          <path d="M 50 50 L 70 60" stroke="url(#modernGradient)" strokeWidth="2.5" opacity="0.7"/>
+          <path d="M 50 50 L 30 60" stroke="url(#modernGradient)" strokeWidth="2.5" opacity="0.7"/>
+          <path d="M 50 50 L 30 40" stroke="url(#modernGradient)" strokeWidth="2.5" opacity="0.7"/>
           
-          <line x1="30" y1="30" x2="50" y2="50" stroke="white" strokeWidth="2" opacity="0.5" />
-          <line x1="50" y1="30" x2="50" y2="50" stroke="white" strokeWidth="2" opacity="0.5" />
-          <line x1="70" y1="30" x2="50" y2="50" stroke="white" strokeWidth="2" opacity="0.5" />
-          <line x1="30" y1="50" x2="50" y2="50" stroke="white" strokeWidth="2" opacity="0.5" />
-          <line x1="50" y1="50" x2="70" y2="50" stroke="white" strokeWidth="2" opacity="0.5" />
-          <line x1="30" y1="70" x2="50" y2="50" stroke="white" strokeWidth="2" opacity="0.5" />
-          <line x1="50" y1="70" x2="50" y2="50" stroke="white" strokeWidth="2" opacity="0.5" />
-          <line x1="70" y1="70" x2="50" y2="50" stroke="white" strokeWidth="2" opacity="0.5" />
-          
-          <path d="M 35 85 Q 50 80 65 85" stroke="white" strokeWidth="3" fill="none" strokeLinecap="round" opacity="0.8" />
+          <circle cx="50" cy="25" r="5" fill="#6366f1"/>
+          <circle cx="70" cy="40" r="5" fill="#a855f7"/>
+          <circle cx="70" cy="60" r="5" fill="#ec4899"/>
+          <circle cx="30" cy="60" r="5" fill="#a855f7"/>
+          <circle cx="30" cy="40" r="5" fill="#6366f1"/>
         </svg>
       </div>
       {showText && (
         <div>
-          <h1 className="text-xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+          <h1 className="text-xl font-bold bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
             Богдан ИИ
           </h1>
           <p className="text-xs text-gray-400">Умный помощник</p>

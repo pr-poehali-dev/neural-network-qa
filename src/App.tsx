@@ -15,6 +15,9 @@ import Terms from "./pages/Terms";
 import License from "./pages/License";
 import Support from "./pages/Support";
 import About from "./pages/About";
+import Help from "./pages/Help";
+import Contact from "./pages/Contact";
+import Status from "./pages/Status";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -37,6 +40,9 @@ const App = () => (
               <Route path="/license" element={<License />} />
               <Route path="/support" element={<Support />} />
               <Route path="/about" element={<About />} />
+              <Route path="/help" element={<Help />} />
+              <Route path="/contact" element={<Contact />} />
+              <Route path="/status" element={<Status />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>

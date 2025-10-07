@@ -12,8 +12,33 @@ export default function Index() {
   const { t } = useTranslation();
   const { toast } = useToast();
   const [showAdminPrompt, setShowAdminPrompt] = useState(false);
-  const [showPreviewModal, setShowPreviewModal] = useState(false);
+  const [showChat, setShowChat] = useState(false);
   const [adminPassword, setAdminPassword] = useState('');
+  const [userName, setUserName] = useState('');
+  const [showNamePrompt, setShowNamePrompt] = useState(false);
+
+  useEffect(() => {
+    const savedName = localStorage.getItem('user_name');
+    if (savedName) {
+      setUserName(savedName);
+    }
+  }, []);
+
+  const handleStartChat = () => {
+    const savedName = localStorage.getItem('user_name');
+    if (!savedName) {
+      setShowNamePrompt(true);
+    } else {
+      setShowChat(true);
+    }
+  };
+
+  const handleSaveName = (name: string) => {
+    localStorage.setItem('user_name', name);
+    setUserName(name);
+    setShowNamePrompt(false);
+    setShowChat(true);
+  };
 
   const ADMIN_PASSWORD = 'bogdan2025';
 
@@ -129,16 +154,20 @@ export default function Index() {
             </div>
 
             <div className="lg:block">
-              <div 
-                className="bg-gradient-to-br from-white/5 to-white/10 backdrop-blur-md rounded-2xl border border-white/20 p-4 shadow-2xl cursor-pointer hover:scale-105 transition-transform"
-                onClick={() => setShowPreviewModal(true)}
-              >
-                <div className="aspect-video bg-gradient-to-br from-slate-800 to-slate-900 rounded-lg flex items-center justify-center relative overflow-hidden">
-                  <div className="absolute inset-0 bg-gradient-to-br from-blue-500/20 to-purple-500/20"></div>
-                  <div className="relative z-10 text-center">
-                    <Icon name="MessageSquare" size={80} className="text-purple-400 opacity-70 mb-4" />
-                    <p className="text-white/60 text-sm">Нажмите для просмотра</p>
+              <div className="bg-gradient-to-br from-white/5 to-white/10 backdrop-blur-md rounded-2xl border border-white/20 p-8 shadow-2xl">
+                <div className="text-center space-y-6">
+                  <div className="inline-flex items-center justify-center w-24 h-24 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full">
+                    <Icon name="MessageSquare" size={48} className="text-white" />
                   </div>
+                  <h3 className="text-2xl font-bold text-white">Начните общение с ИИ</h3>
+                  <p className="text-gray-300">Умный помощник готов ответить на ваши вопросы</p>
+                  <Button
+                    onClick={handleStartChat}
+                    className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-semibold py-6 text-lg"
+                  >
+                    <Icon name="Sparkles" className="mr-2" size={20} />
+                    Открыть чат
+                  </Button>
                 </div>
               </div>
             </div>
@@ -196,10 +225,10 @@ export default function Index() {
             </p>
             <div className="flex flex-wrap gap-4 justify-center">
               <Button 
-                onClick={() => setShowAdminPrompt(true)}
+                onClick={handleStartChat}
                 className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold px-8 py-6 text-lg"
               >
-                <Icon name="Rocket" className="mr-2" size={20} />
+                <Icon name="MessageSquare" className="mr-2" size={20} />
                 Начать работу
               </Button>
               <Button 
@@ -215,23 +244,81 @@ export default function Index() {
         </main>
       </div>
 
-      <Dialog open={showPreviewModal} onOpenChange={setShowPreviewModal}>
-        <DialogContent className="max-w-4xl">
-          <DialogHeader>
-            <DialogTitle>Демонстрация работы ИИ-чата</DialogTitle>
-            <DialogDescription>
-              Интерактивный помощник с поддержкой голоса, файлов и 70+ команд
-            </DialogDescription>
-          </DialogHeader>
-          <div className="aspect-video bg-gradient-to-br from-slate-800 to-slate-900 rounded-lg flex items-center justify-center">
-            <div className="text-center space-y-4">
-              <Icon name="Bot" size={64} className="text-purple-400 mx-auto" />
-              <p className="text-white">Чат будет доступен после настройки API-ключа</p>
-              <p className="text-gray-400 text-sm">Откройте настройки для подключения</p>
+      {showNamePrompt && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl p-8 max-w-md w-full border border-purple-500/30 shadow-2xl">
+            <div className="text-center mb-6">
+              <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full mb-4">
+                <Icon name="User" size={32} className="text-white" />
+              </div>
+              <h3 className="text-2xl font-bold text-white mb-2">Добро пожаловать!</h3>
+              <p className="text-gray-300">Как к вам обращаться?</p>
+            </div>
+            <input 
+              type="text" 
+              placeholder="Введите ваше имя" 
+              className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:border-purple-400 outline-none mb-4"
+              onKeyPress={(e) => {
+                if (e.key === 'Enter' && (e.target as HTMLInputElement).value.trim()) {
+                  handleSaveName((e.target as HTMLInputElement).value.trim());
+                }
+              }}
+              autoFocus
+            />
+            <Button 
+              onClick={(e) => {
+                const input = e.currentTarget.parentElement?.querySelector('input');
+                if (input?.value.trim()) {
+                  handleSaveName(input.value.trim());
+                }
+              }}
+              className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-semibold py-3"
+            >
+              Продолжить
+            </Button>
+          </div>
+        </div>
+      )}
+
+      {showChat && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl max-w-4xl w-full h-[80vh] border border-purple-500/30 shadow-2xl flex flex-col">
+            <div className="flex items-center justify-between p-4 border-b border-white/10">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center">
+                  <Icon name="Bot" size={20} className="text-white" />
+                </div>
+                <div>
+                  <h3 className="text-white font-semibold">Богдан ИИ</h3>
+                  <p className="text-xs text-gray-400">Здравствуйте, {userName}!</p>
+                </div>
+              </div>
+              <Button variant="ghost" size="sm" onClick={() => setShowChat(false)}>
+                <Icon name="X" size={20} className="text-gray-400" />
+              </Button>
+            </div>
+            <div className="flex-1 overflow-y-auto p-6">
+              <div className="text-center text-gray-400 py-12">
+                <Icon name="MessageSquare" size={64} className="mx-auto mb-4 text-purple-400" />
+                <p className="mb-2">Чат готов к работе</p>
+                <p className="text-sm">Для полного функционала настройте API-ключ в админ-панели</p>
+              </div>
+            </div>
+            <div className="p-4 border-t border-white/10">
+              <div className="flex gap-2">
+                <input 
+                  type="text" 
+                  placeholder="Напишите сообщение..." 
+                  className="flex-1 px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:border-purple-400 outline-none"
+                />
+                <Button className="bg-gradient-to-r from-indigo-600 to-purple-600">
+                  <Icon name="Send" size={20} />
+                </Button>
+              </div>
             </div>
           </div>
-        </DialogContent>
-      </Dialog>
+        </div>
+      )}
 
       <Footer />
     </div>
