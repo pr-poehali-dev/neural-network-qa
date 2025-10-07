@@ -12,14 +12,18 @@ interface AIChatButtonProps {
   className?: string;
   apiKey?: string;
   model?: string;
+  embedded?: boolean;
+  isAdmin?: boolean;
 }
 
 export default function AIChatButton({ 
   className = '',
   apiKey,
-  model = 'google/gemini-2.0-flash-exp:free'
+  model = 'google/gemini-2.0-flash-exp:free',
+  embedded = false,
+  isAdmin = false
 }: AIChatButtonProps) {
-  const [showChat, setShowChat] = useState(false);
+  const [showChat, setShowChat] = useState(embedded);
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -28,6 +32,7 @@ export default function AIChatButton({
   const [uploadedFiles, setUploadedFiles] = useState<{name: string; content: string}[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const imageInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
   const scrollToBottom = () => {
@@ -267,13 +272,17 @@ export default function AIChatButton({
   };
 
   if (showChat) {
+    const containerClass = embedded 
+      ? "w-full h-full bg-white dark:bg-gray-800 flex flex-col"
+      : "fixed bottom-6 right-6 z-50 w-96 h-[600px] bg-white dark:bg-gray-800 shadow-2xl flex flex-col animate-scale-in";
+
     return (
-      <Card className="fixed bottom-6 right-6 z-50 w-96 h-[600px] bg-white dark:bg-gray-800 shadow-2xl flex flex-col animate-scale-in">
+      <Card className={containerClass}>
         <AIChatHeader
           model={model}
           onExport={exportChat}
           onClear={clearHistory}
-          onClose={() => setShowChat(false)}
+          onClose={embedded ? undefined : () => setShowChat(false)}
         />
 
         <AIChatStats
@@ -295,15 +304,19 @@ export default function AIChatButton({
           isLoading={isLoading}
           uploadedFiles={uploadedFiles}
           fileInputRef={fileInputRef}
+          imageInputRef={imageInputRef}
           onInputChange={setInput}
           onKeyPress={handleKeyPress}
           onSend={() => sendMessage()}
           onFileUpload={handleFileUpload}
           onRemoveFile={removeFile}
+          isAdmin={isAdmin}
         />
       </Card>
     );
   }
+
+  if (embedded) return null;
 
   return (
     <Button

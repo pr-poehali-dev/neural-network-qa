@@ -1,17 +1,21 @@
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import Icon from '@/components/ui/icon';
+import { useToast } from '@/hooks/use-toast';
 
 interface AIChatInputProps {
   input: string;
   isLoading: boolean;
   uploadedFiles: {name: string; content: string}[];
   fileInputRef: React.RefObject<HTMLInputElement>;
+  imageInputRef: React.RefObject<HTMLInputElement>;
   onInputChange: (value: string) => void;
   onKeyPress: (e: React.KeyboardEvent) => void;
   onSend: () => void;
   onFileUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onRemoveFile: (index: number) => void;
+  isAdmin?: boolean;
 }
 
 export default function AIChatInput({
@@ -19,12 +23,61 @@ export default function AIChatInput({
   isLoading,
   uploadedFiles,
   fileInputRef,
+  imageInputRef,
   onInputChange,
   onKeyPress,
   onSend,
   onFileUpload,
-  onRemoveFile
+  onRemoveFile,
+  isAdmin = false
 }: AIChatInputProps) {
+  const [isListening, setIsListening] = useState(false);
+  const { toast } = useToast();
+
+  const startVoiceInput = () => {
+    if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+      toast({
+        title: 'Голосовой ввод не поддерживается',
+        description: 'Используйте браузер Chrome или Edge',
+        variant: 'destructive'
+      });
+      return;
+    }
+
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    const recognition = new SpeechRecognition();
+    
+    recognition.lang = 'ru-RU';
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
+
+    recognition.onstart = () => {
+      setIsListening(true);
+      toast({ title: '🎤 Говорите...' });
+    };
+
+    recognition.onresult = (event: any) => {
+      const transcript = event.results[0][0].transcript;
+      onInputChange(input + (input ? ' ' : '') + transcript);
+      toast({ title: 'Распознано', description: transcript });
+    };
+
+    recognition.onerror = (event: any) => {
+      setIsListening(false);
+      toast({
+        title: 'Ошибка распознавания',
+        description: 'Попробуйте ещё раз',
+        variant: 'destructive'
+      });
+    };
+
+    recognition.onend = () => {
+      setIsListening(false);
+    };
+
+    recognition.start();
+  };
+
   return (
     <div className="p-4 border-t dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
       {uploadedFiles.length > 0 && (
@@ -44,24 +97,58 @@ export default function AIChatInput({
         </div>
       )}
       <div className="flex gap-2">
+        {isAdmin && (
+          <>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".txt,.pdf,.doc,.docx,.md"
+              multiple
+              onChange={onFileUpload}
+              className="hidden"
+            />
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={isLoading}
+              className="dark:bg-gray-800 dark:border-gray-600"
+              title="Загрузить документ (только админ)"
+            >
+              <Icon name="Paperclip" size={18} />
+            </Button>
+          </>
+        )}
+        
         <input
-          ref={fileInputRef}
+          ref={imageInputRef}
           type="file"
-          accept=".txt,.pdf,.doc,.docx,.md"
-          multiple
+          accept="image/*"
           onChange={onFileUpload}
           className="hidden"
         />
         <Button
           variant="outline"
           size="sm"
-          onClick={() => fileInputRef.current?.click()}
+          onClick={() => imageInputRef.current?.click()}
           disabled={isLoading}
           className="dark:bg-gray-800 dark:border-gray-600"
-          title="Загрузить документ"
+          title="Загрузить изображение"
         >
-          <Icon name="Paperclip" size={18} />
+          <Icon name="Image" size={18} />
         </Button>
+
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={startVoiceInput}
+          disabled={isLoading || isListening}
+          className={`dark:bg-gray-800 dark:border-gray-600 ${isListening ? 'animate-pulse bg-red-500 text-white' : ''}`}
+          title="Голосовой ввод"
+        >
+          <Icon name="Mic" size={18} />
+        </Button>
+
         <Input
           placeholder="Напишите сообщение..."
           value={input}

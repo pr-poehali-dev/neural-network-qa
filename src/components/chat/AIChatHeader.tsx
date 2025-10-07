@@ -5,7 +5,7 @@ interface AIChatHeaderProps {
   model: string;
   onExport: () => void;
   onClear: () => void;
-  onClose: () => void;
+  onClose?: () => void;
 }
 
 export default function AIChatHeader({ model, onExport, onClear, onClose }: AIChatHeaderProps) {
@@ -14,8 +14,8 @@ export default function AIChatHeader({ model, onExport, onClear, onClose }: AICh
       <div className="flex items-center gap-2">
         <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
         <div>
-          <h3 className="font-semibold text-white">Богдан ИИ</h3>
-          <p className="text-xs text-white/80">Онлайн • {model.split('/')[1] || 'AI'}</p>
+          <h3 className="font-semibold text-white">Богдан отвечает</h3>
+          <p className="text-xs text-white/80">Онлайн</p>
         </div>
       </div>
       <div className="flex gap-1">
@@ -37,14 +37,16 @@ export default function AIChatHeader({ model, onExport, onClear, onClose }: AICh
         >
           <Icon name="Trash2" size={16} />
         </Button>
-        <Button 
-          variant="ghost" 
-          size="sm" 
-          onClick={onClose}
-          className="hover:bg-white/20 text-white"
-        >
-          <Icon name="X" size={18} />
-        </Button>
+        {onClose && (
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={onClose}
+            className="hover:bg-white/20 text-white"
+          >
+            <Icon name="X" size={18} />
+          </Button>
+        )}
       </div>
     </div>
   );
