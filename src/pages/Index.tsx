@@ -6,6 +6,7 @@ import AIChatButton from '@/components/AIChatButton';
 export default function Index() {
   const [contactInfo, setContactInfo] = useState<{whatsapp?: string; telegram?: string}>({});
   const [aiChatSettings, setAiChatSettings] = useState<{enabled: boolean; apiKey?: string; model?: string}>({ enabled: false });
+  const [diagnostic, setDiagnostic] = useState<{status: 'idle' | 'checking' | 'success' | 'error'; message?: string}>({ status: 'idle' });
 
   useEffect(() => {
     const savedSettings = localStorage.getItem('site_settings');
@@ -45,19 +46,53 @@ export default function Index() {
     }
   }, []);
 
-  const enableAIChatNow = () => {
-    const settings = {
-      enableAiChat: true,
-      openrouterApiKey: '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',
-      aiModel: 'deepseek/deepseek-r1:free'
-    };
-    localStorage.setItem('site_settings', JSON.stringify(settings));
-    console.log('💾 Сохранил настройки:', settings);
-    setAiChatSettings({
-      enabled: true,
-      apiKey: settings.openrouterApiKey,
-      model: settings.aiModel
-    });
+  const enableAIChatNow = async () => {
+    setDiagnostic({ status: 'checking', message: 'Проверяю API ключ...' });
+    
+    const apiKey = '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';
+    const model = 'deepseek/deepseek-r1:free';
+    
+    try {
+      const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${apiKey}`,
+          'Content-Type': 'application/json',
+          'HTTP-Referer': window.location.origin,
+          'X-Title': 'AI Chat Test'
+        },
+        body: JSON.stringify({
+          model: model,
+          messages: [{ role: 'user', content: 'Привет!' }],
+          max_tokens: 10
+        })
+      });
+      
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error?.message || `HTTP ${response.status}`);
+      }
+      
+      const settings = {
+        enableAiChat: true,
+        openrouterApiKey: apiKey,
+        aiModel: model
+      };
+      localStorage.setItem('site_settings', JSON.stringify(settings));
+      console.log('💾 Сохранил настройки:', settings);
+      setAiChatSettings({
+        enabled: true,
+        apiKey: apiKey,
+        model: model
+      });
+      setDiagnostic({ status: 'success', message: '✅ API работает! Чат включён' });
+    } catch (error) {
+      console.error('Диагностика провалена:', error);
+      setDiagnostic({ 
+        status: 'error', 
+        message: error instanceof Error ? error.message : 'Ошибка подключения к API'
+      });
+    }
   };
 
   return (
@@ -150,11 +185,75 @@ export default function Index() {
                     </svg>
                     AI чат не настроен. Перейдите в админ-панель для настройки.
                   </p>
+                  
+                  {diagnostic.status === 'checking' && (
+                    <div className="mb-3 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg flex items-center gap-2">
+                      <svg className="animate-spin h-5 w-5 text-blue-600" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      <span className="text-sm text-blue-800 dark:text-blue-200">{diagnostic.message}</span>
+                    </div>
+                  )}
+                  
+                  {diagnostic.status === 'success' && (
+                    <div className="mb-3 p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg flex items-center gap-2">
+                      <svg className="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                      </svg>
+                      <span className="text-sm text-green-800 dark:text-green-200 font-medium">{diagnostic.message}</span>
+                    </div>
+                  )}
+                  
+                  {diagnostic.status === 'error' && (
+                    <div className="mb-3 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+                      <div className="flex items-start gap-2">
+                        <svg className="w-5 h-5 text-red-600 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                        </svg>
+                        <div className="flex-1">
+                          <p className="text-sm text-red-800 dark:text-red-200 font-medium mb-1">Ошибка подключения:</p>
+                          <p className="text-xs text-red-700 dark:text-red-300">{diagnostic.message}</p>
+                          <div className="mt-2 text-xs text-red-600 dark:text-red-400">
+                            <p className="font-medium mb-1">Возможные причины:</p>
+                            <ul className="list-disc list-inside space-y-0.5">
+                              <li>API ключ недействителен или истёк</li>
+                              <li>Нет средств на балансе OpenRouter</li>
+                              <li>Модель временно недоступна</li>
+                              <li>Проблемы с интернет-соединением</li>
+                            </ul>
+                            <a 
+                              href="https://openrouter.ai/keys" 
+                              target="_blank" 
+                              rel="noopener noreferrer"
+                              className="inline-block mt-2 text-red-700 dark:text-red-300 underline hover:text-red-900"
+                            >
+                              Проверить ключ на OpenRouter →
+                            </a>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  
                   <button
                     onClick={enableAIChatNow}
-                    className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-semibold py-2 px-4 rounded-lg transition-all"
+                    disabled={diagnostic.status === 'checking'}
+                    className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-semibold py-2 px-4 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    🚀 Включить AI чат прямо сейчас (DeepSeek R1)
+                    {diagnostic.status === 'checking' ? (
+                      <span className="flex items-center justify-center gap-2">
+                        <svg className="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        Проверяю API...
+                      </span>
+                    ) : diagnostic.status === 'success' ? (
+                      '✅ Чат включён! Обновите страницу'
+                    ) : (
+                      '🚀 Включить AI чат с проверкой (DeepSeek R1)'
+                    )}
                   </button>
                 </div>
               )}

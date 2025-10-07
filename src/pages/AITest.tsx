@@ -71,11 +71,28 @@ export default function AITest() {
 
       localStorage.setItem('openrouter_api_key', apiKey);
     } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Не удалось получить ответ';
+      
+      let diagnosticInfo = '';
+      if (errorMessage.includes('401') || errorMessage.includes('Unauthorized')) {
+        diagnosticInfo = 'API ключ недействителен или истёк';
+      } else if (errorMessage.includes('402') || errorMessage.includes('credits')) {
+        diagnosticInfo = 'Недостаточно средств на балансе OpenRouter';
+      } else if (errorMessage.includes('404')) {
+        diagnosticInfo = 'Модель не найдена или недоступна';
+      } else if (errorMessage.includes('429')) {
+        diagnosticInfo = 'Превышен лимит запросов. Подождите немного';
+      } else if (errorMessage.includes('503')) {
+        diagnosticInfo = 'Модель временно недоступна. Попробуйте другую';
+      }
+      
       toast({
         title: '❌ Ошибка теста',
-        description: error instanceof Error ? error.message : 'Не удалось получить ответ',
+        description: diagnosticInfo || errorMessage,
         variant: 'destructive'
       });
+      
+      setResponse(`❌ Ошибка: ${errorMessage}\n\n${diagnosticInfo ? `💡 ${diagnosticInfo}` : ''}`);
     } finally {
       setIsLoading(false);
     }

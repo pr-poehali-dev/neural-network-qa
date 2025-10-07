@@ -130,12 +130,41 @@ export default function AIChatButton({
         description: `Использовано токенов: ${data.usage?.total_tokens || 0}`,
       });
     } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Не удалось получить ответ';
+      
+      let userFriendlyMessage = errorMessage;
+      let diagnosticTips = '';
+      
+      if (errorMessage.includes('401') || errorMessage.includes('Unauthorized')) {
+        userFriendlyMessage = 'API ключ недействителен';
+        diagnosticTips = 'Проверьте ключ в админ-панели';
+      } else if (errorMessage.includes('402') || errorMessage.includes('credits')) {
+        userFriendlyMessage = 'Недостаточно средств';
+        diagnosticTips = 'Пополните баланс на openrouter.ai';
+      } else if (errorMessage.includes('404')) {
+        userFriendlyMessage = 'Модель не найдена';
+        diagnosticTips = 'Выберите другую модель в настройках';
+      } else if (errorMessage.includes('429')) {
+        userFriendlyMessage = 'Слишком много запросов';
+        diagnosticTips = 'Подождите 30 секунд';
+      } else if (errorMessage.includes('503')) {
+        userFriendlyMessage = 'Модель временно недоступна';
+        diagnosticTips = 'Попробуйте DeepSeek Chat или Llama 3';
+      }
+      
       toast({
-        title: 'Ошибка',
-        description: error instanceof Error ? error.message : 'Не удалось получить ответ',
-        variant: 'destructive'
+        title: '❌ ' + userFriendlyMessage,
+        description: diagnosticTips || 'Проверьте настройки в админ-панели',
+        variant: 'destructive',
+        duration: 5000
       });
-      setMessages(prev => prev.slice(0, -1));
+      
+      const errorMsg: Message = {
+        role: 'assistant',
+        content: `❌ ${userFriendlyMessage}\n\n💡 ${diagnosticTips || 'Проверьте настройки API ключа в админ-панели'}`,
+        timestamp: Date.now()
+      };
+      setMessages(prev => [...prev, errorMsg]);
     } finally {
       setIsLoading(false);
     }
