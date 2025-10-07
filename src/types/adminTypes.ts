@@ -26,8 +26,8 @@ export interface SiteSettings {
   telegramBotId?: string;
   telegramAdminChatId?: string;
   openrouterApiKey?: string;
-  geminiApiKey?: string;
   aiModel?: string;
+  fallbackAiModel?: string;
   enableAiChat?: boolean;
 }
 

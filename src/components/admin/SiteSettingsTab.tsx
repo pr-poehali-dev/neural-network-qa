@@ -264,27 +264,32 @@ export default function SiteSettingsTab({ settings, onUpdateSettings }: SiteSett
             </div>
 
             <div>
-              <Label className="mb-2">Google Gemini API Key (опционально)</Label>
-              <Input
-                type="password"
-                value={settings.geminiApiKey || ''}
-                onChange={(e) => onUpdateSettings({ ...settings, geminiApiKey: e.target.value })}
-                className="border-purple-200"
-                placeholder="AIzaSy..."
-              />
+              <Label className="mb-2">Резервная модель AI (при ошибке 429)</Label>
+              <select
+                value={settings.fallbackAiModel || 'meta-llama/llama-3.3-70b-instruct:free'}
+                onChange={(e) => onUpdateSettings({ ...settings, fallbackAiModel: e.target.value })}
+                className="w-full border border-purple-200 rounded-md p-2 bg-white dark:bg-gray-800 dark:text-white"
+              >
+                <optgroup label="🎁 Бесплатные модели">
+                  <option value="meta-llama/llama-3.3-70b-instruct:free">Meta Llama 3.3 70B (рекомендуется) 🔥</option>
+                  <option value="google/gemini-2.0-flash-exp:free">Google Gemini 2.0 Flash ⭐</option>
+                  <option value="meta-llama/llama-3.1-8b-instruct:free">Meta Llama 3.1 8B</option>
+                  <option value="meta-llama/llama-3.1-70b-instruct:free">Meta Llama 3.1 70B</option>
+                  <option value="microsoft/phi-3-medium-128k-instruct:free">Microsoft Phi-3</option>
+                </optgroup>
+              </select>
               <div className="mt-2 p-3 bg-green-50 border border-green-200 rounded-md">
                 <p className="text-xs font-medium text-green-900 mb-1">
-                  🚀 Резервный API ключ для Google Gemini:
+                  🔄 Автоматическое переключение при ошибках:
                 </p>
-                <ol className="text-xs text-green-800 space-y-1 ml-4 list-decimal">
-                  <li>Откройте <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener noreferrer" className="underline font-medium">Google AI Studio</a></li>
-                  <li>Нажмите "Create API Key"</li>
-                  <li>Скопируйте ключ и вставьте сюда</li>
-                  <li>При ошибке 429 чат автоматически переключится на Gemini</li>
-                </ol>
+                <ul className="text-xs text-green-800 space-y-1 ml-4 list-disc">
+                  <li>При ошибке 429 (лимит запросов) чат автоматически переключится на резервную модель</li>
+                  <li>Выберите модель, отличную от основной, для лучшей надёжности</li>
+                  <li>Все модели используют один OpenRouter API ключ</li>
+                </ul>
               </div>
               <p className="text-xs text-gray-500 mt-2">
-                💡 <strong>Зачем?</strong> Если OpenRouter выдаст ошибку лимита (429), чат автоматически переключится на прямой API Google Gemini
+                💡 <strong>Рекомендация:</strong> Llama 3.3 70B как резервная для Gemini (или наоборот)
               </p>
             </div>
 

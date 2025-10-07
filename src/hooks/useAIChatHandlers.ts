@@ -92,36 +92,49 @@ export function useAIChatHandlers({
     toast({ title: t.errors.fileRemoved });
   };
 
-  const sendMessageViaGemini = async (userMessage: Message): Promise<Message> => {
+  const sendMessageViaFallback = async (userMessage: Message, storedApiKey: string): Promise<Message> => {
     const savedSettings = localStorage.getItem('site_settings');
-    const geminiApiKey = savedSettings ? JSON.parse(savedSettings).geminiApiKey : null;
+    const fallbackModel = savedSettings ? JSON.parse(savedSettings).fallbackAiModel : 'meta-llama/llama-3.3-70b-instruct:free';
 
-    if (!geminiApiKey) {
-      throw new Error('GEMINI_NOT_CONFIGURED');
+    if (!fallbackModel) {
+      throw new Error('FALLBACK_NOT_CONFIGURED');
     }
 
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${geminiApiKey}`, {
+    const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
       method: 'POST',
       headers: {
+        'Authorization': `Bearer ${storedApiKey}`,
         'Content-Type': 'application/json',
+        'HTTP-Referer': window.location.origin,
+        'X-Title': 'AI Chat Assistant'
       },
       body: JSON.stringify({
-        contents: [...messages, userMessage].map(m => ({
-          role: m.role === 'user' ? 'user' : 'model',
-          parts: [{ text: m.content }]
-        }))
+        model: fallbackModel,
+        messages: [...messages, userMessage].map(m => {
+          if (m.files && m.files.some(f => f.type === 'image')) {
+            const content: any[] = [{ type: 'text', text: m.content }];
+            m.files.filter(f => f.type === 'image' && f.dataUrl).forEach(img => {
+              content.push({
+                type: 'image_url',
+                image_url: { url: img.dataUrl }
+              });
+            });
+            return { role: m.role, content };
+          }
+          return { role: m.role, content: m.content };
+        })
       })
     });
 
     if (!response.ok) {
       const error = await response.json();
-      throw new Error(error.error?.message || 'Gemini API error');
+      throw new Error(error.error?.message || 'Fallback API error');
     }
 
     const data = await response.json();
     return {
       role: 'assistant',
-      content: data.candidates[0].content.parts[0].text,
+      content: data.choices[0].message.content,
       timestamp: Date.now()
     };
   };
@@ -256,9 +269,12 @@ export function useAIChatHandlers({
       
       if (errorMessage === 'RATE_LIMIT_429') {
         try {
+          const savedSettings = localStorage.getItem('site_settings');
+          const fallbackModel = savedSettings ? JSON.parse(savedSettings).fallbackAiModel : 'meta-llama/llama-3.3-70b-instruct:free';
+          
           toast({
-            title: `🔄 Переключение на Gemini...`,
-            description: `OpenRouter перегружен, пробую Google Gemini API`,
+            title: `🔄 Переключение на резервную модель...`,
+            description: `Основная модель перегружена, пробую ${fallbackModel}`,
           });
 
           const userMessage: Message = { 
@@ -267,30 +283,30 @@ export function useAIChatHandlers({
             timestamp: Date.now()
           };
 
-          const geminiResponse = await sendMessageViaGemini(userMessage);
-          setMessages(prev => [...prev, geminiResponse]);
+          const fallbackResponse = await sendMessageViaFallback(userMessage, storedApiKey!);
+          setMessages(prev => [...prev, fallbackResponse]);
           
           toast({
-            title: `✅ Ответ получен через Gemini`,
-            description: `OpenRouter недоступен, использовался резервный API`,
+            title: `✅ Ответ получен через резервную модель`,
+            description: `Использована модель: ${fallbackModel}`,
           });
           
           setIsLoading(false);
           return;
-        } catch (geminiError) {
-          const geminiErrorMsg = geminiError instanceof Error ? geminiError.message : 'Unknown error';
+        } catch (fallbackError) {
+          const fallbackErrorMsg = fallbackError instanceof Error ? fallbackError.message : 'Unknown error';
           
-          if (geminiErrorMsg === 'GEMINI_NOT_CONFIGURED') {
+          if (fallbackErrorMsg === 'FALLBACK_NOT_CONFIGURED') {
             toast({
-              title: `❌ Gemini API не настроен`,
-              description: `Добавьте Gemini API ключ в настройках для автопереключения`,
+              title: `❌ Резервная модель не настроена`,
+              description: `Настройте резервную модель в админ-панели`,
               variant: 'destructive',
               duration: 10000
             });
             
             const errorMsg: Message = {
               role: 'assistant',
-              content: `❌ **Превышен лимит запросов OpenRouter (429)**\n\n🔄 **Попытка переключения на Gemini провалилась**\n\nGemini API ключ не настроен.\n\n---\n\n📝 **Решения:**\n\n**Вариант 1: Добавить Gemini API ключ (рекомендуется)**\n1. Откройте [Google AI Studio](https://aistudio.google.com/apikey)\n2. Создайте API ключ\n3. Вставьте в **⚙️ Настройки** → **Google Gemini API Key**\n4. При ошибке 429 чат автоматически переключится на Gemini\n\n**Вариант 2: Подождать**\n- Подождите 1-2 минуты\n- Попробуйте снова\n\n**Вариант 3: Пополнить баланс**\n- Пополните $5 на [openrouter.ai](https://openrouter.ai)\n- Платные запросы без лимитов`,
+              content: `❌ **Превышен лимит запросов (429)**\n\n🔄 **Попытка переключения на резервную модель провалилась**\n\n---\n\n📝 **Решения:**\n\n**Вариант 1: Настроить резервную модель (рекомендуется)**\n1. Откройте **⚙️ Настройки** → **Настройки сайта**\n2. Найдите **"Резервная модель AI"**\n3. Выберите другую модель (например, Llama 3.3 70B)\n4. При ошибке 429 чат автоматически переключится\n\n**Вариант 2: Подождать**\n- Подождите 1-2 минуты\n- Попробуйте снова\n\n**Вариант 3: Пополнить баланс**\n- Пополните $5 на [openrouter.ai](https://openrouter.ai)\n- Платные запросы без лимитов`,
               timestamp: Date.now()
             };
             setMessages(prev => [...prev, errorMsg]);
@@ -299,15 +315,15 @@ export function useAIChatHandlers({
           }
           
           toast({
-            title: `❌ Ошибка Gemini API`,
-            description: geminiErrorMsg,
+            title: `❌ Ошибка резервной модели`,
+            description: fallbackErrorMsg,
             variant: 'destructive',
             duration: 8000
           });
           
           const errorMsg: Message = {
             role: 'assistant',
-            content: `❌ **OpenRouter перегружен (429)**\n❌ **Gemini тоже не сработал**\n\n**Ошибка Gemini:** ${geminiErrorMsg}\n\n---\n\n📝 **Решение:**\n1. Проверьте Gemini API ключ в настройках\n2. Или подождите 1-2 минуты\n3. Или пополните баланс на openrouter.ai`,
+            content: `❌ **Основная модель перегружена (429)**\n❌ **Резервная модель тоже не сработала**\n\n**Ошибка:** ${fallbackErrorMsg}\n\n---\n\n📝 **Решение:**\n1. Подождите 1-2 минуты\n2. Попробуйте другую модель в настройках\n3. Или пополните баланс на openrouter.ai ($5)`,
             timestamp: Date.now()
           };
           setMessages(prev => [...prev, errorMsg]);
