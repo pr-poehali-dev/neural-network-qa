@@ -9,18 +9,16 @@ export default function Footer() {
     {
       title: 'Компания',
       links: [
-        { label: 'Возможности', href: '/#features' },
-        { label: 'Обновления', href: '/#updates' },
         { label: 'О нас', href: '/about' },
-        { label: 'Связаться с нами', href: '/contact' }
+        { label: 'Контакты', href: '/contact' },
+        { label: 'Помощь', href: '/help' },
       ]
     },
     {
       title: 'Документы',
       links: [
-        { label: 'Политика конфиденциальности', href: '/privacy' },
-        { label: 'Условия использования', href: '/terms' },
-        { label: 'Лицензионное соглашение', href: '/license' }
+        { label: 'Конфиденциальность', href: '/privacy' },
+        { label: 'Условия', href: '/terms' },
       ]
     }
   ];

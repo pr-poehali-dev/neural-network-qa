@@ -59,7 +59,7 @@ export default function AIChatHeader({ model, onExport, onClear, onClose, onTogg
             <Icon name="Sparkles" size={20} className="text-white" />
           </div>
           <div>
-            <h3 className="font-bold text-white text-lg">AI Ассистент</h3>
+            <h3 className="font-bold text-white text-lg">Богдан</h3>
             {isAdmin && onModelChange ? (
               <button 
                 onClick={() => {

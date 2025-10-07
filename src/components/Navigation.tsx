@@ -34,8 +34,18 @@ export default function Navigation({ onSettingsClick }: NavigationProps) {
   const menuItems = [
     { icon: 'Home', label: t.nav.home, href: '/' },
     { icon: 'Sparkles', label: t.nav.features, action: scrollToFeatures },
+    { icon: 'MessageSquare', label: 'Чат', href: '/', action: () => {} },
+    { icon: 'Languages', label: 'Переводчик', href: '/', action: () => {} },
+    { icon: 'Mic', label: 'Голосовой ввод', href: '/', action: () => {} },
+    { icon: 'FileText', label: 'Работа с файлами', href: '/', action: () => {} },
+    { icon: 'Zap', label: 'Команды', href: '/', action: () => {} },
     { icon: 'BookOpen', label: t.nav.docs, href: '/docs' },
+    { icon: 'HelpCircle', label: 'Помощь', href: '/help' },
     { icon: 'MessageSquare', label: t.nav.support, href: '/support' },
+    { icon: 'Users', label: 'О нас', href: '/about' },
+    { icon: 'Phone', label: 'Контакты', href: '/contact' },
+    { icon: 'Shield', label: 'Конфиденциальность', href: '/privacy' },
+    { icon: 'FileText', label: 'Условия', href: '/terms' },
   ];
 
   return (
