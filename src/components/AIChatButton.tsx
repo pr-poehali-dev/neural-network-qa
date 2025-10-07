@@ -10,6 +10,7 @@ import AIChatMessages, { Message } from '@/components/chat/AIChatMessages';
 import AIChatInput from '@/components/chat/AIChatInput';
 import AIChatStats from '@/components/chat/AIChatStats';
 import SpecialCommands from '@/components/chat/SpecialCommands';
+import ApiKeySetupGuide from '@/components/ApiKeySetupGuide';
 
 interface AIChatButtonProps {
   className?: string;
@@ -101,6 +102,17 @@ export default function AIChatButton({
       } catch (e) {
         console.error('Failed to load chat history:', e);
       }
+    } else {
+      // Приветственное сообщение при первом открытии
+      const hasApiKey = apiKey || localStorage.getItem('openrouter_api_key');
+      const welcomeMsg: Message = {
+        role: 'assistant',
+        content: hasApiKey 
+          ? `👋 **Добро пожаловать в AI чат!**\n\nЯ готов помочь вам с любыми вопросами. Вы можете:\n\n• Задавать вопросы на любые темы\n• Прикреплять файлы и изображения\n• Использовать голосовой ввод\n• Переводить тексты\n• Генерировать контент\n\nПросто напишите ваш вопрос! 💬`
+          : `👋 **Добро пожаловать!**\n\n⚠️ **Для работы чата нужно настроить API ключ:**\n\n1. Нажмите **⚙️ Настройки** в верхней панели\n2. Введите пароль: **bogdan2025**\n3. Перейдите в **"Настройки сайта"**\n4. Прокрутите до **"Настройки AI чат-бота"**\n5. Получите бесплатный ключ на [openrouter.ai/keys](https://openrouter.ai/keys)\n6. Вставьте ключ и сохраните\n\n✅ После этого чат заработает!`,
+        timestamp: Date.now()
+      };
+      setMessages([welcomeMsg]);
     }
   }, []);
 
@@ -175,11 +187,18 @@ export default function AIChatButton({
     const storedApiKey = apiKey || localStorage.getItem('openrouter_api_key');
     
     if (!storedApiKey) {
+      const errorMsg: Message = {
+        role: 'assistant',
+        content: `❌ **API ключ не настроен**\n\n📝 **Как исправить:**\n\n1. Нажмите кнопку **⚙️ Настройки** в верхней панели\n2. Введите пароль: **bogdan2025**\n3. Перейдите в раздел **"Настройки сайта"**\n4. Прокрутите вниз до **"Настройки AI чат-бота"**\n5. Вставьте **OpenRouter API ключ**\n   - Получить бесплатно: [openrouter.ai/keys](https://openrouter.ai/keys)\n6. Нажмите **"Сохранить настройки"**\n\n💡 После настройки чат будет работать!`,
+        timestamp: Date.now()
+      };
+      setMessages(prev => [...prev, errorMsg]);
+      
       toast({
-        title: `❌ ${t.errors.noApiKey}`,
-        description: `💡 ${t.errors.setupApiKey}`,
+        title: `❌ API ключ не настроен`,
+        description: `Зайдите в админ-панель (⚙️) → Настройки сайта`,
         variant: 'destructive',
-        duration: 5000
+        duration: 8000
       });
       return;
     }
@@ -286,16 +305,27 @@ export default function AIChatButton({
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : t.errors.failedToGetResponse;
       
+      let helpText = '';
+      if (errorMessage.includes('401') || errorMessage.includes('Invalid')) {
+        helpText = '\n\n**Решение:** Проверьте API ключ в админ-панели (⚙️ → Настройки сайта)';
+      } else if (errorMessage.includes('402') || errorMessage.includes('credits')) {
+        helpText = '\n\n**Решение:** Пополните баланс на openrouter.ai или выберите бесплатную модель';
+      } else if (errorMessage.includes('404') || errorMessage.includes('model')) {
+        helpText = '\n\n**Решение:** Измените модель в админ-панели (⚙️ → Настройки сайта → Модель AI)';
+      } else {
+        helpText = '\n\n**Решение:** Проверьте интернет-соединение и API ключ';
+      }
+      
       toast({
-        title: `❌ ${t.errors.providerError}`,
-        description: `💡 ${t.errors.checkApiKey}`,
+        title: `❌ Ошибка API`,
+        description: errorMessage,
         variant: 'destructive',
-        duration: 6000
+        duration: 8000
       });
       
       const errorMsg: Message = {
         role: 'assistant',
-        content: `❌ ${t.errors.providerError}\n\n${errorMessage}\n\n💡 ${t.errors.checkApiKey}`,
+        content: `❌ **Ошибка подключения к AI**\n\n**Детали:** ${errorMessage}${helpText}\n\n---\n\n📝 **Инструкция по настройке:**\n1. Нажмите **⚙️ Настройки** → введите пароль **bogdan2025**\n2. Прокрутите до **"Настройки AI чат-бота"**\n3. Вставьте корректный **OpenRouter API ключ**\n4. Выберите **бесплатную модель** (Google Gemini 2.0 Flash)\n5. Сохраните настройки`,
         timestamp: Date.now()
       };
       setMessages(prev => [...prev, errorMsg]);
@@ -369,6 +399,22 @@ export default function AIChatButton({
           totalTokens={totalTokens}
           messageCount={messages.length}
         />
+
+        {!apiKey && !localStorage.getItem('openrouter_api_key') && (
+          <ApiKeySetupGuide onOpenSettings={() => {
+            if (!embedded) {
+              setShowChat(false);
+            }
+            setTimeout(() => {
+              const settingsBtn = document.querySelector('[data-settings-btn]') as HTMLElement;
+              if (settingsBtn) {
+                settingsBtn.click();
+              } else {
+                window.location.href = '/admin';
+              }
+            }, 100);
+          }} />
+        )}
 
         {showSpecialCommands ? (
           <div className="flex-1 overflow-y-auto bg-gradient-to-br from-slate-900 to-slate-800">
