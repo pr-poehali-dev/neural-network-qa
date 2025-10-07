@@ -56,8 +56,16 @@ export default function Index() {
   const enableAIChatNow = async () => {
     setDiagnostic({ status: 'checking', message: 'Проверяю API ключ...' });
     
-    const apiKey = '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';
+    const apiKey = localStorage.getItem('openrouter_api_key');
     const model = 'google/gemini-flash-1.5-8b';
+    
+    if (!apiKey) {
+      setDiagnostic({ 
+        status: 'error', 
+        message: 'Добавьте OpenRouter API ключ в админ-панели (Настройки → OpenRouter API Key)' 
+      });
+      return;
+    }
     
     try {
       const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {

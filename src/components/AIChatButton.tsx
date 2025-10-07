@@ -108,8 +108,19 @@ export default function AIChatButton({
       });
 
       if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error?.message || 'API request failed');
+        let errorMsg = 'API request failed';
+        try {
+          const error = await response.json();
+          errorMsg = error.error?.message || error.message || errorMsg;
+        } catch (e) {
+          errorMsg = `HTTP ${response.status}`;
+        }
+        
+        if (response.status === 401) {
+          throw new Error('API ключ недействителен. Получите новый на openrouter.ai/keys');
+        }
+        
+        throw new Error(errorMsg);
       }
 
       const data = await response.json();

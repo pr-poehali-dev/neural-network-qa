@@ -241,23 +241,24 @@ export default function SiteSettingsTab({ settings, onUpdateSettings }: SiteSett
                 className="border-purple-200"
                 placeholder="sk-or-v1-..."
               />
-              <p className="text-xs text-gray-500 mt-1">
-                Получите ключ на{' '}
-                <a 
-                  href="https://openrouter.ai/keys" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="text-purple-600 hover:underline"
-                >
-                  openrouter.ai/keys
-                </a>
-                {' '}|{' '}
+              <div className="mt-2 p-3 bg-blue-50 border border-blue-200 rounded-md">
+                <p className="text-xs font-medium text-blue-900 mb-1">
+                  🎁 Как получить бесплатный доступ:
+                </p>
+                <ol className="text-xs text-blue-800 space-y-1 ml-4 list-decimal">
+                  <li>Зарегистрируйтесь на <a href="https://openrouter.ai/keys" target="_blank" rel="noopener noreferrer" className="underline font-medium">openrouter.ai</a></li>
+                  <li>Создайте API ключ (Credits → Create Key)</li>
+                  <li>Скопируйте ключ и вставьте сюда</li>
+                  <li>Выберите бесплатную модель ниже ⬇️</li>
+                </ol>
+              </div>
+              <p className="text-xs text-gray-500 mt-2">
                 <a 
                   href="/ai-test" 
                   target="_blank"
                   className="text-green-600 hover:underline font-medium"
                 >
-                  🧪 Протестировать AI
+                  🧪 Протестировать AI после настройки
                 </a>
               </p>
             </div>
