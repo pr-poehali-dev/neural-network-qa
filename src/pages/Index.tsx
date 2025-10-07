@@ -15,6 +15,13 @@ export default function Index() {
     if (savedSettings) {
       try {
         const settings = JSON.parse(savedSettings);
+        
+        if (settings.aiModel === 'deepseek/deepseek-r1' || settings.aiModel === 'deepseek/deepseek-r1:free') {
+          console.warn('🔧 Автомиграция: меняю недоступную модель R1 → Chat');
+          settings.aiModel = 'deepseek/deepseek-chat';
+          localStorage.setItem('site_settings', JSON.stringify(settings));
+        }
+        
         console.log('📦 Распарсил настройки:', settings);
         
         if (settings.whatsappNumber || settings.telegramUsername) {
