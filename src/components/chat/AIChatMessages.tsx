@@ -19,6 +19,12 @@ interface AIChatMessagesProps {
   onCopyMessage: (content: string) => void;
   showQuickPrompts: boolean;
   onQuickPrompt: (text: string) => void;
+  translatedLanguage?: string | null;
+  translatedMessages?: Map<number, string>;
+  isSpeaking?: boolean;
+  currentSpeakingIndex?: number | null;
+  onSpeakMessage?: (text: string, index: number, language: string) => void;
+  onStopSpeaking?: () => void;
 }
 
 const QUICK_PROMPTS = [
@@ -42,7 +48,13 @@ export default function AIChatMessages({
   messagesEndRef, 
   onCopyMessage,
   showQuickPrompts,
-  onQuickPrompt
+  onQuickPrompt,
+  translatedLanguage,
+  translatedMessages,
+  isSpeaking,
+  currentSpeakingIndex,
+  onSpeakMessage,
+  onStopSpeaking
 }: AIChatMessagesProps) {
   const [showQuickMenu, setShowQuickMenu] = useState(false);
   const [showTranslator, setShowTranslator] = useState(false);
@@ -127,9 +139,17 @@ export default function AIChatMessages({
                       remarkPlugins={[remarkGfm]}
                       rehypePlugins={[rehypeRaw]}
                     >
-                      {msg.content}
+                      {translatedLanguage && translatedMessages?.has(idx) 
+                        ? translatedMessages.get(idx) || msg.content
+                        : msg.content}
                     </ReactMarkdown>
                   </div>
+                  {translatedLanguage && translatedMessages?.has(idx) && (
+                    <div className="mt-2 text-xs opacity-70 flex items-center gap-1">
+                      <Icon name="Languages" size={12} />
+                      <span>Переведено на {translatedLanguage}</span>
+                    </div>
+                  )}
                   {msg.timestamp && (
                     <p className="text-xs opacity-60 mt-1">
                       {new Date(msg.timestamp).toLocaleTimeString('ru-RU', { 
@@ -141,17 +161,38 @@ export default function AIChatMessages({
                 </div>
               </div>
               
-              {msg.role === 'assistant' && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => onCopyMessage(msg.content)}
-                  className="absolute -right-10 top-2 opacity-0 group-hover:opacity-100 transition-opacity"
-                  title="Копировать"
-                >
-                  <Icon name="Copy" size={14} />
-                </Button>
-              )}
+              <div className="absolute -right-10 top-2 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col gap-1">
+                {msg.role === 'assistant' && onSpeakMessage && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => {
+                      if (currentSpeakingIndex === idx && isSpeaking) {
+                        onStopSpeaking?.();
+                      } else {
+                        const textToSpeak = translatedLanguage && translatedMessages?.has(idx) 
+                          ? translatedMessages.get(idx) || msg.content
+                          : msg.content;
+                        onSpeakMessage(textToSpeak, idx, translatedLanguage || 'ru');
+                      }
+                    }}
+                    className={currentSpeakingIndex === idx && isSpeaking ? 'text-green-500' : ''}
+                    title={currentSpeakingIndex === idx && isSpeaking ? 'Остановить' : 'Озвучить'}
+                  >
+                    <Icon name={currentSpeakingIndex === idx && isSpeaking ? 'Volume2' : 'Volume'} size={14} />
+                  </Button>
+                )}
+                {msg.role === 'assistant' && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => onCopyMessage(translatedLanguage && translatedMessages?.has(idx) ? translatedMessages.get(idx) || msg.content : msg.content)}
+                    title="Копировать"
+                  >
+                    <Icon name="Copy" size={14} />
+                  </Button>
+                )}
+              </div>
             </div>
           </div>
         ))}

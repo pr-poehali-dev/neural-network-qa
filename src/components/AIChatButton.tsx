@@ -195,6 +195,13 @@ export default function AIChatButton({
         onSpecialCommand={handleSpecialCommand}
         onToggleSpecialCommands={() => state.setShowSpecialCommands(!state.showSpecialCommands)}
         onModelChange={handleModelChange}
+        translatedLanguage={state.translatedLanguage}
+        translatedMessages={state.translatedMessages}
+        onTranslateAll={(lang) => handlers.translateAllMessages(lang, state.setTranslatedLanguage, state.setTranslatedMessages)}
+        isSpeaking={state.isSpeaking}
+        currentSpeakingIndex={state.currentSpeakingIndex}
+        onSpeakMessage={(text, index, lang) => handlers.speakMessage(text, index, lang, state.setIsSpeaking, state.setCurrentSpeakingIndex)}
+        onStopSpeaking={() => handlers.stopSpeaking(state.setIsSpeaking, state.setCurrentSpeakingIndex)}
       />
     );
   }

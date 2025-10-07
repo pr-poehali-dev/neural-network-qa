@@ -10,8 +10,8 @@ export default function About() {
       image: 'https://cdn.poehali.dev/files/87ea466b-a4a1-4746-bc8a-c980f029ba08.png',
       description: 'Основатель проекта "Богдан ИИ". Агент отдела дополнительного обслуживания аэропорта Пулково.',
       social: {
-        linkedin: '#',
-        twitter: '#',
+        telegram: 'https://t.me/bogdankop',
+        whatsapp: 'https://wa.me/79111234567',
         email: 'bogdan@bogdan-ai.com'
       }
     },
@@ -21,8 +21,8 @@ export default function About() {
       image: 'https://cdn.poehali.dev/files/f544efcc-ed58-4c61-857e-6eb90a748068.png',
       description: 'Сооснователь и технический директор. Агент отдела дополнительного обслуживания аэропорта Пулково.',
       social: {
-        linkedin: '#',
-        twitter: '#',
+        telegram: 'https://t.me/andreypashkov',
+        whatsapp: 'https://wa.me/79117654321',
         email: 'andrey@bogdan-ai.com'
       }
     }
@@ -167,22 +167,29 @@ export default function About() {
                     <p className="text-gray-400 text-sm mb-4">{member.description}</p>
                     <div className="flex gap-3">
                       <a
+                        href={member.social.telegram}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 border border-white/10 rounded-lg flex items-center justify-center transition-all hover:scale-110 text-white"
+                        title="Telegram"
+                      >
+                        <Icon name="Send" size={18} />
+                      </a>
+                      <a
+                        href={member.social.whatsapp}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="w-10 h-10 bg-gradient-to-br from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 border border-white/10 rounded-lg flex items-center justify-center transition-all hover:scale-110 text-white"
+                        title="WhatsApp"
+                      >
+                        <Icon name="MessageCircle" size={18} />
+                      </a>
+                      <a
                         href={`mailto:${member.social.email}`}
                         className="w-10 h-10 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg flex items-center justify-center transition-all hover:scale-110"
+                        title="Email"
                       >
                         <Icon name="Mail" size={18} className="text-gray-400" />
-                      </a>
-                      <a
-                        href={member.social.linkedin}
-                        className="w-10 h-10 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg flex items-center justify-center transition-all hover:scale-110"
-                      >
-                        <Icon name="Linkedin" size={18} className="text-gray-400" />
-                      </a>
-                      <a
-                        href={member.social.twitter}
-                        className="w-10 h-10 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg flex items-center justify-center transition-all hover:scale-110"
-                      >
-                        <Icon name="Twitter" size={18} className="text-gray-400" />
                       </a>
                     </div>
                   </div>

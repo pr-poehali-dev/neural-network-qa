@@ -21,6 +21,10 @@ export function useAIChatState({ embedded, apiKey }: UseAIChatStateProps) {
     dataUrl?: string;
   }[]>([]);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [translatedLanguage, setTranslatedLanguage] = useState<string | null>(null);
+  const [translatedMessages, setTranslatedMessages] = useState<Map<number, string>>(new Map());
+  const [isSpeaking, setIsSpeaking] = useState(false);
+  const [currentSpeakingIndex, setCurrentSpeakingIndex] = useState<number | null>(null);
   
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -84,5 +88,13 @@ export function useAIChatState({ embedded, apiKey }: UseAIChatStateProps) {
     messagesEndRef,
     fileInputRef,
     imageInputRef,
+    translatedLanguage,
+    setTranslatedLanguage,
+    translatedMessages,
+    setTranslatedMessages,
+    isSpeaking,
+    setIsSpeaking,
+    currentSpeakingIndex,
+    setCurrentSpeakingIndex,
   };
 }

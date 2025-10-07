@@ -39,6 +39,13 @@ interface AIChatContainerProps {
   onSpecialCommand: (prompt: string) => void;
   onToggleSpecialCommands: () => void;
   onModelChange?: (model: string) => void;
+  translatedLanguage?: string | null;
+  translatedMessages?: Map<number, string>;
+  onTranslateAll?: (language: string) => void;
+  isSpeaking?: boolean;
+  currentSpeakingIndex?: number | null;
+  onSpeakMessage?: (text: string, index: number, language: string) => void;
+  onStopSpeaking?: () => void;
 }
 
 export default function AIChatContainer({
@@ -70,7 +77,14 @@ export default function AIChatContainer({
   onRemoveFile,
   onSpecialCommand,
   onToggleSpecialCommands,
-  onModelChange
+  onModelChange,
+  translatedLanguage,
+  translatedMessages,
+  onTranslateAll,
+  isSpeaking,
+  currentSpeakingIndex,
+  onSpeakMessage,
+  onStopSpeaking
 }: AIChatContainerProps) {
   const { t } = useTranslation();
 
@@ -91,6 +105,7 @@ export default function AIChatContainer({
         isFullscreen={isFullscreen}
         onQuickPrompt={onQuickPrompt}
         onModelChange={onModelChange}
+        onTranslateAll={onTranslateAll}
       />
 
       <AIChatStats
@@ -137,6 +152,12 @@ export default function AIChatContainer({
           onCopyMessage={onCopyMessage}
           showQuickPrompts={showQuickPrompts}
           onQuickPrompt={onQuickPrompt}
+          translatedLanguage={translatedLanguage}
+          translatedMessages={translatedMessages}
+          isSpeaking={isSpeaking}
+          currentSpeakingIndex={currentSpeakingIndex}
+          onSpeakMessage={onSpeakMessage}
+          onStopSpeaking={onStopSpeaking}
         />
       )}
 

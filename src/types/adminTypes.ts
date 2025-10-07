@@ -51,4 +51,4 @@ export interface CustomPage {
   content: string;
 }
 
-export type AdminTabType = 'dashboard' | 'site' | 'files' | 'stats' | 'content' | 'buttons' | 'analytics' | 'voice' | 'control' | 'visual' | 'security' | 'languages';
+export type AdminTabType = 'dashboard' | 'site' | 'files' | 'stats' | 'content' | 'site-content' | 'buttons' | 'analytics' | 'voice' | 'control' | 'visual' | 'security' | 'languages';

@@ -12,9 +12,10 @@ interface AIChatHeaderProps {
   isFullscreen?: boolean;
   onQuickPrompt?: (text: string) => void;
   onModelChange?: (model: string) => void;
+  onTranslateAll?: (language: string) => void;
 }
 
-export default function AIChatHeader({ model, onExport, onClear, onClose, onToggleFullscreen, isFullscreen, onQuickPrompt, onModelChange }: AIChatHeaderProps) {
+export default function AIChatHeader({ model, onExport, onClear, onClose, onToggleFullscreen, isFullscreen, onQuickPrompt, onModelChange, onTranslateAll }: AIChatHeaderProps) {
   const [showQuickMenu, setShowQuickMenu] = useState(false);
   const [showTranslator, setShowTranslator] = useState(false);
   const [showModelSelector, setShowModelSelector] = useState(false);
@@ -147,34 +148,41 @@ export default function AIChatHeader({ model, onExport, onClear, onClose, onTogg
           </p>
           <div className="grid grid-cols-3 gap-2">
             {[
-              { text: 'Переведи на английский', flag: '🇬🇧', name: 'English' },
-              { text: 'Переведи на испанский', flag: '🇪🇸', name: 'Español' },
-              { text: 'Переведи на немецкий', flag: '🇩🇪', name: 'Deutsch' },
-              { text: 'Переведи на французский', flag: '🇫🇷', name: 'Français' },
-              { text: 'Переведи на китайский', flag: '🇨🇳', name: '中文' },
-              { text: 'Переведи на японский', flag: '🇯🇵', name: '日本語' },
-              { text: 'Переведи на корейский', flag: '🇰🇷', name: '한국어' },
-              { text: 'Переведи на итальянский', flag: '🇮🇹', name: 'Italiano' },
-              { text: 'Переведи на португальский', flag: '🇵🇹', name: 'Português' },
-              { text: 'Переведи на арабский', flag: '🇸🇦', name: 'العربية' },
-              { text: 'Переведи на турецкий', flag: '🇹🇷', name: 'Türkçe' },
-              { text: 'Переведи на польский', flag: '🇵🇱', name: 'Polski' },
-              { text: 'Переведи на украинский', flag: '🇺🇦', name: 'Українська' },
-              { text: 'Переведи на чешский', flag: '🇨🇿', name: 'Čeština' },
-              { text: 'Переведи на греческий', flag: '🇬🇷', name: 'Ελληνικά' },
-              { text: 'Переведи на хинди', flag: '🇮🇳', name: 'हिन्दी' },
-              { text: 'Переведи на тайский', flag: '🇹🇭', name: 'ไทย' },
-              { text: 'Переведи на вьетнамский', flag: '🇻🇳', name: 'Tiếng Việt' },
-              { text: 'Переведи на голландский', flag: '🇳🇱', name: 'Nederlands' },
-              { text: 'Переведи на шведский', flag: '🇸🇪', name: 'Svenska' },
-              { text: 'Переведи на финский', flag: '🇫🇮', name: 'Suomi' },
-              { text: 'Переведи на норвежский', flag: '🇳🇴', name: 'Norsk' },
-              { text: 'Переведи на датский', flag: '🇩🇰', name: 'Dansk' },
-              { text: 'Переведи на румынский', flag: '🇷🇴', name: 'Română' },
+              { code: 'en', text: 'Переведи на английский', flag: '🇬🇧', name: 'English' },
+              { code: 'es', text: 'Переведи на испанский', flag: '🇪🇸', name: 'Español' },
+              { code: 'de', text: 'Переведи на немецкий', flag: '🇩🇪', name: 'Deutsch' },
+              { code: 'fr', text: 'Переведи на французский', flag: '🇫🇷', name: 'Français' },
+              { code: 'zh', text: 'Переведи на китайский', flag: '🇨🇳', name: '中文' },
+              { code: 'ja', text: 'Переведи на японский', flag: '🇯🇵', name: '日本語' },
+              { code: 'ko', text: 'Переведи на корейский', flag: '🇰🇷', name: '한국어' },
+              { code: 'it', text: 'Переведи на итальянский', flag: '🇮🇹', name: 'Italiano' },
+              { code: 'pt', text: 'Переведи на португальский', flag: '🇵🇹', name: 'Português' },
+              { code: 'ar', text: 'Переведи на арабский', flag: '🇸🇦', name: 'العربية' },
+              { code: 'tr', text: 'Переведи на турецкий', flag: '🇹🇷', name: 'Türkçe' },
+              { code: 'pl', text: 'Переведи на польский', flag: '🇵🇱', name: 'Polski' },
+              { code: 'uk', text: 'Переведи на украинский', flag: '🇺🇦', name: 'Українська' },
+              { code: 'cs', text: 'Переведи на чешский', flag: '🇨🇿', name: 'Čeština' },
+              { code: 'el', text: 'Переведи на греческий', flag: '🇬🇷', name: 'Ελληνικά' },
+              { code: 'hi', text: 'Переведи на хинди', flag: '🇮🇳', name: 'हिन्दी' },
+              { code: 'th', text: 'Переведи на тайский', flag: '🇹🇭', name: 'ไทย' },
+              { code: 'vi', text: 'Переведи на вьетнамский', flag: '🇻🇳', name: 'Tiếng Việt' },
+              { code: 'nl', text: 'Переведи на голландский', flag: '🇳🇱', name: 'Nederlands' },
+              { code: 'sv', text: 'Переведи на шведский', flag: '🇸🇪', name: 'Svenska' },
+              { code: 'fi', text: 'Переведи на финский', flag: '🇫🇮', name: 'Suomi' },
+              { code: 'no', text: 'Переведи на норвежский', flag: '🇳🇴', name: 'Norsk' },
+              { code: 'da', text: 'Переведи на датский', flag: '🇩🇰', name: 'Dansk' },
+              { code: 'ro', text: 'Переведи на румынский', flag: '🇷🇴', name: 'Română' },
             ].map((lang, idx) => (
               <button
                 key={idx}
-                onClick={() => handlePromptClick(lang.text)}
+                onClick={() => {
+                  if (onTranslateAll) {
+                    onTranslateAll(lang.code);
+                    setShowTranslator(false);
+                  } else {
+                    handlePromptClick(lang.text);
+                  }
+                }}
                 className="bg-blue-600/40 hover:bg-blue-600/60 text-white text-xs py-2 px-2 rounded-lg transition-all hover:scale-105 flex items-center gap-1 justify-center"
                 title={lang.name}
               >

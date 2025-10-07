@@ -18,6 +18,7 @@ const tabs: TabConfig[] = [
   { id: 'dashboard', icon: 'LayoutDashboard', label: 'Дашборд' },
   { id: 'site', icon: 'Globe', label: 'Настройки сайта' },
   { id: 'content', icon: 'FileEdit', label: 'Контент' },
+  { id: 'site-content', icon: 'Edit', label: 'Редактор сайта', gradient: 'from-yellow-500 to-orange-500 shadow-yellow-500/50' },
   { id: 'files', icon: 'FileText', label: 'Файлы' },
   { id: 'stats', icon: 'BarChart', label: 'Статистика' },
   { id: 'buttons', icon: 'Zap', label: 'Быстрые кнопки' },

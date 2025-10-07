@@ -413,12 +413,99 @@ export function useAIChatHandlers({
     toast({ title: t.notifications.chatExported });
   };
 
+  const translateText = async (text: string, targetLang: string): Promise<string> => {
+    try {
+      const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${targetLang}&dt=t&q=${encodeURIComponent(text)}`;
+      const response = await fetch(url);
+      const data = await response.json();
+      return data[0].map((item: any) => item[0]).join('');
+    } catch (error) {
+      console.error('Translation error:', error);
+      return text;
+    }
+  };
+
+  const translateAllMessages = async (targetLanguage: string, setTranslatedLanguage: (lang: string | null) => void, setTranslatedMessages: (map: Map<number, string>) => void) => {
+    if (!targetLanguage) {
+      setTranslatedLanguage(null);
+      setTranslatedMessages(new Map());
+      toast({ title: 'Перевод отключен' });
+      return;
+    }
+
+    toast({ title: `Перевожу все сообщения на ${targetLanguage}...` });
+    
+    const translatedMap = new Map<number, string>();
+    
+    for (let i = 0; i < messages.length; i++) {
+      const msg = messages[i];
+      const translated = await translateText(msg.content, targetLanguage);
+      translatedMap.set(i, translated);
+    }
+    
+    setTranslatedLanguage(targetLanguage);
+    setTranslatedMessages(translatedMap);
+    toast({ title: `✅ Все сообщения переведены!` });
+  };
+
+  const speakMessage = async (
+    text: string, 
+    index: number,
+    language: string,
+    setIsSpeaking: (val: boolean) => void,
+    setCurrentSpeakingIndex: (val: number | null) => void
+  ) => {
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+      
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = language || 'ru-RU';
+      utterance.rate = 0.9;
+      utterance.pitch = 1.0;
+      
+      const voices = window.speechSynthesis.getVoices();
+      const voice = voices.find(v => v.lang.startsWith(language)) || voices[0];
+      if (voice) utterance.voice = voice;
+      
+      utterance.onstart = () => {
+        setIsSpeaking(true);
+        setCurrentSpeakingIndex(index);
+      };
+      
+      utterance.onend = () => {
+        setIsSpeaking(false);
+        setCurrentSpeakingIndex(null);
+      };
+      
+      utterance.onerror = () => {
+        setIsSpeaking(false);
+        setCurrentSpeakingIndex(null);
+        toast({ title: 'Ошибка озвучивания', variant: 'destructive' });
+      };
+      
+      window.speechSynthesis.speak(utterance);
+    } else {
+      toast({ title: 'Озвучка не поддерживается браузером', variant: 'destructive' });
+    }
+  };
+
+  const stopSpeaking = (setIsSpeaking: (val: boolean) => void, setCurrentSpeakingIndex: (val: number | null) => void) => {
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+      setIsSpeaking(false);
+      setCurrentSpeakingIndex(null);
+    }
+  };
+
   return {
     handleFileUpload,
     removeFile,
     sendMessage,
     clearHistory,
     copyMessage,
-    exportChat
+    exportChat,
+    translateAllMessages,
+    speakMessage,
+    stopSpeaking
   };
 }

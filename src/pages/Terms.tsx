@@ -1,8 +1,13 @@
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import Icon from '@/components/ui/icon';
+import { useEffect } from 'react';
 
 export default function Terms() {
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, []);
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
       <Navigation onSettingsClick={() => {}} />

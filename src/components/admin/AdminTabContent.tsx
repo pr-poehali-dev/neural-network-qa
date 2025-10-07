@@ -2,6 +2,7 @@ import { AdminTabType, UploadedFile, CustomPage, SiteSettings } from '@/types/ad
 import DashboardTab from '@/components/admin/DashboardTab';
 import SiteSettingsTab from '@/components/admin/SiteSettingsTab';
 import ContentTab from '@/components/admin/ContentTab';
+import SiteContentEditor from '@/components/admin/SiteContentEditor';
 import FilesTab from '@/components/admin/FilesTab';
 import StatsTab from '@/components/admin/StatsTab';
 import QuickButtonsTab from '@/components/admin/QuickButtonsTab';
@@ -83,6 +84,10 @@ export default function AdminTabContent(props: AdminTabContentProps) {
         onSavePages={onSavePages}
       />
     );
+  }
+
+  if (activeTab === 'site-content') {
+    return <SiteContentEditor />;
   }
 
   if (activeTab === 'files') {
