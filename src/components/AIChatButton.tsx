@@ -282,6 +282,10 @@ export default function AIChatButton({
           throw new Error(t.errors.modelNotFound);
         }
         
+        if (response.status === 429) {
+          throw new Error('Превышен лимит запросов. Попробуйте через 1 минуту или выберите другую модель.');
+        }
+        
         throw new Error(errorMsg);
       }
 
@@ -312,6 +316,8 @@ export default function AIChatButton({
         helpText = '\n\n**Решение:** Пополните баланс на openrouter.ai или выберите бесплатную модель';
       } else if (errorMessage.includes('404') || errorMessage.includes('model')) {
         helpText = '\n\n**Решение:** Измените модель в админ-панели (⚙️ → Настройки сайта → Модель AI)';
+      } else if (errorMessage.includes('429') || errorMessage.includes('rate limit')) {
+        helpText = '\n\n**Решение:** Превышен лимит запросов. Подождите 1 минуту или выберите другую модель';
       } else {
         helpText = '\n\n**Решение:** Проверьте интернет-соединение и API ключ';
       }

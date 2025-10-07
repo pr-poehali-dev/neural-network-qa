@@ -272,8 +272,9 @@ export default function SiteSettingsTab({ settings, onUpdateSettings }: SiteSett
               >
                 <optgroup label="🎁 Бесплатные модели (навсегда!)">
                   <option value="google/gemini-2.0-flash-exp:free">Google Gemini 2.0 Flash (бесплатно, быстро) ⭐</option>
+                  <option value="meta-llama/llama-3.3-70b-instruct:free">Meta Llama 3.3 70B Instruct (бесплатно, мощнее) 🔥</option>
                   <option value="meta-llama/llama-3.1-8b-instruct:free">Meta Llama 3.1 8B (бесплатно)</option>
-                  <option value="meta-llama/llama-3.1-70b-instruct:free">Meta Llama 3.1 70B (бесплатно, мощнее)</option>
+                  <option value="meta-llama/llama-3.1-70b-instruct:free">Meta Llama 3.1 70B (бесплатно)</option>
                   <option value="microsoft/phi-3-medium-128k-instruct:free">Microsoft Phi-3 (бесплатно)</option>
                 </optgroup>
                 <optgroup label="💰 Очень дешёвые ($0.14/1M)">
