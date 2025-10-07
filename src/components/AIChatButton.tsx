@@ -29,7 +29,7 @@ export default function AIChatButton({
   const [isLoading, setIsLoading] = useState(false);
   const [showQuickPrompts, setShowQuickPrompts] = useState(true);
   const [totalTokens, setTotalTokens] = useState(0);
-  const [uploadedFiles, setUploadedFiles] = useState<{name: string; content: string}[]>([]);
+  const [uploadedFiles, setUploadedFiles] = useState<{name: string; content: string; type: 'text' | 'image'; dataUrl?: string}[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const imageInputRef = useRef<HTMLInputElement>(null);
@@ -61,11 +61,11 @@ export default function AIChatButton({
     }
   }, [messages]);
 
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, type: 'text' | 'image') => {
     const files = e.target.files;
     if (!files || files.length === 0) return;
 
-    const newFiles: {name: string; content: string}[] = [];
+    const newFiles: {name: string; content: string; type: 'text' | 'image'; dataUrl?: string}[] = [];
     
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
@@ -79,8 +79,20 @@ export default function AIChatButton({
       }
 
       try {
-        const text = await file.text();
-        newFiles.push({ name: file.name, content: text });
+        if (type === 'image') {
+          // Для изображений создаём base64 data URL
+          const reader = new FileReader();
+          const dataUrl = await new Promise<string>((resolve, reject) => {
+            reader.onload = () => resolve(reader.result as string);
+            reader.onerror = reject;
+            reader.readAsDataURL(file);
+          });
+          newFiles.push({ name: file.name, content: '', type: 'image', dataUrl });
+        } else {
+          // Для текстовых файлов читаем текст
+          const text = await file.text();
+          newFiles.push({ name: file.name, content: text, type: 'text' });
+        }
       } catch (error) {
         toast({
           title: 'Ошибка чтения файла',
@@ -93,14 +105,13 @@ export default function AIChatButton({
     if (newFiles.length > 0) {
       setUploadedFiles(prev => [...prev, ...newFiles]);
       toast({
-        title: `Загружено файлов: ${newFiles.length}`,
+        title: `Загружено: ${newFiles.length}`,
         description: newFiles.map(f => f.name).join(', ')
       });
     }
     
-    if (fileInputRef.current) {
-      fileInputRef.current.value = '';
-    }
+    if (fileInputRef.current) fileInputRef.current.value = '';
+    if (imageInputRef.current) imageInputRef.current.value = '';
   };
 
   const removeFile = (index: number) => {
@@ -123,11 +134,21 @@ export default function AIChatButton({
       return;
     }
 
+    const textFiles = uploadedFiles.filter(f => f.type === 'text');
+    const imageFiles = uploadedFiles.filter(f => f.type === 'image');
+    
     let fullContent = messageToSend;
-    if (uploadedFiles.length > 0) {
+    if (textFiles.length > 0) {
       fullContent += '\n\n📎 Прикреплённые документы:\n\n';
-      uploadedFiles.forEach(file => {
+      textFiles.forEach(file => {
         fullContent += `--- ${file.name} ---\n${file.content}\n\n`;
+      });
+    }
+    
+    if (imageFiles.length > 0) {
+      fullContent += `\n\n🖼️ Прикреплено изображений: ${imageFiles.length}\n`;
+      imageFiles.forEach(file => {
+        fullContent += `📷 ${file.name}\n`;
       });
     }
 
@@ -154,10 +175,20 @@ export default function AIChatButton({
         },
         body: JSON.stringify({
           model: model,
-          messages: [...messages, userMessage].map(m => ({
-            role: m.role,
-            content: m.content
-          }))
+          messages: [...messages, userMessage].map(m => {
+            // Для сообщений с изображениями используем multimodal формат
+            if (m.files && m.files.some(f => f.type === 'image')) {
+              const content: any[] = [{ type: 'text', text: m.content }];
+              m.files.filter(f => f.type === 'image' && f.dataUrl).forEach(img => {
+                content.push({
+                  type: 'image_url',
+                  image_url: { url: img.dataUrl }
+                });
+              });
+              return { role: m.role, content };
+            }
+            return { role: m.role, content: m.content };
+          })
         })
       });
 

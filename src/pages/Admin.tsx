@@ -111,9 +111,10 @@ export default function Admin() {
   };
 
   useEffect(() => {
-    const auth = localStorage.getItem('admin_auth');
-    if (auth === 'true') {
+    const auth = localStorage.getItem('admin_auth') === 'true' || localStorage.getItem('admin_session') === 'true';
+    if (auth) {
       setIsAuthenticated(true);
+      localStorage.setItem('admin_auth', 'true');
     }
     
     const savedSettings = localStorage.getItem('site_settings');
@@ -299,6 +300,8 @@ export default function Admin() {
   const handleLogout = () => {
     setIsAuthenticated(false);
     localStorage.removeItem('admin_auth');
+    localStorage.removeItem('admin_session');
+    window.location.href = '/';
   };
 
   if (!isAuthenticated) {

@@ -10,12 +10,17 @@ interface AIChatHeaderProps {
 
 export default function AIChatHeader({ model, onExport, onClear, onClose }: AIChatHeaderProps) {
   return (
-    <div className="flex items-center justify-between p-4 border-b dark:border-gray-700 bg-gradient-to-r from-indigo-600 to-purple-600">
-      <div className="flex items-center gap-2">
-        <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
+    <div className="flex items-center justify-between p-5 border-b border-white/10 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 backdrop-blur-xl">
+      <div className="flex items-center gap-3">
+        <div className="w-10 h-10 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center">
+          <Icon name="Sparkles" size={20} className="text-white" />
+        </div>
         <div>
-          <h3 className="font-semibold text-white">Богдан отвечает</h3>
-          <p className="text-xs text-white/80">Онлайн</p>
+          <h3 className="font-bold text-white text-lg">Богдан отвечает</h3>
+          <div className="flex items-center gap-2">
+            <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+            <p className="text-xs text-white/90 font-medium">Онлайн • Gemini 2.0 Flash</p>
+          </div>
         </div>
       </div>
       <div className="flex gap-1">

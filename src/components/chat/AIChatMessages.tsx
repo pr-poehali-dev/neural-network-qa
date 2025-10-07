@@ -5,7 +5,7 @@ export interface Message {
   role: 'user' | 'assistant';
   content: string;
   timestamp?: number;
-  files?: {name: string; content: string}[];
+  files?: {name: string; content: string; type: 'text' | 'image'; dataUrl?: string}[];
 }
 
 interface AIChatMessagesProps {

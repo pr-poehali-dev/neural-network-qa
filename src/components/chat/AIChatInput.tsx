@@ -13,7 +13,7 @@ interface AIChatInputProps {
   onInputChange: (value: string) => void;
   onKeyPress: (e: React.KeyboardEvent) => void;
   onSend: () => void;
-  onFileUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onFileUpload: (e: React.ChangeEvent<HTMLInputElement>, type: 'text' | 'image') => void;
   onRemoveFile: (index: number) => void;
   isAdmin?: boolean;
 }
@@ -104,7 +104,7 @@ export default function AIChatInput({
               type="file"
               accept=".txt,.pdf,.doc,.docx,.md"
               multiple
-              onChange={onFileUpload}
+              onChange={(e) => onFileUpload(e, 'text')}
               className="hidden"
             />
             <Button
@@ -124,7 +124,7 @@ export default function AIChatInput({
           ref={imageInputRef}
           type="file"
           accept="image/*"
-          onChange={onFileUpload}
+          onChange={(e) => onFileUpload(e, 'image')}
           className="hidden"
         />
         <Button
