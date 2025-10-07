@@ -135,7 +135,6 @@ export default function AIChatMessages({
                 </div>
                 <div>
                   <p className="font-bold text-white text-base">Что я умею:</p>
-                  <p className="text-xs text-gray-300">Powered by Gemini 2.0 Flash</p>
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-2">

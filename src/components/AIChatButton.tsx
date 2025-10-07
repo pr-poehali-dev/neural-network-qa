@@ -325,7 +325,7 @@ export default function AIChatButton({
           onExport={exportChat}
           onClear={clearHistory}
           onClose={embedded ? undefined : () => setShowChat(false)}
-          onToggleFullscreen={embedded ? undefined : () => setIsFullscreen(!isFullscreen)}
+          onToggleFullscreen={() => setIsFullscreen(!isFullscreen)}
           isFullscreen={isFullscreen}
         />
 

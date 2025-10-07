@@ -25,24 +25,24 @@ export default function AIChatHeader({ model, onExport, onClear, onClose, onTogg
           </div>
         </div>
       </div>
-      <div className="flex gap-1">
+      <div className="flex gap-2">
         <Button 
           variant="ghost" 
           size="sm" 
           onClick={onExport}
           title="Экспорт чата"
-          className="hover:bg-white/20 text-white"
+          className="hover:bg-white/20 text-white h-9 w-9 p-0"
         >
-          <Icon name="Download" size={16} />
+          <Icon name="Download" size={18} />
         </Button>
         <Button 
           variant="ghost" 
           size="sm" 
           onClick={onClear}
           title="Очистить чат"
-          className="hover:bg-white/20 text-white"
+          className="hover:bg-white/20 text-white h-9 w-9 p-0"
         >
-          <Icon name="Trash2" size={16} />
+          <Icon name="Trash2" size={18} />
         </Button>
         {onToggleFullscreen && (
           <Button 
@@ -50,9 +50,9 @@ export default function AIChatHeader({ model, onExport, onClear, onClose, onTogg
             size="sm" 
             onClick={onToggleFullscreen}
             title={isFullscreen ? 'Выйти из полноэкранного режима' : 'Полноэкранный режим'}
-            className="hover:bg-white/20 text-white"
+            className="hover:bg-white/30 text-white h-9 w-9 p-0 border-2 border-white/50 bg-white/10"
           >
-            <Icon name={isFullscreen ? 'Minimize2' : 'Maximize2'} size={16} />
+            <Icon name={isFullscreen ? 'Minimize2' : 'Maximize2'} size={18} />
           </Button>
         )}
         {onClose && (
@@ -60,9 +60,9 @@ export default function AIChatHeader({ model, onExport, onClear, onClose, onTogg
             variant="ghost" 
             size="sm" 
             onClick={onClose}
-            className="hover:bg-white/20 text-white"
+            className="hover:bg-white/20 text-white h-9 w-9 p-0"
           >
-            <Icon name="X" size={18} />
+            <Icon name="X" size={20} />
           </Button>
         )}
       </div>
